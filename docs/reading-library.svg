@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="380" viewBox="0 0 1280 380" role="img" aria-label="AI for Materials 文献精读">
+<rect width="1280" height="380" rx="12" fill="#f5f6ef"/>
+<path d="M52 325H1228" stroke="#d8dfd1"/>
+<g font-family="system-ui,Microsoft YaHei,sans-serif">
+<text x="58" y="64" font-size="13" letter-spacing="3" fill="#456c53">MATERIALS · SIMULATION · AGENTS</text>
+<text x="56" y="134" font-size="44" font-weight="600" fill="#20352a">读懂方法，发现下一步研究。</text>
+<text x="58" y="184" font-size="20" fill="#6e786e">材料设计、原子模拟与科研智能体的中文文献精读</text>
+<rect x="58" y="224" width="198" height="46" rx="4" fill="#456c53"/>
+<text x="83" y="254" font-size="17" fill="#fff">打开在线文献库 ↗</text>
+<text x="59" y="357" font-size="13" fill="#6e786e">300+ 篇精读</text><text x="214" y="357" font-size="13" fill="#6e786e">8 个研究话题</text><text x="386" y="357" font-size="13" fill="#6e786e">按话题浏览 · 关键词检索</text>
+</g>
+<g transform="translate(1015 170)" stroke="#bfcdbb" fill="none" stroke-width="1.5"><path d="M-100-65L0-115 100-65 100 65 0 115-100 65Z M-100-65L0 0 100-65 M0-115V115 M-100 65L0 0 100 65"/><ellipse rx="150" ry="44" transform="rotate(-28)"/></g>
+<g fill="#456c53"><circle cx="915" cy="105" r="9"/><circle cx="1015" cy="55" r="8"/><circle cx="1115" cy="105" r="11"/><circle cx="1015" cy="170" r="17"/><circle cx="1115" cy="235" r="9"/><circle cx="1015" cy="285" r="11"/><circle cx="915" cy="235" r="12"/></g>
+</svg>
