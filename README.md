@@ -18,4 +18,4 @@ python scripts/export.py --source /path/to/reading-cards --queue /path/to/digest
 python -m http.server 8765 --directory dist
 ```
 
-图片与摘要译文保留论文来源。论文原图、原始摘要及其译文不适用网站代码的开放许可，不声称取得统一转载授权。数学公式使用固定版本 MathJax，中文衬线字体有系统字体后备。
+数学公式使用固定版本 MathJax，中文衬线字体有系统字体后备。
