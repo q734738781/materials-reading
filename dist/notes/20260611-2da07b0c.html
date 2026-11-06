@@ -1,0 +1,55 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>MLIPilot: LLM-Driven Auto-Research for Machine-Learned Interatomic Potentials · AI for Materials 文献精读</title><meta name="description" content="AI for Materials、原子模拟与科研智能体的中文文献解读"><link rel="stylesheet" href="../style.css"><link rel="icon" href="../icon.svg" type="image/svg+xml"></head><body><header><a class="brand" href="../index.html"><span class="mark">M</span><span>AI for Materials<small>文献精读 / RESEARCH NOTES</small></span></a><a class="header-link" href="../index.html#library">浏览文献 <span>↗</span></a></header><main class="article-layout"><aside><a href="../index.html#library">← 返回文献库</a><nav aria-label="文章目录"><a href="#section-1">Bibliographic status</a><a href="#section-2">One-line takeaway</a><a href="#section-3">What the paper asks</a><a href="#section-4">Methods</a><a href="#section-5">Main findings</a><a href="#section-6">Limitations and caveats</a><a href="#section-7">Possible actions</a></nav></aside><article><div class="eyebrow">RESEARCH NOTE / T8</div><h1>MLIPilot: LLM-Driven Auto-Research for Machine-Learned Interatomic Potentials</h1><div class="article-meta"><span>智能体技术与科研系统</span><span>收录 2026-06-11</span><span>6 分钟阅读</span></div><a class="original" href="https://arxiv.org/abs/2605.30889" target="_blank" rel="noopener noreferrer">论文原文 ↗</a><div class="prose"><h2 id="section-1">Bibliographic status</h2>
+<ul>
+<li><strong>Source PDF</strong>:</li>
+<li><strong>Parsed Markdown</strong>: <code>文献PDF与解析/260611/mineru_md_shortnames_no_formula_table/p06.pdf/auto/p06.pdf.md</code></li>
+<li><strong>Topic</strong>: LLM-driven autoresearch for MLIP training optimization; MACE backend; physical scorecards.</li>
+<li><strong>Status</strong>: arXiv preprint.</li>
+</ul>
+<h2 id="section-2">One-line takeaway</h2>
+<p>MLIPilot 将 LLM agent 放进“固定评估 harness + 可编辑训练代码 + HPC 提交 + 物理硬门槛 scorecard”的闭环中，让 agent 自动优化 MACE 训练；真正有价值的是硬 gate 与 integrity enforcement，而不是单纯让 LLM 调参。</p>
+<h2 id="section-3">What the paper asks</h2>
+<p>MLIP 开发不是单目标优化：能量/力误差、NVE 稳定性、结构 relax、throughput 都必须同时满足。普通 AutoML 或 Bayesian optimization 通常在预定义参数空间上优化一个 scalar metric，容易忽略动力学失稳等物理失败。文章的问题是：LLM agent 是否能像研究者一样提出训练假设、修改代码、提交 HPC、读取 scorecard 并保留有效改进？</p>
+<p>作者特别关注：</p>
+<ol>
+<li>物理硬约束是否能避免“低 MAE 但 MD 爆炸”的假改进；</li>
+<li>LLM 是否能提出超越超参数调节的训练策略，如 normalization、loss function、model capacity；</li>
+<li>不同 LLM agent 的科学推理质量、token 消耗和最终性能如何比较；</li>
+<li>这种 auto-research pattern 是否适合 MLIP production workflow。</li>
+</ol>
+<h2 id="section-4">Methods</h2>
+<p>MLIPilot 的闭环组件：</p>
+<ul>
+<li><strong>Data Inspector</strong>：用 ASE 解析 extXYZ，识别元素、周期性、property keys，并在缺少划分时生成 70/20/10 train/valid/test split。</li>
+<li><strong>Template Generator</strong>：生成 <code>train.py</code>，在 <code># FIXED HARNESS</code> sentinel 以上留出可编辑区域，以下固定评价 harness；同时从自然语言目标中解析 scorecard targets。</li>
+<li><strong>Agent Loop</strong>：LLM tool-calling agent 可读写/编辑文件、提交并等待训练、最终 finish。上下文有截断和 plateau early stopping。</li>
+<li><strong>HPC Executor</strong>：管理 Slurm job lifecycle，支持 exponential-backoff polling 和本地 GPU fallback。</li>
+<li><strong>Scorecard Evaluator</strong>：计算 composite score，并强制两个接受条件：score 必须优于当前 best；所有 hard-gated metrics 必须低于 4× target，否则即使 composite 变好也拒绝。</li>
+<li><strong>Integrity Enforcement</strong>：初始化时对 evaluation harness 和 scorecard 做 SHA-256 hash，每次提交前验证，防止 agent 修改测试集、评分逻辑或评估代码。</li>
+<li><strong>MACE backend</strong>：固定 harness 评估 energy/force/stress MAE、10 次扰动的 throughput、FIRE relaxation、NVE MD stability（300 K、0.5 fs、5000 steps，总能量线性漂移）。</li>
+</ul>
+<p>实验数据包括 QM7-derived B3LYP/6-31G(d) molecule dataset 和 periodic Cu EMT supercells；比较 GPT-5.5、GPT-4.1、Mistral-24B、Qwen3-32B，每个 budget 10 iterations。</p>
+<h2 id="section-5">Main findings</h2>
+<ul>
+<li><strong>QM7</strong>：默认 baseline energy MAE 51.98 meV/atom，超过 40 meV/atom hard gate，因此不可接受。GPT-5.5 先通过 energy weight=10 把能量误差降到 21.89 meV/atom，但后续 500 epochs 虽通过 energy gate 却导致 NVE drift 6.59 meV/atom/ps，超过 4 meV/atom/ps gate，被正确拒绝。</li>
+<li><strong>GPT-5.5 发现非平凡策略</strong>：它没有继续盲目延长训练，而是切换到 ScaleShiftMACE，认为 output normalization 更适合 QM7 中不同分子大小和能量分布；随后用 Huber loss 替代 squared error，提高对 outliers 的鲁棒性。最终 ScaleShiftMACE + Huber + energy weight 30 + 300 epochs 同时满足 energy &lt;10 meV/atom、force &lt;10 meV/Å 和低 NVE drift 0.051 meV/atom/ps。</li>
+<li><strong>Cu EMT</strong>：baseline energy MAE 12.7 meV/atom，超过 4 meV hard gate。GPT-5.5 首先把 epoch 从 50 增至 500，能量降到 1.22 meV/atom；随后 1000、2000 epochs 继续改善；第 7 轮加入第三 message-passing interaction layer，达到 0.57 meV/atom，但 throughput 从 65 降到 46 steps/s。</li>
+<li><strong>跨 agent 差异</strong>：GPT-5.5 在两个任务上表现最强，能够做 architecture/loss 级别改变；GPT-4.1 更偏 capacity 和 weighting；Mistral-24B 虽较小但在 QM7 上通过持续探索训练时长超过 GPT-4.1；Qwen3-32B token 消耗大但有效改进少。</li>
+<li><strong>token 数不等于研究质量</strong>：Qwen3-32B 在 QM7 消耗约 486k tokens 只得到 1.4× improvement，而 GPT-5.5 用约 244k 得到 3.2×；说明关键是因果推理和实验策略，而非调用次数。</li>
+<li><strong>硬 gate 的意义</strong>：所有 baseline 和多个看似改进的候选都因物理不可行被拒绝，尤其是 catastrophic NVE drift。hard gates 将优化问题先变成 feasibility problem，再进入 score minimization。</li>
+</ul>
+<h2 id="section-6">Limitations and caveats</h2>
+<ul>
+<li>当前只展示 MACE backend 和两个相对小的 benchmark；真实 MLIP 开发涉及更大元素空间、表面反应、长时程 MD 和多温区稳定性。</li>
+<li>repeatedly evaluated held-out split 更像 validation/selection set，不是严格 blind test；作者也承认需要 sealed test。</li>
+<li>4× target gate 是启发式，具体阈值应随应用调整。</li>
+<li>agent 可任意改训练代码虽灵活，但也增加不可控性；SHA-256 只能保护 harness，不能保证修改的科学合理性。</li>
+<li>使用 GPT-5.5 等模型的结果需要结合实际模型可用性核查。</li>
+</ul>
+<h2 id="section-7">Possible actions</h2>
+<ul>
+<li>对 CatMaster：非常适合作为“LLM agent 在 MLIP training 中必须受 physical scorecard 约束”的参考。</li>
+<li>对 NFPP MLFF：可借鉴 energy/force/stress + NVE drift + throughput + relaxation 的多指标 gate，避免只看测试集 RMSE。</li>
+<li>对本地 agent：submit 工具应强制填写 hypothesis、target metric、risk，形成可审计实验记录。</li>
+<li>对 CSR/综述：把 MLIPilot 与 AUTOMAT 区分：前者优化 MLIP 训练代码与物理约束，后者优化 composition descriptors。</li>
+</ul>
+</div><div class="credit">本文为辅助理解研究方法的中文解读。论文原图、图注及摘要内容归原作者和相应权利人；来源见文首论文链接。</div></article></main><script>window.MathJax={tex:{inlineMath:[['$','$'],['\\(','\\)']],displayMath:[['$$','$$'],['\\[','\\]']]},options:{skipHtmlTags:['script','noscript','style','textarea','pre','code']}};</script><script defer src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-mml-chtml.js"></script><footer><span>AI for Materials 文献精读</span><span>中文研究笔记 · 图与摘要注明论文来源 · 不提供论文 PDF</span></footer></body></html>

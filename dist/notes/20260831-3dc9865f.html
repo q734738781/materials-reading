@@ -1,0 +1,116 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>The role of the N2/H2 reactant gas mixture on nitrogen activation in the Haber–Bosch process · AI for Materials 文献精读</title><meta name="description" content="AI for Materials、原子模拟与科研智能体的中文文献解读"><link rel="stylesheet" href="../style.css"><link rel="icon" href="../icon.svg" type="image/svg+xml"></head><body><header><a class="brand" href="../index.html"><span class="mark">M</span><span>AI for Materials<small>文献精读 / RESEARCH NOTES</small></span></a><a class="header-link" href="../index.html#library">浏览文献 <span>↗</span></a></header><main class="article-layout"><aside><a href="../index.html#library">← 返回文献库</a><nav aria-label="文章目录"><a href="#section-1">导读</a><a href="#section-2">研究对象：一个不断交换物质的热气体—铁界面</a><a href="#section-3">为什么这个问题难</a><a href="#section-4">三个计算部件怎样拼成可检验的工况模型</a><a href="#section-8">决定性证据</a><a href="#section-14">由这些证据得到的新认识</a><a href="#section-15">证据边界</a></nav></aside><article><div class="eyebrow">RESEARCH NOTE / T7</div><h1>The role of the N2/H2 reactant gas mixture on nitrogen activation in the Haber–Bosch process</h1><div class="article-meta"><span>采样与高性能原子模拟</span><span>收录 2026-08-31</span><span>12 分钟阅读</span></div><a class="original" href="https://doi.org/10.1038/s41467-026-76887-5" target="_blank" rel="noopener noreferrer">论文原文 ↗</a><div class="prose"><ul>
+<li><strong>文献信息</strong>：Giulia M. Bovolenta、Michele Parrinello；2026；<em>Nature Communications</em>，Article in Press；DOI：<a href="https://doi.org/10.1038/s41467-026-76887-5" target="_blank" rel="noopener noreferrer">10.1038/s41467-026-76887-5</a></li>
+<li><strong>核心证据位置</strong>：研究问题与总体设计见 PDF 第 1–2 页；氢覆盖及表面结构见第 3–4 页、图 2–5；H₂ 解离、H 原子扩散与复合见第 4–6 页、图 6；N₂/H₂ 混合气及 N₂ 活化见第 6–7 页、图 7–8；计算方法见第 8–9 页。</li>
+</ul>
+<h2 id="section-1">导读</h2>
+<p>这项工作追问的不是洁净铁表面能否活化氮气，而是更接近合成氨反应器的问题：当 Fe(110) 前方始终维持着 <strong>150–340 bar、723 或 823 K 的致密热气体</strong>时，H₂ 会把表面覆盖到什么程度，这层快速交换的吸附氢又会怎样影响 N₂ 吸附和 N—N 键断裂？</p>
+<p>模拟给出的图景不是“氢把表面完全毒死”，也不是“高温下表面只有少量氢”。Fe(110) 在这些条件下形成覆盖度约 <strong>0.77–0.87</strong> 的富氢动态界面；H₂ 持续解离，吸附氢持续扩散、复合和返回气相。N₂ 活化受到的主要影响发生在<strong>吸附和稳定化阶段</strong>，而从吸附态出发的解离自由能垒只由洁净表面的 <strong>110 kJ mol⁻¹</strong> 增至富氢表面的 <strong>120 kJ mol⁻¹</strong>。因此，本文支持的是“高氢覆盖调节并抑制部分基元步骤，但没有关闭 Fe(110) 上的 N₂ 解离通道”。</p>
+<h2 id="section-2">研究对象：一个不断交换物质的热气体—铁界面</h2>
+<p>模型表面为体心立方铁的 Fe(110) 晶面。作者选择该晶面，是因为它是最稳定的铁晶面之一，也与合成氨催化相关。研究分为两层：</p>
+<ol>
+<li>先让纯 H₂ 在 <strong>150、245、340 bar</strong> 和 <strong>723、823 K</strong> 下与 Fe(110) 接触，观察 H₂ 解离、吸附氢 $H_{\mathrm{ad}}$ 的扩散、复合脱附和短暂进入次表层等过程。</li>
+<li>再在 <strong>723 K</strong> 下引入化学计量比为 <strong>N₂:H₂ = 1:3</strong> 的混合气，比较氢覆盖，并在 <strong>245 bar、723 K</strong> 的富氢表面上计算 N₂ 吸附和解离的自由能面。（PDF 第 3、6 页，图 2、7、8）</li>
+</ol>
+<p>这里的“覆盖”并非一张静态结构图，而是气相 H₂、表面 $H_{\mathrm{ad}}$ 和重新生成的 H₂ 之间达到动态平衡后的统计量。论文将氢覆盖度定义为：</p>
+<p>$$
+\theta=\frac{N_{\mathrm H}}{N_{\mathrm s}}
+$$</p>
+<p>这是<strong>论文原式（式 1，PDF 第 3 页）</strong>。其中 $N_{\mathrm H}$ 是吸附在表面的 H 原子数，$N_{\mathrm s}$ 是最外层 Fe 原子数，因此 $\theta$ 是无量纲比值。它不表示每一种吸附位都被占据，也不能直接等同于“可供 N₂ 使用的位点比例”；位点的空间排列和寿命同样重要。</p>
+<h2 id="section-3">为什么这个问题难</h2>
+<p>困难首先来自真实工况与常规表面计算之间的错位。合成氨操作区间超过 700 K、压力超过 150 bar，直接原位测量困难；传统理论研究又多从洁净表面的静态势能面出发，难以表示热涨落、吸附物间的横向相互作用以及气体持续补给。（PDF 第 1–2 页）</p>
+<p>其次，高压反应模拟存在三个相互耦合的尺度问题：</p>
+<ul>
+<li><strong>气体会被消耗</strong>：若只在有限模拟盒中放入固定数量的 H₂，分子解离后气相密度会不断下降，所模拟的压力不再是目标压力。</li>
+<li><strong>反应需要长时间统计</strong>：氢覆盖达到平衡通常需要 <strong>2–3 ns</strong>，而同时保持接近第一性原理精度的直接从头算分子动力学难以覆盖这一时间尺度。（PDF 第 3 页）</li>
+<li><strong>N₂ 解离是稀有事件</strong>：常规分子动力学很难在可承受时间内反复跨越 N—N 断裂自由能垒，因而无法可靠重建反应自由能面。（PDF 第 2、9 页）</li>
+</ul>
+<p>此外，覆盖度不是唯一控制量。H₂ 解离要求附近能接纳两个产物 H 原子的空位组合，N₂ 从弱吸附态进入活化构型也依赖 N—Fe 配位和局部几何。即便平均覆盖度相同，空位是否相邻、能维持多久以及吸附氢移动多快，都会改变反应概率。</p>
+<h2 id="section-4">三个计算部件怎样拼成可检验的工况模型</h2>
+<h3 id="section-5">1. GCMC-MD：维持压力，同时不在界面上“凭空加分子”</h3>
+<p>作者把巨正则蒙特卡洛与分子动力学结合为 GCMC-MD。模拟盒上方设置压力控制区，在该区域尝试插入或删除 H₂；控制区与 Fe 表面之间保留缓冲层，使新插入的分子先热化，再自然运动到界面。由此，蒙特卡洛操作不会直接改动正在反应的表面区域，而分子动力学负责传播碰撞、解离、扩散和复合。（PDF 第 2、8–9 页，图 1）</p>
+<p>在理想气体假设下，压力通过化学势输入：</p>
+<p>$$
+\mu=kT\ln\!\left(\frac{P\Lambda^3}{kT}\right),
+\qquad
+\Lambda=\sqrt{\frac{h^2}{2\pi m_{\mathrm{H_2}}kT}}
+$$</p>
+<p>这是<strong>论文原式（式 5–6，PDF 第 8 页）</strong>。其中 $\mu$ 为 H₂ 化学势，$P$ 为目标压力，$T$ 为温度，$k$ 为玻尔兹曼常数，$h$ 为普朗克常数，$m_{\mathrm{H_2}}$ 为 H₂ 分子质量，$\Lambda$ 为热德布罗意波长。插入和删除是否接受，则由体系体积、控制区内分子数、化学势及能量变化共同进入 Metropolis 判据（式 7，PDF 第 9 页）。</p>
+<p>Fe(110) 模型含 <strong>400 个 Fe 原子</strong>，构成 $10\times8\times5$ 超胞，气相方向有 <strong>25 Å</strong> 空间，最下面两层 Fe 固定。压力调整在前 2 ns 每 25 ps 进行一次，此后每 100 ps 进行一次；总模拟时长为 <strong>6–10 ns</strong>。（PDF 第 9 页）</p>
+<h3 id="section-6">2. 机器学习势：把 DFT 反应精度延伸到纳秒动力学</h3>
+<p>原子间作用由 MACE 机器学习势描述。训练标签来自 PBE 密度泛函计算的能量和力，训练结构包括不同氢覆盖度的 Fe(110)、气相分子以及 H₂ 和 N₂ 在界面上的反应构型。作者通过多个模型之间的预测分歧识别欠采样结构，再用主动学习补充 DFT 标签；H₂ 复合等反应构型还由增强采样生成。（PDF 第 2、8 页）</p>
+<p>Fe—H 数据集最终约含 <strong>3000 个构型</strong>；加入 Fe—N 和 N₂ 活化构型后，完整数据集约含 <strong>5000 个构型</strong>。Fe—H 势在测试集上的力平均绝对误差为 <strong>7.6 meV Å⁻¹</strong>，能量平均绝对误差为 <strong>0.3 meV atom⁻¹</strong>；相应均方根误差分别为 <strong>13.2 meV Å⁻¹</strong> 和 <strong>0.3 meV atom⁻¹</strong>。（PDF 第 8 页）</p>
+<p>机器学习势在这里不是直接预测“反应是否发生”的分类器，而是给出每一步原子构型的能量和力，使分子动力学能够自然产生键断裂、键形成和表面扩散。它的可信度仍继承自所用 PBE 标签以及训练构型覆盖范围。</p>
+<h3 id="section-7">3. OPES：沿 N—N 断裂和 N—Fe 成键方向加速稀有事件</h3>
+<p>N₂ 活化采用 on-the-fly probability enhanced sampling（OPES）。作者选择两个集体变量：</p>
+<ul>
+<li>$d(\mathrm{N-N})$：N—N 键长，直接表征分子键从完整到断裂的变化；</li>
+<li>$C_{\mathrm{N-Fe}}$：N 与周围 Fe 的平滑配位数，表征 N₂ 接近、吸附及与表面成键的程度。</li>
+</ul>
+<p>OPES 在这些慢变量上加入偏置，使体系更频繁地跨越高自由能区域；随后通过重加权恢复无偏概率分布。自由能与概率密度的关系为：</p>
+<p>$$
+F(\mathbf{s})=-\frac{1}{\beta}\ln P(\mathbf{s})+C
+$$</p>
+<p>这是<strong>论文原式（式 9，PDF 第 9 页）</strong>。其中 $\mathbf{s}=[d(\mathrm{N-N}),C_{\mathrm{N-Fe}}]$，$\beta=(kT)^{-1}$，$P(\mathbf{s})$ 是重加权后的无偏概率密度，$C$ 是任意能量零点。图 8 的二维自由能面及最小自由能路径正是由这两个变量重建。</p>
+<p>作者分别采样 N₂ 从气相进入吸附态和从吸附态解离的过程。OPES 的“barrier parameter”设为 <strong>120 kJ mol⁻¹</strong>，但这是控制偏置范围的算法参数，不能与最终得到的 N₂ 解离自由能垒混为一谈。（PDF 第 9 页）</p>
+<h2 id="section-8">决定性证据</h2>
+<h3 id="section-9">证据一：150–340 bar 下形成的是高覆盖、未饱和的动态氢层</h3>
+<p>在纯 H₂ 的六组条件——150、245、340 bar 分别配合 723 和 823 K——中，H₂ 撞击 Fe(110) 后解离，$H_{\mathrm{ad}}$ 在表面移动，并通过复合和脱附返回气相。约 <strong>2–3 ns</strong> 后，原子氢生成与 H₂ 复合脱附达到平衡。（PDF 第 3 页）</p>
+<p><strong>观察到的结果</strong>：所有条件下的平衡覆盖度处于接近饱和但仍未饱和的区间；论文在讨论中汇总为 <strong>0.77–0.87</strong>。同一压力下，723 K 的覆盖度始终高于 823 K。（PDF 第 3、6 页，图 2）</p>
+<p><strong>作者的解释</strong>：较低温度下复合速率更低，因此 723 K 表面保留更多原子氢；升至 823 K 后，表面过程加快，加之高覆盖下 $H_{\mathrm{ad}}$ 间排斥削弱结合，H₂ 脱附更容易，覆盖度下降。（PDF 第 3、6 页）</p>
+<p>这不是一层冻结的氢膜。最稳定的三重空位是主要占据位置，长桥位和短桥位更多充当迁移中的过渡位置；空位和吸附氢都在皮秒尺度上重排。（PDF 第 3–4 页，图 4）</p>
+<h3 id="section-10">证据二：H₂ 解离受相邻空位控制，氢扩散远快于复合</h3>
+<p><strong>观察到的结果</strong>：H₂ 解离时至少有一个 H 原子先处于表面 Fe 的 atop 构型附近；要使两个产物 H 原子稳定下来，反应中心周围必须同时存在两个相邻、未占据的 hollow 位。可用相邻空位对的平均比例在 723 和 823 K 下分别约为 <strong>0.25 和 0.32</strong>，但其寿命很短，很少超过 <strong>1 ps</strong>。823 K 下空位对更多，与该温度下较低的平均覆盖度一致。（PDF 第 4–5 页，图 6a、e、f）</p>
+<p>氢吸附的 sticking coefficient 与 $(1-\theta)^2$ 呈线性关系，说明在本文覆盖区间内，H₂ 解离本身没有需要额外克服的显著势垒，吸附概率主要由能否同时找到两个空位控制。（PDF 第 3–4 页，图 5）</p>
+<p>$H_{\mathrm{ad}}$ 主要沿 hollow—短桥—hollow 的之字形路径扩散，扩散系数约为 <strong>$10^{-5}\ \mathrm{cm^2\,s^{-1}}$</strong>，且覆盖越高，迁移越慢。由 723 和 823 K 两点估算的表面扩散表观活化能为 <strong>0.13 eV</strong>。（PDF 第 4–5 页）</p>
+<p><strong>观察到的结果</strong>：绝大多数 H₂ 通过 Langmuir–Hinshelwood 机制形成，即两个已经热化的 $H_{\mathrm{ad}}$ 扩散相遇后复合；不足 <strong>20%</strong> 的事件属于 hot-atom 机制，即刚由 H₂ 解离产生、尚未热化的 H 很快撞上另一个 $H_{\mathrm{ad}}$ 并形成 H₂。（PDF 第 4–5 页，图 6c、d）</p>
+<p>氢跳跃频率比复合频率高近 <strong>四个数量级</strong>，而复合表观活化能为 <strong>0.95–1.00 eV</strong>。因此限制 H₂ 生成的不是“两个 H 找不到彼此”，而是它们相遇后很少恰好进入可成键的反应构型。作者观察到的典型路径是：两个 H 先在桥位相遇，再共同迁移到 atop 构型形成 H—H 键。（PDF 第 5 页，图 6b、c）</p>
+<h3 id="section-11">证据三：高覆盖使少量氢短暂进入次表层，但没有证明稳定储氢层</h3>
+<p>在覆盖度低于 <strong>0.7</strong> 的轨迹中，作者没有观察到氢进入次表层；高覆盖和热涨落共同出现时，才有 $H_{\mathrm{ad}}$ 短暂下移。事件平均约持续 <strong>1 ps</strong>，最长约 <strong>5 ps</strong>，随后氢返回表面。估算的次表层迁移表观能垒为 <strong>0.29–0.40 eV</strong>，并随压力升高而逐渐降低，作者据此把这一趋势归因于高覆盖下的横向相互作用。（PDF 第 5–6 页）</p>
+<p>这是对短时可逆穿入事件的观察，不等于已经形成稳定的体相氢库。论文关于“次表层氢可能补充表面并参与其他氢化机制”的表述仍是由这些轨迹引出的可能性，而非本文直接模拟出的合成氨反应路径。（PDF 第 7 页）</p>
+<h3 id="section-12">证据四：加入 1:3 的 N₂/H₂ 后，表面仍然富氢，但覆盖下降约 4%</h3>
+<p>作者在 723 K、150–340 bar 下比较纯 H₂ 与 N₂:H₂ = 1:3 混合气。由于氢在混合气中的分数降低，平衡氢覆盖相对纯 H₂ 条件系统性下降约 <strong>4%</strong>；不过表面仍处于富氢状态。（PDF 第 6 页，图 7）</p>
+<p>后续 N₂ 解离计算只选取其中的 <strong>245 bar、723 K</strong> 状态。因此，图 8 对 N₂ 活化的结论不是在全部六组纯氢条件或全部三组混合气压力上分别验证的。</p>
+<h3 id="section-13">证据五：氢主要削弱 N₂ 吸附稳定化，对断键能垒的影响较小</h3>
+<p>图 8 给出的活化路径包含三个阶段：</p>
+<ol>
+<li>N₂ 先以近乎直立的方式形成较弱的 $\gamma$ 吸附态；</li>
+<li>随后重排为沿 $[110]$ 方向跨桥吸附的 $\alpha$ 态，N—Fe 配位增强，Fe 向 N₂ 的电荷转移使 N—N 键削弱；</li>
+<li>分子再转向 $\langle111\rangle$ 方向并断裂，两个 $N_{\mathrm{ad}}$ 最终占据相邻 hollow 位。（PDF 第 6–7 页，图 8）</li>
+</ol>
+<p><strong>观察到的结果</strong>：与此前采用相同路线研究的洁净 Fe(110) 相比，富氢表面上的 $\alpha$ 态被明显去稳定化，不再显著优于 $\gamma$ 态，而是与其自由能相近。正文没有给出“吸附抑制了多少 kJ mol⁻¹”的洁净表面同图数值，因此不能从本文单独报出一个精确的吸附抑制量。（PDF 第 6 页，图 8a、b）</p>
+<p><strong>观察到的结果</strong>：若从 $\alpha$ 吸附态计算，N₂ 解离自由能垒由洁净 Fe(110) 的 <strong>110 kJ mol⁻¹</strong> 增至富氢 Fe(110) 的 <strong>120 kJ mol⁻¹</strong>，即增加 <strong>10 kJ mol⁻¹</strong>。（PDF 第 6 页，图 8c、d）</p>
+<p><strong>作者的解释</strong>：吸附阶段受到的影响更强，是因为高氢覆盖减少了可用位点，也削弱了表面对 N₂ 吸附态的稳定化；断键势垒变化较小，则因为控制该势垒的 N—Fe 相互作用及 Fe(110) 局部结合几何仍大体保留。氢覆盖没有破坏铁的 bcc 结构，反而降低了表面 Fe 原子的位移涨落和粗糙度。（PDF 第 3、6 页，图 3）</p>
+<p>论文所说的“twofold inhibitory effect”指的是<strong>吸附与解离两个阶段均受到抑制、但程度不同</strong>，不是“反应被抑制两倍”。其中有明确数字的只有解离能垒从 110 增至 120 kJ mol⁻¹；吸附抑制主要由 $\alpha$ 态相对去稳定化这一自由能面变化来表征。</p>
+<h2 id="section-14">由这些证据得到的新认识</h2>
+<p>首先，本文把 Fe(110) 在高温高压氢气中的状态从“某个预设覆盖度的静态表面”改写为一个有明确交换机制的动态稳态：H₂ 解离、$H_{\mathrm{ad}}$ 扩散、少量次表层穿入、表面复合和气相补给同时进行。平均覆盖度很高，但仍有短寿命空位不断出现，因此“高覆盖”并不等于“反应位点永久消失”。</p>
+<p>其次，氢对 N₂ 活化的作用具有步骤选择性。最明显的影响是使 N₂ 难以获得稳定的 $\alpha$ 吸附构型；一旦 N₂ 已经进入该构型，N—N 断裂所需的额外自由能只小幅增加。由此得到的机制图景是：在本文模型中，氢覆盖更像是在控制 N₂ 接近和驻留于合适位点的机会，而不是从根本上改变 Fe(110) 断裂 N—N 键的局部几何通道。</p>
+<p>第三，高覆盖同时降低 H 原子迁移空间并通过横向相互作用改变复合、脱附和次表层穿入。表面扩散比复合快近四个数量级这一结果说明，表面上的“运动快慢”不能直接替代反应速率判断；真正的瓶颈可能是少数反应性构型的形成概率。</p>
+<p>这些认识均来自机器学习势驱动的原子模拟和 OPES 自由能重建。它们支持富氢而仍具 N₂ 活化能力的 Fe(110) 界面，但不是对工业合成氨总速率或速率控制步骤的直接测量。</p>
+<h2 id="section-15">证据边界</h2>
+<ol>
+<li>
+<p><strong>工业工况只在温度和压力层面得到部分逼近。</strong> 纯 H₂ 覆盖考察了 150–340 bar 和 723/823 K；N₂:H₂ 混合气覆盖只在 723 K 考察，N₂ 吸附与解离自由能面则仅对应 <strong>245 bar、723 K</strong>。不能据此断言 N₂ 抑制程度在全部压力和 823 K 下相同。</p>
+</li>
+<li>
+<p><strong>催化剂模型限于平坦、无促进剂的 Fe(110)。</strong> 实际工业铁催化剂可能包含其他晶面、台阶、缺陷、合金元素和促进剂。本文没有测试这些结构是否维持相同氢覆盖、吸附态排序或 N₂ 解离能垒。作者也明确把共吸附物和促进剂留给后续研究。（PDF 第 7 页）</p>
+</li>
+<li>
+<p><strong>研究止于 N₂ 解离，没有模拟完整合成氨循环。</strong> 论文没有继续计算表面 N 的逐步氢化、NHₓ 中间体、NH₃ 生成与脱附，也没有建立全反应微观动力学。因此，“表面仍具催化活性”在本文中具体指 N₂ 仍能吸附并跨越解离通道，不等于已经得到工业氨合成周转频率，更没有确定全流程的速率控制步骤。</p>
+</li>
+<li>
+<p><strong>洁净表面对照并非全部来自本次同一组生产轨迹。</strong> 富氢 Fe(110) 的 N₂ 解离结果与作者团队此前对洁净 Fe(110) 的研究比较；正文给出解离能垒 110 与 120 kJ mol⁻¹ 的对照，但没有在本 PDF 中列出洁净表面的完整吸附自由能曲线。因此，吸附抑制只能按作者给出的态稳定性变化表述，不能自行补出精确差值。</p>
+</li>
+<li>
+<p><strong>压力映射采用理想气体关系。</strong> GCMC 化学势由理想气体公式得到，论文认为它适用于所研究压力下的气态氢，但没有在本文中系统比较高压 N₂/H₂ 混合物的非理想逸度修正。（PDF 第 7–9 页）</p>
+</li>
+<li>
+<p><strong>动力学量带有同位素近似。</strong> 为降低计算成本，所有生产模拟实际采用氘化体系。作者指出，这不改变结构和平衡热力学性质，但会使扩散系数略低、驻留时间略长。因此，覆盖度和自由能结论可按论文设定解释，扩散系数与皮秒寿命则不是未经同位素修正的普通氢实验预测。（PDF 第 9 页）</p>
+</li>
+<li>
+<p><strong>量子隧穿被忽略。</strong> 论文认为在本文高温区间隧穿作用较弱，但若纳入，它仍可能提高氢跨越间隙位势垒的效率。次表层扩散动力学因此保留这一模型误差。（PDF 第 7 页）</p>
+</li>
+<li>
+<p><strong>次表层氢的催化作用尚属提议。</strong> 本文直接观察到的是最长约 5 ps 的短暂进入和返回；“次表层氢可能补充表面或参与替代氢化机制”没有通过完整反应轨迹或自由能计算得到验证。（PDF 第 5–7 页）</p>
+</li>
+</ol>
+</div><div class="credit">本文为辅助理解研究方法的中文解读。论文原图、图注及摘要内容归原作者和相应权利人；来源见文首论文链接。</div></article></main><script>window.MathJax={tex:{inlineMath:[['$','$'],['\\(','\\)']],displayMath:[['$$','$$'],['\\[','\\]']]},options:{skipHtmlTags:['script','noscript','style','textarea','pre','code']}};</script><script defer src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-mml-chtml.js"></script><footer><span>AI for Materials 文献精读</span><span>中文研究笔记 · 图与摘要注明论文来源 · 不提供论文 PDF</span></footer></body></html>

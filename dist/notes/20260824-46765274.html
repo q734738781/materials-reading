@@ -1,0 +1,355 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>LLMs Can Predict Failure Risk, But Struggle to Predict Which Collaboration Protocol Pays Off: Cost-Aware Protocol Routing Across Reasoning Tasks · AI for Materials 文献精读</title><meta name="description" content="AI for Materials、原子模拟与科研智能体的中文文献解读"><link rel="stylesheet" href="../style.css"><link rel="icon" href="../icon.svg" type="image/svg+xml"></head><body><header><a class="brand" href="../index.html"><span class="mark">M</span><span>AI for Materials<small>文献精读 / RESEARCH NOTES</small></span></a><a class="header-link" href="../index.html#library">浏览文献 <span>↗</span></a></header><main class="article-layout"><aside><a href="../index.html#library">← 返回文献库</a><nav aria-label="文章目录"><a href="#section-1">研究对象与实际协议</a><a href="#section-2">为什么失败风险不等于协议的边际价值</a><a href="#section-3">固定顺序预言机与 `None` 动作</a><a href="#section-4">指标怎样同时表示正确率与成本</a><a href="#section-5">AUROC、AUPRC、ECE与目标流行率</a><a href="#section-6">置信门控与Kneedle选择</a><a href="#section-7">主实验结果：少漏题往往靠多花令牌</a><a href="#section-8">广度检查与完整验证范围</a><a href="#section-9">这些结果改变了什么认识</a><a href="#section-10">证据边界与尚未解决的问题</a></nav></aside><article><div class="eyebrow">RESEARCH NOTE / T8</div><h1>LLMs Can Predict Failure Risk, But Struggle to Predict Which Collaboration Protocol Pays Off: Cost-Aware Protocol Routing Across Reasoning Tasks</h1><div class="article-meta"><span>智能体技术与科研系统</span><span>收录 2026-08-24</span><span>14 分钟阅读</span></div><a class="original" href="https://arxiv.org/abs/2608.14927" target="_blank" rel="noopener noreferrer">论文原文 ↗</a><div class="prose"><ul>
+<li><strong>文献信息</strong>：Chih-Hsuan Yang、Jingyan Jiang、Cheng-Hau Yang、Vikram Vasudevan、Huihuo Zheng、Venkatram Vishwanath、Rajeev Thakur；2026；arXiv预印本；arXiv:2608.14927</li>
+<li><strong>导读</strong>：这篇论文研究的不是怎样换用更强的模型，而是在底层求解器不变时，怎样为每道题选择直接作答、自我纠正或多智能体协作。实验表明，同一模型能较好判断自己的直接答案是否可能出错，但这种失败风险不能直接回答另一个更难的问题：追加哪一种协作协议才值得它带来的令牌成本。</li>
+</ul>
+<h2 id="section-1">研究对象与实际协议</h2>
+<p>每道题都有四次彼此匹配的协议运行。主实验固定使用同一套 <code>gpt-oss-120b</code> 求解器，并把解码温度设为0，因此协议之间的差异来自计算和协作结构，而不是换成了能力更强的基础模型。每道题结束后，题内记忆和对话历史都会重置（PDF第2、19页，2节与C.3节）。</p>
+<p>四种协议的实际含义如下。</p>
+<ol>
+<li><code>Baseline</code> 是一次直接求解，不进行自我纠正，也不调用其他角色。</li>
+<li><code>Single</code> 仍是单智能体方案，但加入迭代自我纠正，并使用仅限当前题目的修正记忆。它不是多智能体讨论。</li>
+<li><code>PER</code> 将工作拆成 planner、executor 和 reviewer 三个角色，由规划者提出方案、执行者求解、审查者检查。</li>
+<li><code>Broadcast</code> 让多个智能体共享候选答案和中间状态，再通过同伴审阅或批准形成最终答案。它强调并行候选和相互检查，不只是把 <code>PER</code> 多运行一次（PDF第2、19页，2节与C.3节）。</li>
+</ol>
+<p>主测试集的423道留出题上，这四种固定协议的平均令牌数分别为18.2K、47.6K、401.9K和622.1K，解题率分别为56.3%、78.5%、84.9%和88.9%。在完整4,181题上，四类协议合计消耗约45.3亿个记录令牌，其中 <code>Baseline</code> 约0.77亿、<code>Single</code> 约2.01亿、<code>PER</code> 约16.7亿、<code>Broadcast</code> 约25.8亿；对应模型调用数为40,501、75,370、416,037和562,939次。平均墙钟时间约为每题44秒、74秒、4.7分钟和4.9分钟（PDF第19页，表S25与C.3节）。</p>
+<p>这些数字说明，协作协议确实能提高总体覆盖率，但成本差距很大。平均令牌数方面，<code>PER</code> 是 <code>Single</code> 的约8.44倍，即净增约7.44倍；<code>Broadcast</code> 是 <code>Baseline</code> 的约34.18倍，即净增约33.18倍。因此，路由器不能只追求正确率，还要判断额外计算是否值得。</p>
+<h2 id="section-2">为什么失败风险不等于协议的边际价值</h2>
+<p>论文区分了两个容易混在一起的问题。</p>
+<p>失败风险预测问的是：</p>
+<p>\[
+r_i=1-P(\text{Baseline正确}\mid x_i,a_i),
+\]</p>
+<p>其中 \(x_i\) 是题目及允许使用的元数据，\(a_i\) 是已经生成的 <code>Baseline</code> 最终答案。这个分数只表示直接答案可能错误。</p>
+<p>协议边际价值则要进一步比较：</p>
+<p>\[
+\Delta V_{i,p}
+=
+P(\text{协议 }p\text{ 成功}\mid x_i)
+-
+P(\text{较便宜方案成功}\mid x_i),
+\]</p>
+<p>同时考虑协议 \(p\) 增加的令牌成本。这个式子是理解论文任务的概念表达，不是作者拟合出的精确效用函数。真正的难点在于，即使已经知道 <code>Baseline</code> 大概率失败，也仍不知道 <code>Single</code> 是否足够、是否需要 <code>PER</code>、<code>Broadcast</code> 能否提供额外收益，或者所有方案都可能失败。</p>
+<p>作者用四种越来越具体的标签检验同一个事后失败风险分数：</p>
+<ul>
+<li><code>Baseline fails</code>：直接作答失败。</li>
+<li><code>Any collaboration helps</code>：<code>Baseline</code> 失败，但至少一种更强协议成功。</li>
+<li><code>PER first success</code>：<code>Baseline</code> 和 <code>Single</code> 都失败，<code>PER</code> 成功。</li>
+<li><code>Broadcast-only success</code>：前三种协议都失败，只有 <code>Broadcast</code> 成功。</li>
+</ul>
+<p>因此，识别直接答案错误只是升级决策的第一步。完整路由还要预测每一级协议相对于较便宜协议的增量成功机会，而这些事件更稀少，也更依赖题型和模型（PDF第4页，4节与表2）。</p>
+<h2 id="section-3">固定顺序预言机与 <code>None</code> 动作</h2>
+<p>作者定义了一个回顾性的 fixed-order oracle。对每道题，它按完整数据上的平均成本顺序</p>
+<p>\[
+\text{Baseline}&lt;\text{Single}&lt;\text{PER}&lt;\text{Broadcast}
+\]</p>
+<p>检查四次已经完成的运行，并把第一个成功协议作为标签。如果四种协议都失败，标签就是 <code>None</code>。完整4,181题上的标签比例为56.8% <code>Baseline</code>、23.0% <code>Single</code>、8.8% <code>PER</code>、4.2% <code>Broadcast</code> 和7.3% <code>None</code>（PDF第2页，2节）。423题主测试集的对应比例为56.3%、22.9%、9.0%、4.3%和7.6%（PDF第18至19页，表S24与S26）。</p>
+<p><code>None</code> 不是缺失值，而是允许路由器预测的弃答动作。它的协议执行成本为0，并排在 <code>Baseline</code> 以下。如果预言机为 <code>None</code>，路由器仍调用某个协议，就算过度升级，该协议消耗的全部令牌都会成为超额成本。如果预言机有可成功的协议，路由器却选择 <code>None</code>，则属于升级不足。</p>
+<p>这个预言机只能作为回顾性诊断上界。它提前看到了四个协议在同一道题上的实际成败，而且每个题目和协议只有一次确定性运行。它既不是可部署策略，也不是按每道题实际令牌数选择的最低成本预言机，更不是重复采样下的期望效用最优策略（PDF第2、5、18页，2节、局限性与C.2节）。</p>
+<h2 id="section-4">指标怎样同时表示正确率与成本</h2>
+<p>设第 \(i\) 道题由路由器选择动作 \(a_i\)，其实际正确性指示量为 \(s_i(a_i)\)，记录令牌数为 \(c_i(a_i)\)，预言机动作为 \(o_i\)。论文的三个主要量可写成：</p>
+<p>\[
+\text{Solve rate}
+=
+\frac{1}{N}\sum_{i=1}^{N}s_i(a_i),
+\]</p>
+<p>\[
+\text{Average tokens}
+=
+\frac{1}{N}\sum_{i=1}^{N}c_i(a_i),
+\]</p>
+<p>\[
+\text{Excess tokens}
+=
+\frac{1}{N}\sum_{i=1}^{N}
+\max[c_i(a_i)-c_i(o_i),0].
+\]</p>
+<p><code>Solve rate</code> 是所选协议实际答对的题目比例。<code>Average tokens</code> 是每题平均记录成本。<code>Excess tokens</code> 只计算相对于该题回顾性预言机动作多付的正令牌差，不用便宜动作节省的令牌抵消浪费。路由或置信度探针自身的开销也应计入；主表中的置信门控已包含平均0.34K令牌的自评调用，冻结路由器另做的敏感性检查显示每题约增加0.4K至0.8K令牌，不改变成本排序（PDF第2、14页，2节与表S13）。</p>
+<p>论文还按动作成本顺序定义方向性错误：</p>
+<p>\[
+\text{under-escalation}: a_i&lt;o_i,
+\qquad
+\text{over-escalation}: a_i&gt;o_i.
+\]</p>
+<p>升级不足表示选得太便宜，因而漏掉可由更强协议救回的题。过度升级表示选得比实际所需协议更贵。单看五分类准确率会把这两类后果不同的错误混为一谈（PDF第2至3、13页，3节与表S9）。</p>
+<h2 id="section-5">AUROC、AUPRC、ECE与目标流行率</h2>
+<p>事后置信度探针在 <code>Baseline</code> 已经生成答案之后运行。它只能看到题目、允许的元数据和该答案，不能看到推理轨迹、标准答案、正确性标签、预言机标签或任何协作结果。4,181道题中有4,151道返回可解析分数，覆盖率为99.28%；其余30道被排除，没有插补（PDF第4、8至10页，4节与A.3节）。</p>
+<p>几个概率指标的含义不同：</p>
+<ul>
+<li><code>AUROC</code> 衡量随机抽取一个阳性样本和一个阴性样本时，风险分数把阳性排在前面的概率。它主要看排序，不直接反映稀有目标上的精确率。</li>
+<li><code>AUPRC</code> 是精确率与召回率曲线下面积。它对类别不平衡敏感，必须和目标的 <code>prevalence</code> 一起读。随机排序的基准AUPRC约等于阳性比例。</li>
+<li><code>ECE</code> 即期望校准误差。其常用形式为</li>
+</ul>
+<p>\[
+\mathrm{ECE}
+=
+\sum_{b=1}^{B}
+\frac{|S_b|}{N}
+\left|
+\operatorname{acc}(S_b)
+-
+\operatorname{conf}(S_b)
+\right|,
+\]</p>
+<p>其中 \(S_b\) 是第 \(b\) 个置信度分箱。ECE越小，预测概率和实际频率越接近。</p>
+<ul>
+<li><code>Prevalence</code> 是当前阳性标签在评估集中的比例。协议特异事件很少，因此AUPRC即使高于随机基线，也可能仍不足以支撑可靠路由。</li>
+</ul>
+<p>同一 <code>gpt-oss-120b</code> 事后失败分数在4,151个可解析样本上的结果如下（PDF第4、10页，表2与表S5）：</p>
+<table>
+<thead>
+<tr>
+<th>预测目标</th>
+<th style="text-align:right">流行率</th>
+<th style="text-align:right">AUROC</th>
+<th style="text-align:right">AUPRC</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>Baseline</code> 失败</td>
+<td style="text-align:right">43.4%</td>
+<td style="text-align:right">0.8847</td>
+<td style="text-align:right">0.8950</td>
+</tr>
+<tr>
+<td>任一协作能救回</td>
+<td style="text-align:right">36.0%</td>
+<td style="text-align:right">0.8544</td>
+<td style="text-align:right">0.7683</td>
+</tr>
+<tr>
+<td><code>PER</code> 首次成功</td>
+<td style="text-align:right">8.8%</td>
+<td style="text-align:right">0.7259</td>
+<td style="text-align:right">0.1674</td>
+</tr>
+<tr>
+<td>只有 <code>Broadcast</code> 成功</td>
+<td style="text-align:right">4.2%</td>
+<td style="text-align:right">0.7639</td>
+<td style="text-align:right">0.1041</td>
+</tr>
+</tbody>
+</table>
+<p><code>Baseline</code> 失败的AUROC为0.8847，95%置信区间为[0.8732, 0.8955]；ECE为0.0852，Brier分数为0.1314。对于 <code>PER</code> 和 <code>Broadcast</code>，AUPRC分别高于8.8%和4.2%的随机基线，但绝对值只有0.1674和0.1041。这说明风险分数并非完全没有协议价值信息，却远未达到可以稳定选择昂贵协议的程度。</p>
+<p>这种置信能力也不是跨模型、跨领域恒定的。在六个完整置信度设置中，失败AUROC从 <code>gpt-oss-120b</code> 的LAB strict条件下0.5814，到OmniMath上的0.8847；ECE从0.0852到0.3474。Gemma在OmniMath、LAB strict和LAB text-no-tool上的失败AUROC分别为0.8012、0.8637和0.7337，<code>gpt-oss-120b</code> 在相同三项条件下分别为0.8847、0.5814和0.6069（PDF第10页，表S4）。所以主数学设置中的高AUROC不能直接外推成通用自知能力。</p>
+<h2 id="section-6">置信门控与Kneedle选择</h2>
+<p>论文有两个不同的置信度实验，不能混作重复测量。</p>
+<p>事后探针在看过 <code>Baseline</code> 最终答案后预测其正确概率，用于分析失败风险和协议价值。预作答探针则在模型尚未尝试解题时，要求它估计单次直接作答成功概率。主测试集423题中只有329题得到可用预作答分数，覆盖率77.8%；其中310题直接解析成功，19题经人工重解析恢复，剩余72题在给出估计前被截断，22题遭遇HTTP 429错误。该探针对单次失败的AUROC为0.859，而仅用难度层级得到0.773；ECE为7.5个百分点，Brier分数为0.152（PDF第15、18、21页，表S16、S23与D.5节）。</p>
+<p>作者把这个预作答分数变成二元门控：</p>
+<p>\[
+a_i=
+\begin{cases}
+\text{Baseline}, &amp; q_i\geq 70,\\
+\text{Single}, &amp; q_i&lt;70\text{ 或置信度缺失}.
+\end{cases}
+\]</p>
+<p>阈值70不是在测试集上挑出的。作者在开发集上扫描阈值，画出解题率和平均令牌的双目标曲线，再用Kneedle寻找收益开始变平的膝点。Kneedle在这里寻找的是一个折中工作点，不是统计显著性阈值。效用权重 \(\lambda=0.4\) 或0.5的开发集选择也得到相同测试工作点。补充的双阈值级联同样通过开发集Pareto前沿和Kneedle选出低阈值10、高阈值70，在高置信时用 <code>Baseline</code>、中间区间用 <code>Single</code>、极低置信时退回难度层级多数策略（PDF第16至17页，图S3与表S18）。</p>
+<p>低置信度并不能指定唯一的后续协议。预作答置信度为0至20的29道题中，预言机标签仍分散为13.8% <code>Baseline</code>、27.6% <code>Single</code>、24.1% <code>PER</code>、10.3% <code>Broadcast</code> 和24.1% <code>None</code>。置信度为20至40的104道题也分散在五种动作上（PDF第18页，表S22）。这正是二元门控有效但无法完成多协议路由的原因。</p>
+<h2 id="section-7">主实验结果：少漏题往往靠多花令牌</h2>
+<p>423题留出集的主要路由结果如下。点估计来自表S9，代表性置信区间来自表1与表S10（PDF第3、13页）。</p>
+<table>
+<thead>
+<tr>
+<th>策略</th>
+<th style="text-align:right">解题率</th>
+<th style="text-align:right">平均令牌</th>
+<th style="text-align:right">超额令牌</th>
+<th style="text-align:right">升级不足</th>
+<th style="text-align:right">过度升级</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>始终 <code>Baseline</code></td>
+<td style="text-align:right">56.3%</td>
+<td style="text-align:right">18.2K</td>
+<td style="text-align:right">1.7K</td>
+<td style="text-align:right">36.2%</td>
+<td style="text-align:right">7.6%</td>
+</tr>
+<tr>
+<td>难度层级多数策略</td>
+<td style="text-align:right">65.0%</td>
+<td style="text-align:right">28.9K</td>
+<td style="text-align:right">5.7K</td>
+<td style="text-align:right">27.4%</td>
+<td style="text-align:right">12.5%</td>
+</tr>
+<tr>
+<td>元数据逻辑回归</td>
+<td style="text-align:right">60.8%</td>
+<td style="text-align:right">44.3K</td>
+<td style="text-align:right">20.5K</td>
+<td style="text-align:right">31.4%</td>
+<td style="text-align:right">11.3%</td>
+</tr>
+<tr>
+<td>文本加元数据逻辑回归</td>
+<td style="text-align:right">61.2%</td>
+<td style="text-align:right">41.6K</td>
+<td style="text-align:right">18.2K</td>
+<td style="text-align:right">31.2%</td>
+<td style="text-align:right">12.5%</td>
+</tr>
+<tr>
+<td>冻结 <code>gpt-oss-120b</code> 路由器</td>
+<td style="text-align:right">73.8%</td>
+<td style="text-align:right">71.3K</td>
+<td style="text-align:right">37.1K</td>
+<td style="text-align:right">18.0%</td>
+<td style="text-align:right">33.3%</td>
+</tr>
+<tr>
+<td>带数值成本提示的 <code>gpt-oss-120b</code></td>
+<td style="text-align:right">78.3%</td>
+<td style="text-align:right">88.6K</td>
+<td style="text-align:right">51.6K</td>
+<td style="text-align:right">13.0%</td>
+<td style="text-align:right">45.2%</td>
+</tr>
+<tr>
+<td>预作答置信门控</td>
+<td style="text-align:right">78.0%</td>
+<td style="text-align:right">45.0K</td>
+<td style="text-align:right">14.8K</td>
+<td style="text-align:right">13.7%</td>
+<td style="text-align:right">42.1%</td>
+</tr>
+<tr>
+<td>回顾性固定顺序预言机</td>
+<td style="text-align:right">92.4%</td>
+<td style="text-align:right">101.1K</td>
+<td style="text-align:right">0</td>
+<td style="text-align:right">0</td>
+<td style="text-align:right">0</td>
+</tr>
+</tbody>
+</table>
+<p>置信门控的解题率95%置信区间为[74.0%, 81.8%]，平均令牌区间为[41.6K, 48.7K]。冻结 <code>gpt-oss-120b</code> 路由器的对应区间为[69.5%, 77.5%]和[56.5K, 86.7K]。两者的解题率区间重叠，因此论文只主张置信门控在相近解题水平下更省令牌，不主张其真实解题率已经显著更高。预言机的解题率为92.4%，区间[89.8%, 95.0%]，仍比门控高14.4个百分点（PDF第3至4页，表1）。</p>
+<p>更激进的冻结路由器还能多解少量题，但代价急升。<code>Llama-3.1-70B</code>、<code>Gemma-4-E4B</code> 和 <code>Gemma-3-27B</code> 的解题率分别为80.4%、81.8%和82.5%，平均令牌为155.7K、195.6K和279.8K；它们的升级不足降至11.1%、7.8%和6.4%，过度升级却升至63.6%、62.9%和71.4%。相对置信门控，<code>Llama-3.1-70B</code>和<code>Gemma-4-E4B</code>每额外解出一道题的边际令牌分别为4,684K和3,981K，这两项由表S12直接报告。表S12没有报告<code>Gemma-3-27B</code>的对应值；若仅用表S9中已经四舍五入的点估计计算，则约为5.2M令牌/额外解出一题，不能把这一自算值表述为作者报告的独立统计量（PDF第13页，表S9至S12）。</p>
+<p>结果揭示的是方向性取舍。保守策略便宜，但会漏掉可救题；激进路由器通过频繁升级换来更高解题率，同时产生大量不必要的 <code>PER</code> 或 <code>Broadcast</code> 调用。分类准确率或macro-F1都不能替代这组解题率和成本指标。</p>
+<h2 id="section-8">广度检查与完整验证范围</h2>
+<p>主实验集中于OmniMath 2、<code>gpt-oss-120b</code> 和423题留出集。作者另在四个基准的五种条件上，用 <code>gpt-oss-120b</code> 与 <code>Gemma-4-31B-it</code> 做了10组逐题匹配的四协议运行。下表为完整匹配集上的解题率或预言机覆盖率，仍是每个题目和协议各一次确定性运行（PDF第5、9页，图2与表S2）。</p>
+<table>
+<thead>
+<tr>
+<th>求解器与条件</th>
+<th style="text-align:right">题数</th>
+<th style="text-align:right">Baseline</th>
+<th style="text-align:right">Single</th>
+<th style="text-align:right">PER</th>
+<th style="text-align:right">Broadcast</th>
+<th style="text-align:right">预言机</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>gpt-oss</code> OmniMath 2</td>
+<td style="text-align:right">4,181</td>
+<td style="text-align:right">56.83%</td>
+<td style="text-align:right">78.78%</td>
+<td style="text-align:right">85.17%</td>
+<td style="text-align:right">89.21%</td>
+<td style="text-align:right">92.68%</td>
+</tr>
+<tr>
+<td><code>gpt-oss</code> JEEBench</td>
+<td style="text-align:right">515</td>
+<td style="text-align:right">41.55%</td>
+<td style="text-align:right">55.34%</td>
+<td style="text-align:right">91.46%</td>
+<td style="text-align:right">94.95%</td>
+<td style="text-align:right">96.50%</td>
+</tr>
+<tr>
+<td><code>gpt-oss</code> SciBench</td>
+<td style="text-align:right">565</td>
+<td style="text-align:right">62.12%</td>
+<td style="text-align:right">72.21%</td>
+<td style="text-align:right">87.43%</td>
+<td style="text-align:right">89.73%</td>
+<td style="text-align:right">91.15%</td>
+</tr>
+<tr>
+<td><code>gpt-oss</code> LAB strict</td>
+<td style="text-align:right">741</td>
+<td style="text-align:right">19.03%</td>
+<td style="text-align:right">30.23%</td>
+<td style="text-align:right">47.64%</td>
+<td style="text-align:right">74.22%</td>
+<td style="text-align:right">77.33%</td>
+</tr>
+<tr>
+<td><code>gpt-oss</code> LAB text-no-tool</td>
+<td style="text-align:right">1,542</td>
+<td style="text-align:right">30.54%</td>
+<td style="text-align:right">55.64%</td>
+<td style="text-align:right">59.27%</td>
+<td style="text-align:right">81.26%</td>
+<td style="text-align:right">86.38%</td>
+</tr>
+<tr>
+<td>Gemma OmniMath 2</td>
+<td style="text-align:right">4,181</td>
+<td style="text-align:right">69.39%</td>
+<td style="text-align:right">85.94%</td>
+<td style="text-align:right">90.65%</td>
+<td style="text-align:right">92.99%</td>
+<td style="text-align:right">95.67%</td>
+</tr>
+<tr>
+<td>Gemma JEEBench</td>
+<td style="text-align:right">515</td>
+<td style="text-align:right">70.49%</td>
+<td style="text-align:right">81.36%</td>
+<td style="text-align:right">95.92%</td>
+<td style="text-align:right">98.25%</td>
+<td style="text-align:right">99.22%</td>
+</tr>
+<tr>
+<td>Gemma SciBench</td>
+<td style="text-align:right">565</td>
+<td style="text-align:right">70.27%</td>
+<td style="text-align:right">79.29%</td>
+<td style="text-align:right">91.33%</td>
+<td style="text-align:right">88.67%</td>
+<td style="text-align:right">93.45%</td>
+</tr>
+<tr>
+<td>Gemma LAB strict</td>
+<td style="text-align:right">741</td>
+<td style="text-align:right">44.40%</td>
+<td style="text-align:right">58.16%</td>
+<td style="text-align:right">69.37%</td>
+<td style="text-align:right">89.34%</td>
+<td style="text-align:right">90.55%</td>
+</tr>
+<tr>
+<td>Gemma LAB text-no-tool</td>
+<td style="text-align:right">1,542</td>
+<td style="text-align:right">41.96%</td>
+<td style="text-align:right">74.77%</td>
+<td style="text-align:right">85.02%</td>
+<td style="text-align:right">91.05%</td>
+<td style="text-align:right">96.37%</td>
+</tr>
+</tbody>
+</table>
+<p>10组设置中，预言机相对 <code>Baseline</code> 多覆盖23.2至58.3个百分点，说明每个领域都存在可由协作救回的题。但 <code>Broadcast</code> 只在9组中是最强固定协议。Gemma在SciBench上反而是 <code>PER</code> 91.33%、<code>Broadcast</code> 88.67%，相差2.66个百分点。协议排序会随任务改变，不能把最贵方案视为逐题支配其他方案。</p>
+<p>在 <code>Baseline</code> 和 <code>Single</code> 都失败的条件子集上，<code>Broadcast</code> 相对 <code>PER</code> 的优势在OmniMath为9.6至10.7个百分点，在两个LAB条件上为30.8至44.6个百分点；即便如此，每组仍有2.4%至11.1%的题只被 <code>PER</code> 解出，因此 <code>Broadcast</code> 不构成点对点支配（PDF第5、11页，表S8）。</p>
+<p>这里还要区分两种验证范围。10组设置都完成了四协议的匹配成败比较，但完整的事后置信度和留出路由器评估只覆盖六组，即两个求解器在OmniMath、LAB strict和LAB text-no-tool上的组合。六组文本加元数据路由器相对各自 <code>Baseline</code> 提高7.2至37.5个百分点，但仍落后预言机18.5至28.9个百分点；相对难度层级多数策略则有正有负（PDF第4、10至11页，表S6至S7）。因此，10组结果证明协议价值具有任务依赖性，不足以证明该路由规律已经普遍成立。</p>
+<h2 id="section-9">这些结果改变了什么认识</h2>
+<p>论文给出的新认识是方法论上的。首先，模型的自报置信度确实能支持便宜的第一层控制，即决定保留直接作答还是升级到单智能体自我纠正。其次，<code>Baseline</code> 失败风险不是 <code>PER</code> 或 <code>Broadcast</code> 边际价值的充分统计量。低置信题可能需要任何一种协议，也可能四种都失败。最后，较高的路由解题率经常来自系统性过度升级，而不是准确识别了哪个协议真正必要。</p>
+<p>这项工作没有给出已经解决的全协议路由器。它提供的是一个可检验的诊断框架：在固定求解器和逐题匹配结果下，分别衡量失败风险、协议特异增益、升级方向和令牌浪费。</p>
+<h2 id="section-10">证据边界与尚未解决的问题</h2>
+<ol>
+<li>每个题目和协议只有一次温度为0的确定性运行。2,000次自助法置信区间反映的是题目抽样差异，不是重新运行模型时的随机波动（PDF第3、5页，表1与局限性）。</li>
+<li>预言机使用事后成败和全局平均成本顺序，不能部署，也没有估计重复采样下的期望成功率。</li>
+<li>成本主要按记录令牌计算。时延、货币价格、能耗、并行效率以及正确答案之外的质量都可能改变真实部署选择。</li>
+<li>预作答置信度只覆盖329/423道测试题，而且缺失并非随机；部分模型会偏离JSON要求而开始解题。</li>
+<li>六个完整置信度设置的校准质量差异很大。OmniMath上的高失败AUROC不能代表生物学或其他模型。</li>
+<li><code>PER</code> 与 <code>Broadcast</code> 的差异是匹配观察结果，不是协议机制的因果分解。论文尚未证明哪些题目属性使规划审查优于多候选讨论。</li>
+<li>主门控只在 <code>Baseline</code> 与 <code>Single</code> 之间选择，不会调用 <code>PER</code>、<code>Broadcast</code> 或 <code>None</code>。它解决了初始升级，未解决完整的成本感知协议控制。</li>
+</ol>
+</div><div class="credit">本文为辅助理解研究方法的中文解读。论文原图、图注及摘要内容归原作者和相应权利人；来源见文首论文链接。</div></article></main><script>window.MathJax={tex:{inlineMath:[['$','$'],['\\(','\\)']],displayMath:[['$$','$$'],['\\[','\\]']]},options:{skipHtmlTags:['script','noscript','style','textarea','pre','code']}};</script><script defer src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-mml-chtml.js"></script><footer><span>AI for Materials 文献精读</span><span>中文研究笔记 · 图与摘要注明论文来源 · 不提供论文 PDF</span></footer></body></html>

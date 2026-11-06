@@ -1,0 +1,159 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Coverage-Dependent Lateral Interactions Shape the Electrocatalytic Activity of High-Entropy Alloys · AI for Materials 文献精读</title><meta name="description" content="AI for Materials、原子模拟与科研智能体的中文文献解读"><link rel="stylesheet" href="../style.css"><link rel="icon" href="../icon.svg" type="image/svg+xml"></head><body><header><a class="brand" href="../index.html"><span class="mark">M</span><span>AI for Materials<small>文献精读 / RESEARCH NOTES</small></span></a><a class="header-link" href="../index.html#library">浏览文献 <span>↗</span></a></header><main class="article-layout"><aside><a href="../index.html#library">← 返回文献库</a><nav aria-label="文章目录"><a href="#section-1">Bibliographic status</a><a href="#section-2">One-line takeaway</a><a href="#section-3">What the paper asks</a><a href="#section-4">Methods</a><a href="#section-12">Main findings</a><a href="#section-20">Competitive overlap and implications</a><a href="#section-21">Limitations and caveats</a><a href="#section-22">Possible actions</a></nav></aside><article><div class="eyebrow">RESEARCH NOTE / T6</div><h1>Coverage-Dependent Lateral Interactions Shape the Electrocatalytic Activity of High-Entropy Alloys</h1><div class="article-meta"><span>机器学习势训练与泛化</span><span>收录 2026-07-26</span><span>18 分钟阅读</span></div><a class="original" href="https://doi.org/10.1021/jacs.6c09129" target="_blank" rel="noopener noreferrer">论文原文 ↗</a><div class="prose"><h2 id="section-1">Bibliographic status</h2>
+<ul>
+<li>作者：Pengfei Hou；Jin-Cheng Liu（通讯作者）。</li>
+<li>期刊：<strong>Journal of the American Chemical Society</strong>（2026，已接收/出版社正文版本；当前 PDF 页眉的卷、期、页仍显示 <code>XXXX, XXX, XXX–XXX</code>）。</li>
+<li>DOI：<a href="https://doi.org/10.1021/jacs.6c09129" target="_blank" rel="noopener noreferrer"><code>10.1021/jacs.6c09129</code></a></li>
+<li>时间线：Received 2026-05-04；Revised 2026-07-09；Accepted 2026-07-10。</li>
+<li>正文数据与模型仓库：Zenodo DOI <code>10.5281/zenodo.20580247</code>（fine-tuned MLIP、训练/验证数据库及示例结构优化脚本）。</li>
+<li><strong>SI 核对结果：明确不匹配，未混入本卡。</strong> 用户给出的 <code>d0cp03216f1_suppl.txt</code> 题名为 <em>Theoretical study of metal/silica interfaces: Ti, Fe, Cr and Ni on β-cristobalite</em>，作者为 Jacopo Baima 等，期刊为 <em>Physical Chemistry Chemical Physics</em>（2020），对应文件名所示 DOI 为 <code>10.1039/D0CP03216F</code>；其题名、作者、期刊、年份、体系与 JACS DOI <code>10.1021/jacs.6c09129</code> 均不一致。因此该文件不是本文附件，其中任何方法、图表或数值均未采用。本文真正 SI 尚未补齐，正文中仅能看到对 Sections S2–S4、Figures S1–S17、Tables S1–S5 的引用。</li>
+<li>High 类型：<strong>Direct competitor</strong>。</li>
+<li>对应项目：<strong>Spin_SAC/HESAC</strong>。</li>
+</ul>
+<h2 id="section-2">One-line takeaway</h2>
+<p>该文以 fine-tuned GemNet-OC MLIP、O*/OH* 顺序填位和 coverage-aware ORR 电流模型证明：在 Ag–Ir–Ru–Pd–Pt–Cu–Rh–Re 合金空间中，复杂度增加虽可先通过局域配位/配体效应改善位点，却也会拓宽吸附能分布、优先毒化强亲氧位点并提前触发横向排斥，最终稀释最优位点人口，产生非单调的 activity–entropy 火山关系；因此“高复杂度提高 good-site probability”必须限定到具体工作态覆盖度、位点隔离程度和相互作用模型。</p>
+<h2 id="section-3">What the paper asks</h2>
+<ol>
+<li>传统 isolated-site 模型忽略邻近吸附物时，是否会系统误判拥挤 HEA 表面的 O*/OH* 工作态吸附能分布和 ORR 活性？</li>
+<li>氢键网络带来的吸引稳定与吸附物间静电/位阻排斥如何随覆盖度、合金组成及位点异质性发生竞争？</li>
+<li>将这些 coverage-dependent lateral interactions 显式纳入后，能否比静态孤立位模型更好重现实验报道的 PtIr、AgPd 组成–活性趋势？</li>
+<li>在八元素 Ag–Ir–Ru–Pd–Pt–Cu–Rh–Re 空间内，增加元素数与混合熵究竟会增加最优局域位点，还是通过统计稀释、强吸附位点俘获和横向排斥降低可用活性位点人口？</li>
+<li>ORR 活性、构型混合熵与材料成本之间的 Pareto 边界是什么，是否存在高活性、低成本的低复杂度或无 Pt 组成？</li>
+</ol>
+<h2 id="section-4">Methods</h2>
+<h3 id="section-5">1. 总体框架（Figure 1）</h3>
+<p>论文构建三个串联模块：</p>
+<ol>
+<li><strong>主动学习 + MLIP 微调</strong>：以预训练催化 GemNet-OC 为基础，通过 MLIP 结构弛豫、迭代间能量偏差评估、困难样本 DFT 标注和模型微调，获得能够处理多组分表面及共吸附层的势函数。</li>
+<li><strong>Coverage-aware、site-specific ORR 电流模型</strong>：不是逐个位点在空表面上计算吸附，而是依次向表面加入 O*/OH*、保留已吸附物并用 MLIP 弛豫整个共吸附层，从而同时包含 site blocking、结构响应、吸引性氢键网络及排斥性吸附物相互作用。</li>
+<li><strong>多目标贝叶斯优化（MOBO）</strong>：在八元素组成空间搜索活性–混合熵和活性–成本的 Pareto 前沿，并用所得大样本分析复杂度–活性关系。</li>
+</ol>
+<h3 id="section-6">2. HEA 构型池与吸附态设计（Figures 2a–b；Figures S1–S3 仅见正文引用）</h3>
+<ul>
+<li>元素空间：Ag、Ir、Ru、Pd、Pt、Cu、Rh、Re。</li>
+<li>初始建立 <strong>1,000 个随机组成</strong>的 HEA 结构；每个训练构型采用 <strong>五层 3 × 3 超胞</strong>，以 Dirichlet 分布采样组成，扩大局域化学环境覆盖。</li>
+<li>在不同随机表面上加入纯 O* 多覆盖度、纯 OH* 多覆盖度以及 O*/OH* 混合共吸附，形成 <strong>14,813 个</strong>不同覆盖度/位点的结构池。</li>
+<li>ORR 位点近似中，O* 主要放置于 <strong>fcc hollow</strong>，OH* 主要放置于 <strong>on-top</strong>；OOH* 不单独进行同等规模采样，而由既有 <em><em>OOH</em>–OH</em> scaling relation**给出。</li>
+<li>该设计的关键不是只学习“局域位点 → 单吸附能”，而是让训练池覆盖拥挤程度及共吸附环境，以便 MLIP 学习横向作用和弛豫后的总能变化。</li>
+</ul>
+<h3 id="section-7">3. 主动学习、结构筛选与 DFT 验证（Figure 2c–f；Table S1、Figures S4–S5 仅见引用）</h3>
+<ul>
+<li>每轮以当前 MLIP 弛豫全部候选构型，并由总能计算相对 Pt(111) 的 O*/OH* binding strength。</li>
+<li>弛豫后有 <strong>1.99%</strong> 构型不再保持定义清楚的 O*/OH* 吸附态，被 structural-integrity screening 排除，不进入后续吸附强度评估和选样。</li>
+<li>自第二轮起，以相邻两轮对同一吸附态 A（A = O* 或 OH*）给出的 Pt(111)-relative binding-strength 差值衡量自洽性。若构型的最大迭代偏差超过 <strong>0.08 eV</strong>，则属于不稳定候选；每轮取偏差最大的 <strong>top 5%</strong> 做 DFT single-point 标注并回灌训练。</li>
+<li>停止条件：结构池中 <strong>99.9%</strong> 构型的迭代间差值低于 <strong>0.08 eV</strong>。</li>
+<li>验证集分为两组：<strong>100 个 in-domain HEA 表面</strong>（吸附环境来自初始池）和 <strong>100 个 out-of-domain 新 HEA 表面</strong>（含混合 O*/OH* 共吸附）；验证结构均进行完整 DFT 弛豫。</li>
+<li>主动学习最终只累计 <strong>2,718 次 DFT single-point</strong>，用于支撑远大于此的 14,813 构型池，而不是对整个池逐一做 DFT。</li>
+<li>当前缺失真正 SI，故无法从所给材料核对具体 DFT 泛函、赝势、截断能、k 点、真空层、固定层、电子/离子收敛阈值，以及 GemNet-OC 微调超参数；这些细节不能由错误的 PCCP SI 代填。</li>
+</ul>
+<h3 id="section-8">4. Coverage-aware binding strength 与 ORR 活性映射（Figures 3–5；Figures S6–S12 仅见引用）</h3>
+<ul>
+<li>定义 <code>E_isolated</code> 为无邻近吸附物时主要反映 adsorbate–substrate 作用的孤立位吸附强度；<code>E_coverage</code> 为保留并弛豫共吸附层后的吸附强度。</li>
+<li>有效横向作用写为 <code>E_lateral = E_coverage − E_isolated</code>：负值代表净稳定（如氢键网络占优），正值代表净去稳定/排斥占优。该量是覆盖层造成的综合有效差值，并非单独分解出的纯静电项。</li>
+<li>按顺序填位追踪 O*/OH* 的 binding strength–coverage 曲线和最终分布，因此可以识别哪些强位点先被占据、何时出现能量平台、何时排斥使后续吸附能正移。</li>
+<li>采用 Rossmeisl 类热力学描述符，将 Pt-relative binding strength 相对最优值的偏离映射为 site-specific relative ORR current；设定 <strong>ΔE_OH,opt = +0.1 eV</strong>、<strong>ΔE_O,opt = +0.2 eV</strong>。</li>
+<li>单个组成在 <strong>8 × 8 slab</strong> 上汇总所有位点贡献，再对 <strong>40 个随机 slab</strong> 求平均，得到组成层面的活性描述符及空间电流热图。</li>
+<li>正文说明另有 DFT 验证及电流计算细节位于真正 SI Section S3、Figures S8–S9；因本次 SI 不匹配，具体电流方程、温度/电位参数、覆盖度归一方式与填位判据仍不能核对。</li>
+</ul>
+<h3 id="section-9">5. 二元体系对照设计（Figures 4–5）</h3>
+<ul>
+<li><strong>PtIr</strong>：扫描正文给出的 <strong>30%–80% Ir</strong> 范围，将 coverage-aware 预测同时与 isolated-site 模型及既有实验组成–活性趋势比较；并分解 O*/OH* 的覆盖率、电流贡献、吸附强度分布、energy–coverage 平台和空间活性热图。</li>
+<li><strong>AgPd</strong>：用同一框架检验实验报道的 Ag 含量依赖活性峰；追踪约 15 at% Ag 前后 O* 与 OH* 主导电流的转换，并用双峰吸附能分布及两个能量平台解释。</li>
+<li>这两组不是独立的新实验，而是模型相对于既有实验/文献 isolated-site 数据的趋势验证。</li>
+</ul>
+<h3 id="section-10">6. MOBO、降维与可解释分析（Figure 6；Figures S13–S16、Tables S2–S4 仅见引用）</h3>
+<ul>
+<li>运行两条 MOBO 轨迹：① 同时最大化模型 ORR 活性和构型混合熵；② 最大化活性并最小化相对材料成本。</li>
+<li>每条轨迹运行 <strong>50 iterations</strong>；每轮采用 stratified complexity sampling，从 <strong>2–8 元</strong>的每个复杂度层级各选一个组成，即每轮 7 个组成。</li>
+<li>两条轨迹合计评估 <strong>700 个组成</strong>；hypervolume 平台（Figure S14）用于判断所采样目标空间前沿在该协议下数值收敛。</li>
+<li>对候选组成使用 <strong>t-SNE</strong> 显示高活性拓扑簇，并用 <strong>SHAP</strong> 分析组成分数与拟合 surrogate 预测活性的统计关联。SHAP 是对该数据集/代理模型的解释，不等同于元素的普适因果效应。</li>
+</ul>
+<h3 id="section-11">7. 活性–熵关系提取（Figure 7；Figure S17、Table S5 仅见引用）</h3>
+<ul>
+<li>用 700 个 MOBO 已评估组成分析元素数、<code>ΔS_mix</code> 与模型活性的关系。</li>
+<li>选择等原子比 PtPd、PtPdAgCu、PtPdAgIrRhCu、PtPdAgIrRuCuReRh 作为 2/4/6/8 元代表，比较 O*/OH* 分布和空间电流热图。</li>
+<li>将采样到的 <code>ΔS_mix</code> 范围划分为 <strong>40 个区间</strong>，取每个区间内最大预测活性，构造 activity–entropy upper envelope，而不是对所有点做简单平均。</li>
+<li>正文没有主文表格；Tables S1–S5 均属于真正 SI。依据正文只能确认：S1 汇总结构完整性筛选统计，S2 列活性–熵 Pareto 候选，S3–S4 涉及活性–成本优化候选/成本数据，S5 支撑火山区间；因所给 SI 错配，本卡不转录或臆测其具体条目。</li>
+</ul>
+<h2 id="section-12">Main findings</h2>
+<h3 id="section-13">Figure 1：论文的实质创新是从“静态位点预测”转向“工作态顺序填位”</h3>
+<p>框架把可弛豫 MLIP、显式共吸附层与组成优化串起来。其竞争性不只在于又训练了一个吸附能模型，而在于把“位点首先被谁占据以及占据后怎样改写邻位能量”纳入宏观活性评估；这直接改变 good-site population 的定义。</p>
+<h3 id="section-14">Figure 2：有限 DFT 标注把预训练模型修正到接近化学精度</h3>
+<ul>
+<li>初始模型在 in-domain 构型上的预测相对 DFT 明显分散，MAE 约 <strong>0.40 eV</strong>。</li>
+<li>微调后，O*、OH* 和混合 O*/OH* 共吸附的 MAE 分别降至 <strong>0.066、0.048、0.043 eV</strong>。</li>
+<li>新生成的 out-of-domain 混合共吸附构型上仍有 <strong>0.082 eV</strong> MAE。</li>
+<li>以 <strong>2,718 个 DFT single-point</strong> 完成主动学习后，in-domain 最终 overall MAE 为 <strong>0.052 eV</strong>。</li>
+<li>这说明模型在所定义 HEA/吸附池内能够较可靠地区分 coverage-induced 能量变化，但 out-of-domain 误差变大也提示其适用边界。</li>
+</ul>
+<h3 id="section-15">Figure 3：复杂表面更早由净吸引转入净排斥</h3>
+<ul>
+<li>与 isolated-site 分布相比，coverage-aware 模型预测 Ag18Pd82 上 O*、OH* 结合均更强，而在 Ag20Ir20Ru20Pd20Pt20 上略微变弱，说明横向作用的方向依赖组成和位点分布，不能用统一常数修正。</li>
+<li>随覆盖度升高，两种体系的 <code>E_lateral</code> 都总体正移，即拥挤后排斥最终削弱吸附。</li>
+<li><strong>Ag18Pd82 要到 coverage &gt; 0.6 ML 时 <code>E_lateral</code> 才转正</strong>；五元等比例 AgIrRuPdPt 在仅约 <strong>0.2 ML</strong> 时排斥已占主导。</li>
+<li>机制解释：较均一的 AgPd 具有集中能量分布，易形成可维持到较高覆盖度的氢键稳定网络；高异质五元表面先填充强亲氧位点，局部电荷/强吸附物聚集使排斥更早主导。八元体系的 <code>E_lateral</code> 波动进一步增大（正文指向 Figures S10–S11），故复杂度越高，孤立位近似越不可靠。</li>
+</ul>
+<h3 id="section-16">Figure 4：coverage-aware 模型修正 PtIr 的错误静态趋势</h3>
+<ul>
+<li>在 <strong>30%–80% Ir</strong> 范围，coverage-aware 模型重现实验所示 Ir 增加时 ORR 活性单调下降，而 isolated-site 基线存在动力学趋势偏差。</li>
+<li>全范围内 OH* 同时主导表面覆盖和电流贡献；随 Ir 含量增加，O*/OH* 分布在各自最优能量附近的密度持续降低。</li>
+<li>Ir-rich 表面上的 energy–coverage 平台远低于最优能量，代表大量相近但过强的结合位点，几乎不贡献电流；继续填位后又受到强横向排斥而大幅正移，形成“前一批位点过度毒化、后一批位点过度排斥”的能量极化。</li>
+<li>40 个随机构型平均的空间热图显示，高 Ir 组成中高活性区域明显耗竭。即便静态局域位点看起来有利，工作态占据顺序也会移除真正可访问的最优人口。</li>
+</ul>
+<h3 id="section-17">Figure 5：AgPd 的实验活性峰来自 O*→OH*贡献转换与平台重排</h3>
+<ul>
+<li>coverage-aware 模型给出约 <strong>17 at% Ag</strong> 的活性峰，与既有实验基准一致。</li>
+<li>低 Ag 时 O* 主导覆盖与电流；当 Ag 超过约 <strong>15%</strong> 后，OH* 的动力学贡献超过 O*。</li>
+<li>Ag 增加虽部分拓宽 O*/OH* 分布，但最优能量附近仍保持较高密度，尤其 OH* 主峰靠近 <code>ΔE_OH,opt</code>。</li>
+<li>O*、OH* 的 energy–coverage 曲线均出现两个平台，对应双峰分布。O* 次平台靠近最优值；OH* 的长主平台位于最优值附近，而且随 Ag 增加斜率减小，使活性位点进一步集中。因此 AgPd 在所考察组成内整体维持较高活性，而不是像 Ir-rich PtIr 那样发生严重两极化。</li>
+</ul>
+<h3 id="section-18">Figure 6：Pareto 前沿偏向低复杂度，并给出具体无 Pt 候选</h3>
+<ul>
+<li>同时优化活性与混合熵时，Pareto 前沿中的高活性点主要是<strong>二元或三元</strong>，高熵/高元素数候选总体预测活性更低。</li>
+<li>活性–成本轨迹找到无 Pt 候选；代表性的 <strong>Pd62Cu38</strong> 预测活性约为 Pt(111) 的 <strong>125%</strong>，归一化成本约为 Pt 基线的一半。</li>
+<li>两条前沿整体偏向由 Pt、Pd、Ag、Cu 构成的简单合金。</li>
+<li>t-SNE 将高活性候选聚为三类：near-pure Pt、Pt-rich，以及显著的 Pt-free PdAgCu 区。</li>
+<li>SHAP 在当前代理模型中显示，Pt、Pd 较高分数通常与正活性贡献相关；Cu、Ag 的作用依组成而变；Re、Ru、Ir、Rh 较高分数平均与较低预测活性相关。这与强亲氧局域 motif 先俘获中间体并放大覆盖排斥的机制相符，但不能解释为脱离组成空间和表面状态的元素固有排序。</li>
+</ul>
+<h3 id="section-19">Figure 7：复杂度–活性不是单调关系，而是统计稀释与横向排斥共同造成的火山</h3>
+<ul>
+<li>二元、三元候选中存在超过 Pt(111) 的预测活性；随元素数上升，活性上包络收窄并下移。</li>
+<li>所评估八元合金中，最大预测活性仅约 <strong>Pt(111) 的 20%</strong>。</li>
+<li>从 PtPd 到 4/6/8 元等比例代表，O*/OH* 吸附强度分布逐步变宽；八元体系的分布跨度<strong>超过 3 eV</strong>，最优能量附近概率密度显著减少。</li>
+<li>空间热图由 PtPd 上广泛分布的高活性位点，演化为高复杂度表面上彼此隔离的低活性“岛”。这不是只有“最优 motif 被更多组合稀释”，还包括强亲氧位点先占据后产生的 coverage-dependent repulsion。</li>
+<li>activity–entropy upper envelope 呈火山形：左侧 <strong>ΔS_mix &lt; 4.16 J mol⁻¹ K⁻¹</strong> 时，局域配体/配位协同仍可提高活性；右侧 <strong>ΔS_mix &gt; 6.79 J mol⁻¹ K⁻¹</strong> 时，统计稀释与横向排斥主导下降；模型给出的最大活性区约为 <strong>4.16–6.79 J mol⁻¹ K⁻¹</strong>。</li>
+<li>论文据此把设计原则从“最大化总体混合熵”改为“在工作态表面保留高活性局域 motif，同时控制表面拥挤、短程有序和局域排斥”。作者也承认 operando 下可能发生短程有序、吸附诱导偏析等转变，真实 HEA 更像可调热力学储库而非固定随机表面。</li>
+</ul>
+<h2 id="section-20">Competitive overlap and implications</h2>
+<ul>
+<li><strong>竞争定位：Direct competitor；对应 Spin_SAC/HESAC。</strong> 该文直接覆盖“高熵/多金属 ORR—局域吸附能分布—好位点人口—复杂度/熵与活性关系”这一核心链条，不应只当一般 HEA 背景文献。</li>
+<li><strong>最强重叠不在材料形态，而在统计论证。</strong> Spin_SAC/HESAC 若主张复杂邻域扩大描述符分布并提高 low-η / good-site probability，本文已经证明：静态候选位点人口不等于工作态可访问人口；先占据、site blocking、氢键和排斥可以重新排序甚至移除“好位点”。</li>
+<li><strong>对 novelty 的实质压力。</strong> “higher entropy/complexity creates more diverse sites and therefore higher activity”不能再作为宽泛新结论。本文已给出八元素金属 HEA ORR 的系统反例：复杂度先有利、后因分布跨度 &gt;3 eV、亲氧位点俘获及提前排斥而下降，八元最好点也只有 Pt(111) 的约 20%。Spin_SAC/HESAC 的创新应落在<strong>自旋调控的 Fe-centered active pocket、相对隔离的单中心几何、邻域金属如何改变特定 OOH/OH 路径，以及可验证的概率增益条件</strong>，而不是泛化的“高熵带来更好位点”。</li>
+<li><strong>必须守住的体系边界。</strong> 本文对象是连续金属合金表面上密集且相互邻接的 fcc-hollow O* / atop OH*，可在 0.2–0.6 ML 范围出现显著横向作用；Spin_SAC 是碳载 Fe–N4/异质局域 pocket，若活性中心空间隔离，跨中心 adsorbate–adsorbate interaction 可能弱得多。另一方面，若 HESAC 模型本身含高密度相邻中心或多个可共占据位点，就不能仅凭“SAC”名称假定 lateral interaction 可忽略。</li>
+<li><strong>对 claim wording 的要求。</strong> 建议将表述限定为：“在当前单吸附态、Fe-centered 位点定义和采样组成范围内，复杂局域邻域提高某类低过电位 motif 的出现概率”；同时明确这不是“熵越高活性越高”，且 working coverage 可能重排该概率。若 medium complexity 也出现最佳位点，应主动展示非单调性，而非只比较 low vs high 的均值。</li>
+<li><strong>对机制拆分的启发。</strong> 本文把 <code>E_coverage − E_isolated</code> 作为有效 lateral contribution；Spin_SAC/HESAC 可借鉴成最小配对检查：固定同一局域 pocket，对比孤立 OOH*/OH* 与邻近预覆盖后的增量吸附能，从而区分“邻域金属导致的电子/自旋响应”与“吸附物横向作用”。不一定需要复制其全规模 MOBO，但至少要避免把两者混为 entropy effect。</li>
+<li><strong>对评价指标的启发。</strong> 除报告 mean/best adsorption energy 或低 η 比例，还应区分：原始候选位点比例、顺序占据后可访问比例、被强吸附物毒化比例，以及覆盖后仍落在目标窗口的位点比例。本文说明宏观活性更接近后几项，而不是空表面的静态直方图。</li>
+<li><strong>引用策略。</strong> 该文应在 introduction/related work 中用于承认 coverage-aware HEA ORR 的最新进展，并在 discussion/limitations 中正面约束 complexity–activity claim；不能只作为泛泛“ML for HEA”引用。最适合的对照句是：连续 HEA 表面上复杂度可通过统计稀释和 lateral repulsion 降低最优位点人口，而本项目检验的是相对隔离、可自旋调控 Fe–N4 pocket 是否具有不同的复杂度响应。</li>
+</ul>
+<h2 id="section-21">Limitations and caveats</h2>
+<ol>
+<li><strong>真正 SI 缺失。</strong> 当前虽已全文精读正文，但用户给出的补充材料确定属于另一篇 PCCP 金属/SiO2 界面论文，已完全排除。因此 DFT 参数、MLIP 训练超参数、顺序填位算法、电流密度完整方程、MOBO surrogate/acquisition 细节及 Tables S1–S5 的具体数据仍未核对；不能把本卡理解为“正文 + 正确 SI”的完全复现卡。</li>
+<li><strong>模型研究而非新实验闭环。</strong> PtIr、AgPd 的实验数据来自既有文献，主要验证组成趋势；论文没有对 Pareto 候选、Pd62Cu38 或 activity–entropy 火山做新的统一条件实验验证。</li>
+<li><strong>活性是描述符模型输出。</strong> 最优能量固定为 OH* +0.1 eV、O* +0.2 eV（相对 Pt），OOH* 又来自 scaling relation；电位、溶剂、电解质、双电层、显式动力学势垒及传质等未在正文展示为同等层次的显式模拟。125% 或 20% 等数值应称为 model-predicted activity，而非实测速率。</li>
+<li><strong><code>E_lateral</code> 是有效差分。</strong> <code>E_coverage − E_isolated</code> 同时包含共吸附层、结构弛豫及环境变化，正文的“氢键 vs 静电排斥”是物理解释，但未在主文中展示严格能量分解。</li>
+<li><strong>表面模型较理想化。</strong> 训练和评估以随机合金 slab 为核心；短程有序、偏析、吸附诱导重构、溶解及不同晶面/缺陷可能改变局域位点人口。作者在结尾承认 operando segregation/ordering，但没有在当前主流程中显式耦合。</li>
+<li><strong>结构池和元素空间限定结论。</strong> 火山区间 4.16–6.79 J mol⁻¹ K⁻¹、八元上限约 20% 及 SHAP 元素排序只适用于 Ag–Ir–Ru–Pd–Pt–Cu–Rh–Re、当前采样与代理模型；不能外推为所有 HEA、HESAC 或所有 ORR 电解质条件的普适定律。</li>
+<li><strong>误差向活性的传播未充分量化。</strong> 最终能量 MAE 约 0.052 eV、OOD 约 0.082 eV 已相当好，但火山映射会放大最优能量附近的小误差；正文未给出 Pareto 排名和活性上包络对 MLIP/DFT 不确定性的完整置信区间。</li>
+<li><strong>采样存在优化偏置。</strong> activity–entropy 关系来自两条 MOBO 轨迹的 700 个模型评估点，并非均匀穷举八维组成空间；40-bin upper envelope 描述的是所采样点的上限。hypervolume 收敛表示该优化协议下前沿趋稳，不等于全空间数学完备。</li>
+<li><strong>与 Spin_SAC/HESAC 不可直接等同。</strong> 连续金属 HEA 上的高覆盖共吸附和相对隔离 Fe–N4 pocket 的横向相互作用尺度可能不同；本文构成重要边界条件和竞争叙事，但不能直接证明 Spin_SAC 的复杂度优势必然消失。</li>
+</ol>
+<h2 id="section-22">Possible actions</h2>
+<ol>
+<li><strong>立即更新竞品与 claim audit</strong>：将 DOI <code>10.1021/jacs.6c09129</code> 标为 Direct competitor；记录其关键词 <code>coverage-aware MLIP</code>、<code>sequential site filling</code>、<code>good-site population</code>、<code>activity–entropy volcano</code>、<code>statistical dilution + lateral repulsion</code>。</li>
+<li><strong>收敛 Spin_SAC/HESAC 主 claim</strong>：避免“entropy/complexity 越高越好”；改为“特定复杂局域邻域在当前 Fe-centered、单吸附态定义下提高低 η motif 概率”，并主动报告 low/medium/high 是否非单调。</li>
+<li><strong>做一个最小 coverage robustness test</strong>：优先选 high/medium/low 各 1–2 个代表 Fe–N4 pocket，固定结构和计算协议，对比孤立吸附与邻近预覆盖后的增量 OOH*/OH* 能量；至少回答横向作用是否会改变候选排序，而不必一开始复制其 700-composition 流程。</li>
+<li><strong>把“概率”改成分层指标</strong>：同时给出静态低 η 比例、强吸附/潜在毒化比例、预覆盖后仍处于目标窗口的比例；如暂无多覆盖计算，则在正文限制中明确当前概率是 zero/low-coverage candidate probability。</li>
+<li><strong>强化差异化证据</strong>：围绕 Fe 中心自旋态、Fe–N4 局域电子结构、邻域元素诱导的自旋/电荷响应及 SAC 位点隔离度建立机制链；这些才是相对于连续金属 HEA coverage-aware 工作的更稳固 novelty。</li>
+<li><strong>获取正确 SI 后再补一次参数核验</strong>：正确附件应来自 ACS DOI <code>10.1021/jacs.6c09129</code>，而不是 <code>d0cp03216f1_suppl</code>。届时重点补 Sections S2–S4、DFT 设置、填位/电流公式、MOBO 细节以及 Tables S1–S5 的具体组成和数值；在此之前不要引用 SI 表中未见的最佳候选清单。</li>
+<li><strong>写作中正面引用而非回避</strong>：在讨论中明确承认连续 HEA 的工作态位点人口会随覆盖重排，再说明 Spin_SAC/HESAC 因单中心隔离和自旋自由度提出不同、可检验的设计窗口。这样可把该 Direct competitor 从 novelty 风险转化为项目边界与必要性证据。</li>
+</ol>
+</div><div class="credit">本文为辅助理解研究方法的中文解读。论文原图、图注及摘要内容归原作者和相应权利人；来源见文首论文链接。</div></article></main><script>window.MathJax={tex:{inlineMath:[['$','$'],['\\(','\\)']],displayMath:[['$$','$$'],['\\[','\\]']]},options:{skipHtmlTags:['script','noscript','style','textarea','pre','code']}};</script><script defer src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-mml-chtml.js"></script><footer><span>AI for Materials 文献精读</span><span>中文研究笔记 · 图与摘要注明论文来源 · 不提供论文 PDF</span></footer></body></html>

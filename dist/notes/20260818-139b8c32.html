@@ -1,0 +1,28 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Mixture of Experts Architectures for Machine Learning Interatomic Potentials · AI for Materials 文献精读</title><meta name="description" content="AI for Materials、原子模拟与科研智能体的中文文献解读"><link rel="stylesheet" href="../style.css"><link rel="icon" href="../icon.svg" type="image/svg+xml"></head><body><header><a class="brand" href="../index.html"><span class="mark">M</span><span>AI for Materials<small>文献精读 / RESEARCH NOTES</small></span></a><a class="header-link" href="../index.html#library">浏览文献 <span>↗</span></a></header><main class="article-layout"><aside><a href="../index.html#library">← 返回文献库</a><nav aria-label="文章目录"><a href="#section-1">What the paper asks</a><a href="#section-2">Methods</a><a href="#section-3">Main findings</a><a href="#section-4">Limitations and caveats</a><a href="#section-5">Possible actions</a></nav></aside><article><div class="eyebrow">RESEARCH NOTE / T6</div><h1>Mixture of Experts Architectures for Machine Learning Interatomic Potentials</h1><div class="article-meta"><span>机器学习势训练与泛化</span><span>收录 2026-08-18</span><span>4 分钟阅读</span></div><a class="original" href="https://doi.org/10.1038/s44387-026-00144-9" target="_blank" rel="noopener noreferrer">论文原文 ↗</a><div class="prose"><ul>
+<li><strong>Bibliographic status</strong>: Yuzhi Liu, Duo Zhang, Anyang Peng, Weinan E, Linfeng Zhang, Han Wang；npj Artificial Intelligence；online 2026-08-13；DOI <code>10.1038/s44387-026-00144-9</code>。当前来源标注为未经最终编辑的 early-access manuscript。</li>
+<li><strong>One-line takeaway</strong>: 在 DPA3 中，以始终激活的共享专家配合按元素身份稀疏选择的非线性专家，可在相近激活参数量下优于统一加宽的 dense 模型；但论文尚未证明实际吞吐、延迟、显存、通信和总训练成本优势。</li>
+</ul>
+<h2 id="section-1">What the paper asks</h2>
+<p>论文研究能否把语言模型中的稀疏 Mixture of Experts 引入 MLIP，使模型拥有较大的总容量，但每个输入只调用有限专家。关键困难是 MLIP 需要保持对称性和连续势能面；若专家选择随坐标突变，能量与力可能不连续并破坏分子动力学。</p>
+<p>作者选择以不变量特征为主的 DPA3，比较非线性 MoE、线性 MoLE、元素级路由、构型级全局路由、共享专家以及加宽 dense 模型，重点判断精度是否来自更大的激活容量，还是来自更合理的专家分工。</p>
+<h2 id="section-2">Methods</h2>
+<p>DPA3 的消息传递 dense blocks 被 MoE 或 MoLE 替换。MoE 中，各专家分别执行非线性变换，再对输出加权混合；MoLE 先混合专家权重，再统一施加非线性，因此等价于输入调制的 dense layer。</p>
+<p>元素级路由 MoE-E 以原子序数生成元素嵌入，再选择 Top-K 路由专家，同时加入始终激活的共享专家。由于路由只依赖元素身份，不随坐标变化，可避免原子运动触发硬切换。全局路由 MoE-G 则对构型元素嵌入平均池化，构型内所有原子共享专家组合。</p>
+<p>主要数据集为 OMol25、OMat24 和 OC20M，并在 MPtrj 上测试 CHGNet 迁移。模型固定训练 100 万步，比较 6 层、12 层 DPA3，4×/6× dense，以及不同 N、K 和共享专家比例。典型 N=64、K=6 模型总参数约 83M，单次激活参数约 7.8M。</p>
+<h2 id="section-3">Main findings</h2>
+<p>在 OMol25、N=64、无共享专家时，K 从 2 增至 8 的归一化能量 MAE 依次为 1.082、0.965、0.923、0.926，力 MAE 为 0.965、0.919、0.902、0.900。增加激活专家并不保证单调改进，K=2 的能量误差反而恶化，K=6 后基本饱和。</p>
+<p>当共享专家约占激活专家一半时，K=2、4、6、8 的归一化能量 MAE 为 0.939、0.771、0.740、0.673，力 MAE 为 0.913、0.779、0.747、0.715。共享专家在基本不改变激活预算的条件下稳定改善扩展趋势，说明公共知识骨干与专门化分支的分工比单纯增加专家数量更重要。</p>
+<p>在 K=4、两个共享专家时，MoE-E 相对无共享版本的能量 MAE 降低约 19.0%至22.0%，力 MAE 降低约 14.1%至15.2%；MoLE-E 的对应改善较小。相近激活参数预算下，N=64、K=4 的 MoE-E 又比 4× dense 的能量和力 MAE 分别低 5.8% 和 6.1%。</p>
+<p>元素级路由明显优于全局路由。本文实现的 MoE-G 出现灾难性训练失败；MoLE-E 的能量和力 MAE 比 MoLE-G 低约 5%至10%。该结果支持异质体系需要细粒度路由，但不能推出所有全局路由设计都必然不稳定。</p>
+<p>在 OMol25 和 OC20M 上，MoE 的能量 MAE 改善约 25%至30%，力 MAE 改善约 20%至25%；OMat24 的能量改善约 10%至15%，力改善低于 10%。收益明显依赖 backbone 和数据域。误差分布整体左移，高误差尾部也受到抑制，OC20M 最明显。</p>
+<p>作者报告双原子扫描平滑，数据集专用 checkpoint 的 50 ps NVE 轨迹能量漂移可忽略。OMat24 路由分数前两个 PCA 分量解释 93.57% 方差，并呈现周期表相关聚类。不过，路由输入本来就是元素身份，这只支持元素层面的统计专门化，不能证明专家已经学会氧化态、配位或反应机理。</p>
+<p>在半尺寸 CHGNet 上，N=32、K=6 的 MoE-E 将能量 MAE 从 35.9 降至 32.4 meV/atom，力 MAE 从 80.8 降至 75.9 meV/Å，应力 MAE 从 0.3636 降至 0.3468 GPa。该结果提供有限的跨 backbone 支持，同时也暴露完整尺寸模型加专家池后的显存问题。</p>
+<h2 id="section-4">Limitations and caveats</h2>
+<p>主要证据来自不变量 DPA3，普通非线性专家不能直接无缝插入所有等变张量模型。路由只依赖元素身份，不能显式区分同一元素的氧化态、配位、表面与体相、吸附态、过渡态或 OOD 状态。</p>
+<p>三组 benchmark 主要仍是各数据集内部验证，没有跨数据集零样本或严格 OOD 测试。50 ps NVE 与双原子扫描只能作为最低限度稳定性证据，不能覆盖长时间、极端条件、反应路径或相变。</p>
+<p>公平性主要依据激活参数量相近，而不是实测 FLOPs、wall-clock、显存和能耗相近。全部参数仍需存储，稀疏激活也有路由与 gather/scatter 开销。论文未报告专家并行、通信、负载均衡和实际吞吐，因此尚不能宣称端到端成本更低。</p>
+<h2 id="section-5">Possible actions</h2>
+<p>模型设计可借鉴“共享通用骨干加专门化分支”，但路由特征必须与体系异质性粒度匹配。对于外部 MLIP 路由，不应直接照搬元素身份路由；至少还要纳入局域环境、任务类型与不确定性，并为连续轨迹设计软混合、滞后区间或平滑权重，防止硬切换破坏能量和力连续性。</p>
+<p>评估时应同时报告实际训练和推理吞吐、峰值显存、通信、能耗、MD 漂移与同精度总成本。还需增加 OOD 元素、稀有局域环境、表面吸附、过渡态与长时动力学测试，并监控路由熵、专家利用率和负载均衡。</p>
+<p>本文足以把 MoE 作为复杂化学环境下值得测试的架构方向，但尚不足以改变 CatMaster 的默认模型路由。更合适的用法是作为窄 benchmark 候选，在明确的精度、稳定性与真实成本门下与 dense 模型比较。</p>
+</div><div class="credit">本文为辅助理解研究方法的中文解读。论文原图、图注及摘要内容归原作者和相应权利人；来源见文首论文链接。</div></article></main><script>window.MathJax={tex:{inlineMath:[['$','$'],['\\(','\\)']],displayMath:[['$$','$$'],['\\[','\\]']]},options:{skipHtmlTags:['script','noscript','style','textarea','pre','code']}};</script><script defer src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-mml-chtml.js"></script><footer><span>AI for Materials 文献精读</span><span>中文研究笔记 · 图与摘要注明论文来源 · 不提供论文 PDF</span></footer></body></html>

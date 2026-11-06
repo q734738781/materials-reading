@@ -1,0 +1,53 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>CatGo: Bridging CLI Coding Agents with Interactive Structure and Workflow Management for Computational Chemistry · AI for Materials 文献精读</title><meta name="description" content="AI for Materials、原子模拟与科研智能体的中文文献解读"><link rel="stylesheet" href="../style.css"><link rel="icon" href="../icon.svg" type="image/svg+xml"></head><body><header><a class="brand" href="../index.html"><span class="mark">M</span><span>AI for Materials<small>文献精读 / RESEARCH NOTES</small></span></a><a class="header-link" href="../index.html#library">浏览文献 <span>↗</span></a></header><main class="article-layout"><aside><a href="../index.html#library">← 返回文献库</a><nav aria-label="文章目录"><a href="#section-1">What the paper asks</a><a href="#section-2">Methods and data</a><a href="#section-3">Main findings</a><a href="#section-4">Key evidence</a><a href="#section-5">Limitations and caveats</a><a href="#section-6">Relevance to user projects</a><a href="#section-7">Possible actions</a><a href="#section-8">Citation notes</a></nav></aside><article><div class="eyebrow">RESEARCH NOTE / T8</div><h1>CatGo: Bridging CLI Coding Agents with Interactive Structure and Workflow Management for Computational Chemistry</h1><div class="article-meta"><span>智能体技术与科研系统</span><span>收录 2026-05-18</span><span>4 分钟阅读</span></div><a class="original" href="https://doi.org/10.26434/chemrxiv.15002984/v1" target="_blank" rel="noopener noreferrer">论文原文 ↗</a><div class="prose"><ul>
+<li><strong>Bibliographic status</strong>: Guangsheng Liu, Xiao Ma, Leshen Zhang, Jenedith Pascasio, Jonathan Yang, Yuxiang Chen, Wan-Lu Li, ChemRxiv preprint, posted 11 May 2026, DOI: 10.26434/chemrxiv.15002984/v1.</li>
+<li><strong>One-line takeaway</strong>: CatGo 是一个面向计算化学的 LLM coding-agent + MCP + 可视化 workflow 平台，和 CatMaster 竞品/相邻工作高度相关；需要认真比对，但应避免在 CatMaster 中被其“workflow automation”叙事牵着走。</li>
+</ul>
+<h2 id="section-1">What the paper asks</h2>
+<p>计算化学 workflow 的瓶颈越来越不是单个 DFT/MD 计算，而是跨结构构建、参数化、作业提交、监控、后处理和 provenance 的多步骤组织。该文问的是：能否让 CLI coding agents 通过统一接口直接构建和执行可视化、可追踪的计算化学 DAG workflow。</p>
+<h2 id="section-2">Methods and data</h2>
+<ul>
+<li>提出 CatGo 平台。</li>
+<li>使用 Model Context Protocol (MCP) 作为 agent-operable interface。</li>
+<li>人类用自然语言指定目标，CLI-based agents 构建、验证、执行和监控 DAG workflows。</li>
+<li>支持结构生成、催化模型准备、电子结构计算、MD 分析和后处理。</li>
+<li>集成 VASP、CP2K、ORCA、LAMMPS 和 MLIP frameworks。</li>
+<li>通过 bidirectionally synchronized visual workflow editor 让人类和 agent 共享 workflow state。</li>
+<li>引入 compact graph-state serialization 和 batch workflow mutation operations，降低 LLM tool-calling overhead。</li>
+</ul>
+<h2 id="section-3">Main findings</h2>
+<ul>
+<li>CatGo 把 code-centric workflow framework 包装成 agent 可操作和人机共用的 workflow state。</li>
+<li>端到端演示为 Pt(111) 上 ORR workflow：从 slab generation、adsorbate placement、geometry optimization、vibrational analysis 到 free-energy assembly。</li>
+<li>论文强调从单条自然语言指令自动生成 executable multi-node computational pipeline。</li>
+<li>其创新点更偏 workflow infrastructure / UI + MCP + DAG orchestration，而非新的催化科学机制发现。</li>
+</ul>
+<h2 id="section-4">Key evidence</h2>
+<ul>
+<li>摘要明确说 CatGo is an AI-native computational chemistry platform designed for direct operation by LLM coding agents through MCP。</li>
+<li>支持多个计算引擎，并通过 compact graph-state serialization / batch mutation 降低 tool-calling overhead。</li>
+<li>ESI 还提到 elemental substitution、cation intercalation、MCP action palette、26-node MACE-MLP workflow 等 worked examples。</li>
+</ul>
+<h2 id="section-5">Limitations and caveats</h2>
+<ul>
+<li>该文是 preprint，未同行评议。</li>
+<li>摘要层面主要展示 workflow 生成能力；科学发现深度、错误恢复、DFT/ML validation gate 和人工审计边界需要进一步核对全文。</li>
+<li>如果只看 Pt(111) ORR demo，可能仍偏“自动搭流程”，未必证明 autonomous catalytic discovery。</li>
+<li>与 CatMaster 存在叙事重叠，引用时要清楚区分：CatGo 强在 workflow infrastructure；CatMaster 需强调 virtual ecosystem、scientific decision logic、validation gates 和 evidence upgrading。</li>
+</ul>
+<h2 id="section-6">Relevance to user projects</h2>
+<ul>
+<li><strong>CatMaster</strong>：高度相关，是需要重点跟踪的近邻/竞品。可用于 Introduction/Related Work 说明 computational chemistry agent workflows 正在快速出现。</li>
+<li><strong>AI4X PPT</strong>：可提醒避免过度展示内部 architecture；强调 CatMaster 的催化科研决策闭环而不只是 workflow editor。</li>
+<li><strong>CSR Review</strong>：可放入 LLM agents for computational chemistry workflows 小节。</li>
+</ul>
+<h2 id="section-7">Possible actions</h2>
+<ol>
+<li>标为 <strong>High</strong>：建议手动审阅 Fig.、Methods 和 demo 案例，整理 CatMaster vs CatGo 对比表。</li>
+<li>CatMaster 写作中避免声称“唯一/首次” workflow agent；改强调“catalysis-oriented virtual ecosystem with validation and human supervision”。</li>
+<li>若后续做 related work，可从该文提取 MCP、DAG、tool-call compression 等关键词。</li>
+</ol>
+<h2 id="section-8">Citation notes</h2>
+<ul>
+<li>ChemRxiv DOI: 10.26434/chemrxiv.15002984/v1；posted 11 May 2026；正式引用前核对作者列表和版本。</li>
+</ul>
+</div><div class="credit">本文为辅助理解研究方法的中文解读。论文原图、图注及摘要内容归原作者和相应权利人；来源见文首论文链接。</div></article></main><script>window.MathJax={tex:{inlineMath:[['$','$'],['\\(','\\)']],displayMath:[['$$','$$'],['\\[','\\]']]},options:{skipHtmlTags:['script','noscript','style','textarea','pre','code']}};</script><script defer src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-mml-chtml.js"></script><footer><span>AI for Materials 文献精读</span><span>中文研究笔记 · 图与摘要注明论文来源 · 不提供论文 PDF</span></footer></body></html>

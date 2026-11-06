@@ -1,0 +1,36 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>将多保真学习接入实验闭环，按需发现热固性材料配方 · AI for Materials 文献精读</title><meta name="description" content="AI for Materials、原子模拟与科研智能体的中文文献解读"><link rel="stylesheet" href="../style.css"><link rel="icon" href="../icon.svg" type="image/svg+xml"></head><body><header><a class="brand" href="../index.html"><span class="mark">M</span><span>AI for Materials<small>文献精读 / RESEARCH NOTES</small></span></a><a class="header-link" href="../index.html#library">浏览文献 <span>↗</span></a></header><main class="article-layout"><aside><a href="../index.html#library">← 返回文献库</a><nav aria-label="文章目录"><a href="#section-1">方法怎样做：用配方表示连接数据，再让预测指导实验</a><a href="#section-2">主要结果：多源预测、实验效率与目标配方的共同改善</a><a href="#section-6">研究贡献</a><a href="#section-7">附：完整原始摘要中文翻译</a></nav></aside><article><div class="eyebrow">RESEARCH NOTE / T3</div><h1>将多保真学习接入实验闭环，按需发现热固性材料配方</h1><div class="article-meta"><span>自主实验闭环</span><span>收录 2026-10-16</span><span>5 分钟阅读</span></div><a class="original" href="https://doi.org/10.1021/acs.chemmater.6c01600" target="_blank" rel="noopener noreferrer">论文原文 ↗</a><div class="prose"><p><strong>Scalable Thermoset Informatics Integrated with Autonomous Experimentation for On-Demand Discovery</strong><br />
+Marcus R. Fratarcangeli、Ayush Jain、Farzad Gholami 等｜Chemistry of Materials，2026｜<a href="https://doi.org/10.1021/acs.chemmater.6c01600" target="_blank" rel="noopener noreferrer">DOI</a>｜</p>
+<p>光固化打印需要面向具体用途的树脂：有时要柔软、可拉伸，有时要更硬、更强，同时还要满足固化速度和温度要求。单体、交联剂及其配比形成庞大组合空间，逐一配料和测试十分费力。这篇工作将热固性材料数据库、性质预测与部分自驱实验室接在一起，让模型提出配方、实验测量反馈，寻找同时满足多项目标的材料。</p>
+<p>作者以热固性丙烯酸酯为对象，融合实验室、文献和分子动力学数据，训练单任务与多任务模型，再把模型放进真实配料和表征流程。最终完成目标弹性材料的优化，人工投入减少超过 90%，目标优化约需 40 小时主动实验时间。</p>
+<h2 id="section-1">方法怎样做：用配方表示连接数据，再让预测指导实验</h2>
+<p>热固性材料固化后形成交联网络，同一单体的作用会随着配比和其他组分变化。作者建立的 ThermosetDB 将组分、配方、加工步骤、样品和性质关联起来，整合实验室测试、文献和模拟结果，为模型提供组成与性能之间的对应关系。</p>
+<p>每个组分先写成 SELFIES 分子字符串，由 polyBART 编码为数值向量。这种“嵌入”把分子的化学结构变为模型可以处理的特征。作者比较了按配比平均组分向量的方式，以及将组分和摩尔分数放进关系图、由图神经网络学习组合贡献的方式；后者利用组分之间的信息传递形成整份配方的表示。</p>
+<p><img src="../assets/20261016-2a86d194/fig01.png" alt="数据、模型与实验闭环" loading="lazy" width="1750" height="1666" />
+<em>图1｜多来源数据进入数据库和配方模型，候选搜索连接配料、固化监测与力学测量，新数据再返回训练。</em></p>
+<p>多任务模型同时学习模量、玻璃化转变温度 Tg、强度等性质，利用它们与组成之间的相关关系。文献数据扩展化学覆盖；模拟则从单体混合、交联和弛豫出发，生成固化网络，通过降温过程的体积变化估计 Tg，为实验预测补充另一类保真度的信息。</p>
+<p><img src="../assets/20261016-2a86d194/fig03.png" alt="多来源数据及性质关系" loading="lazy" width="1500" height="1750" />
+<em>图3｜实验室、文献和模拟数据的化学覆盖、性质分布及相关性，说明融合学习可以利用哪些信息。</em></p>
+<p>模型接收目标性质后，优化器在配方空间选择待测组合。初期以贝叶斯优化在离散配比网格中探索，结合预测和不确定度，每轮提出四个配方。积累数据后，可求导的多任务图网络从较好的配方出发，沿预测更接近目标的方向连续调整比例，进一步细化组成。</p>
+<p>候选进入部分自驱实验室后，系统按质量反馈自动配料、混合，记录紫外固化过程中的扭矩和温度，再由机器人拉伸系统测量试样，提取模量、极限强度和断裂伸长。研究者安排制样及必要的样品操作，自动平台承担重复配料、测量和分析，使模型与真实材料性质形成循环。</p>
+<h2 id="section-2">主要结果：多源预测、实验效率与目标配方的共同改善</h2>
+<h3 id="section-3">独立测量验证为闭环提供数据基础</h3>
+<p>作者先分别检验平台组件：比较目标与实际配料质量，将固化监测结果连接到打印曝光，并用两种刚度的聚合物对照自动拉伸系统与商用测试机。应力—应变曲线和提取性质接近，使自动采集结果能够进入后续模型训练。</p>
+<p><img src="../assets/20261016-2a86d194/fig02.png" alt="实验平台组件验证" loading="lazy" width="1254" height="1035" />
+<em>图2｜配料质量、固化时间映射及自动拉伸与商用设备的比较，将自动操作接到可用的材料测量。</em></p>
+<p>对于每轮四个配方，主动人工时间由约 <strong>400 分钟降到 35 分钟，减少 91.3%</strong>。自动测量和结果提取使研究者可以将精力从持续操作与手工分析转向实验设计。</p>
+<h3 id="section-4">多任务与多来源数据提高性质预测</h3>
+<p>在十折交叉验证中，图网络的 Tg 均方根误差，从单任务、仅实验室数据的约 <strong>43.3 K</strong>，降到多任务、实验—文献联合训练的约 <strong>30.1 K</strong>。在专门考察模拟数据增广的另一组实验中，加入全量模拟数据后，Tg 预测误差从 <strong>41.8 K 降到 34.47 K</strong>。这两组结果展示了性质相关性、额外化学覆盖和模拟信息对预测的帮助。</p>
+<p><img src="../assets/20261016-2a86d194/fig04.png" alt="性质预测与模拟增广" loading="lazy" width="2088" height="1794" />
+<em>图4｜预测与实验性质的比较，以及增加分子动力学数据后 Tg 预测的变化。</em></p>
+<h3 id="section-5">从粗配比搜索到实际打印材料</h3>
+<p>目标弹性材料需要模量接近 1.2 MPa、强度与模量之比超过 3、断裂伸长超过 200%，同时满足快速固化和加工温度要求。前期探索建立数据覆盖后，贝叶斯搜索先找到 <strong>85.0 wt% BCOE 与 15.0 wt% DEGDMA</strong> 的组合，梯度细化再将比例调整到 <strong>87.4:12.6</strong>。</p>
+<p>BCOE 是单官能丙烯酸酯，DEGDMA 是双官能交联剂；调整比例改变了固化网络的形成及其力学表现。最终配方测得 <strong>模量 1.2 MPa、极限拉伸强度 3.7 MPa、断裂伸长 200.9%</strong>，并满足设定加工窗口。作者将树脂打印为薄片、Gyroid 结构和立方晶格，进一步进行循环拉伸或压缩测试。</p>
+<p><img src="../assets/20261016-2a86d194/fig05.png" alt="配方细化与实物验证" loading="lazy" width="1500" height="1269" />
+<em>图5｜优化过程、预测与实测性质、打印样品及循环力学表现，把模型找到的配比接到真实材料。</em></p>
+<p>目标优化约用 <strong>40 小时主动实验时间</strong>完成，体现了数据库、预测器、优化器和实验设备共同工作的效率。</p>
+<h2 id="section-6">研究贡献</h2>
+<p>这篇工作给出了一条面向热固性配方的端到端发现路线。它既处理组分组合与多种性质，又把实验室、文献和模拟数据嵌入持续更新的模型；部分自驱实验室则将候选转为实际机械与加工测量。通过目标弹性材料的优化，作者展示多保真学习怎样进入实验室工作流程，使按需配方发现能够以较少人工和较少穷举实验推进。</p>
+<h2 id="section-7">附：完整原始摘要中文翻译</h2>
+<p>随着光聚合物增材制造日趋成熟，对按需、面向特定应用的材料的需求不断增长。一个主要瓶颈是对新型热固性聚合物配方巨大设计空间的探索不足，而这些配方必须同时满足材料性质要求与加工约束。这一挑战源于配方的组合复杂性和实验评价的高成本。在本工作中，我们提出一条端到端流程，将部分自驱实验室（p-SDL）与信息学驱动的优化相结合，用于发现并验证热固性丙烯酸酯配方。</p>
+<p>该流程从一个热固性丙烯酸酯数据库开始，整合包括实验室内部实验、分子动力学模拟和文献数据在内的多种数据来源。这些数据集用于训练单任务与多任务预测模型，模型直接对接 p-SDL，以指导实验并测量力学性质及加工相关性质。每个组件先独立验证，再联合部署以优化一个目标弹性材料，使人工投入减少超过 90%。完整优化只需要约 40 小时的主动实验时间，展示了无需穷尽筛选即可快速找到满足多项目标性质的配方。本工作建立了一个可扩展框架，将多保真机器学习嵌入实验室工作流程，使自主、数据驱动的热固性配方发现成为可能。</p>
+</div><div class="credit">本文为辅助理解研究方法的中文解读。论文原图、图注及摘要内容归原作者和相应权利人；来源见文首论文链接。</div></article></main><script>window.MathJax={tex:{inlineMath:[['$','$'],['\\(','\\)']],displayMath:[['$$','$$'],['\\[','\\]']]},options:{skipHtmlTags:['script','noscript','style','textarea','pre','code']}};</script><script defer src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-mml-chtml.js"></script><footer><span>AI for Materials 文献精读</span><span>中文研究笔记 · 图与摘要注明论文来源 · 不提供论文 PDF</span></footer></body></html>

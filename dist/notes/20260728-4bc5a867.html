@@ -1,0 +1,55 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Auto Research for Materials: Auditable AI-Scientist Workflows with Held-Out Transfer · AI for Materials 文献精读</title><meta name="description" content="AI for Materials、原子模拟与科研智能体的中文文献解读"><link rel="stylesheet" href="../style.css"><link rel="icon" href="../icon.svg" type="image/svg+xml"></head><body><header><a class="brand" href="../index.html"><span class="mark">M</span><span>AI for Materials<small>文献精读 / RESEARCH NOTES</small></span></a><a class="header-link" href="../index.html#library">浏览文献 <span>↗</span></a></header><main class="article-layout"><aside><a href="../index.html#library">← 返回文献库</a><nav aria-label="文章目录"><a href="#section-1">Bibliographic status</a><a href="#section-2">One-line takeaway</a><a href="#section-3">What the paper asks</a><a href="#section-4">Methods</a><a href="#section-5">Main findings</a><a href="#section-6">Limitations and caveats</a><a href="#section-7">Possible actions</a></nav></aside><article><div class="eyebrow">RESEARCH NOTE / T8</div><h1>Auto Research for Materials: Auditable AI-Scientist Workflows with Held-Out Transfer</h1><div class="article-meta"><span>智能体技术与科研系统</span><span>收录 2026-07-28</span><span>5 分钟阅读</span></div><a class="original" href="https://arxiv.org/abs/2607.17100" target="_blank" rel="noopener noreferrer">论文原文 ↗</a><div class="prose"><h2 id="section-1">Bibliographic status</h2>
+<ul>
+<li>作者：Jingjie Ning, Xiaochuan Li, Shanshan Zhong, Ji Zeng, Guolin Ke</li>
+<li>状态：arXiv <code>2607.17100v1</code>（2026-07-21）</li>
+<li>全文状态：PDF 已归档，MinerU 解析成功（11 页）。</li>
+<li>High 类型：<strong>Incremental insight</strong></li>
+<li>对应项目：CatMaster</li>
+</ul>
+<h2 id="section-2">One-line takeaway</h2>
+<p>这篇文章把 AI scientist 的验收对象从“循环中最高分”改成“冻结的可执行代码是否在不可见 holdout 上仍有效、能否跨任务复用并与其他独立发现组合”；这为 CatMaster 后续 hypothesis/code-agent benchmark 提供了比 demo 完成率更严格的评价设计。</p>
+<h2 id="section-3">What the paper asks</h2>
+<ol>
+<li>agent 反复读取开发分数后获得的改进，是否能在完全未进入循环的数据上保持？</li>
+<li>改进来自 feature、model、representation 还是 external data，能否归因？</li>
+<li>agent 生成的代码变化是否能跨材料端点复用，或与独立发现组合？</li>
+<li>如何隔离 holdout label 并保留完整可重放审计记录？</li>
+</ol>
+<h2 id="section-4">Methods</h2>
+<ul>
+<li>在 Matbench 的 10 个端点上开展 7 次搜索，共评价 701 个代码变化。</li>
+<li>将可修改内容拆成四类 intervention：手工 feature、model/calibration、learned representation、external training data；每次搜索只允许修改一类，其他源文件恢复并用 hash 验证。</li>
+<li>agent 每轮提出假设、修改代码、运行固定 evaluator、读取结果，再决定下一次试验。</li>
+<li>搜索信号仅为 Matbench fold-0 训练分区内部的五折均值（shuffle seed 42）；fold-0 test label 从不载入 agent 进程。</li>
+<li>搜索结束后冻结最佳代码；只在 untouched fold-0 test 上评价一次。若训练内选择在 holdout 上仍为已测单一 intervention 中最佳，则算 selection transfer。</li>
+<li>每次 trial 记录 hypothesis、code diff、score、runtime、status、parent trial 和 source hash；外部数据按 reduced formula 去重并检查与 train/test 重合。</li>
+<li>使用 DeepSeek-v4-pro 生成假设与代码；Codex 只协助后续代码审阅和稿件修改。</li>
+</ul>
+<h2 id="section-5">Main findings</h2>
+<ol>
+<li><strong>Figure 1：搜索与最终证据隔离。</strong> agent 只能见训练内五折均值；代码先冻结，再打开 holdout，避免把适应性搜索误当泛化证据。</li>
+<li><strong>九个端点通过 selection transfer。</strong> 10 个任务中，9 个由搜索信号选出的单类 intervention 在 holdout 上仍是已测最佳；唯一不一致是 <code>matbench_jdft2d</code>，训练内 feature 改进，但 128 个 holdout 样本更偏好 baseline。</li>
+<li><strong>组成任务没有单一万能方案。</strong> feature、model 和 representation 平均均有约 5–7% 的改进路线；band gap held-out MAE 降 17.4%，steel strength 降 18.6%，两个分类任务 AUC 也提高。</li>
+<li><strong>外部数据增益很小。</strong> 53 个 external-data intervention 最终仅使搜索信号平均改善 0.76%、holdout 0.20%、benchmark replay 0.03%；在严格筛重后，小规模外部数据不如改 feature/model/representation。</li>
+<li><strong>有结构时几何描述符改变 intervention hierarchy。</strong> 九个轻量结构描述符将 phonon MAE 由 66.05 降到 54.98、bulk modulus MAE 由 0.0837 降到 0.0655；composition embeddings 则无改善或变差。</li>
+<li><strong>可复用代码比单任务分数更重要。</strong> 独立找到的 feature 与 model 变化可以直接组合；结构任务组合后 mean held-out improvement 为 26.3%，官方 CV 为 27.0%。</li>
+<li><strong>Figure 2–5 的共同结论</strong>：有效输出是可归因、冻结、可迁移的 executable intervention，而不是 agent 活动量、自然语言想法或 in-loop best score。</li>
+<li><strong>审计记录暴露真实 implementation discrepancy。</strong> <code>jdft2d</code> 模型搜索的 calibration state 在独立进程 replay 时未恢复，分数从 40.62 变到 60.47；虽然不影响主要 9/10 结论，却说明 process replay 是必要质量检查。</li>
+</ol>
+<h2 id="section-6">Limitations and caveats</h2>
+<ul>
+<li>任务都是数字化的监督学习端点，并非 DFT/实验闭环或催化机理发现。</li>
+<li>fold-0 test 是主要独立证据；官方 Matbench folds 1–4 与搜索池有样本复用，因此只算 benchmark context。</li>
+<li>搜索只用一个 agent/model、固定 seed 和 trial budget；9/10 不能外推到所有 AI scientist。</li>
+<li>多 intervention 组合在看到单项结果后构造，不计入预先定义的 selection-transfer 结论。</li>
+<li>“代码可复用”仍在相近材料预测端点内验证，不等于跨软件栈、跨研究范式迁移。</li>
+</ul>
+<h2 id="section-7">Possible actions</h2>
+<ol>
+<li>CatMaster 后续 benchmark 将输出对象定义为冻结 artifact/代码/工作流变化，而不是“agent 完成任务”或最佳 in-loop 结果。</li>
+<li>对 hypothesis/code-agent 测试隔离 final evidence：agent 不得读取 holdout 标签/最终高精度计算，选择冻结后仅评价一次。</li>
+<li>将 intervention 分成 prompt/planner、tool/workflow、scientific model/descriptor、data，避免多类同时变化导致无法归因。</li>
+<li>要求每项发现有 hypothesis、diff、parent、score、runtime、failure 与 source hash，并验证独立进程 replay。</li>
+<li>当前只作为 CatMaster benchmark 设计输入，不据此重启大规模 Matbench 或材料筛选实验。</li>
+</ol>
+</div><div class="credit">本文为辅助理解研究方法的中文解读。论文原图、图注及摘要内容归原作者和相应权利人；来源见文首论文链接。</div></article></main><script>window.MathJax={tex:{inlineMath:[['$','$'],['\\(','\\)']],displayMath:[['$$','$$'],['\\[','\\]']]},options:{skipHtmlTags:['script','noscript','style','textarea','pre','code']}};</script><script defer src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-mml-chtml.js"></script><footer><span>AI for Materials 文献精读</span><span>中文研究笔记 · 图与摘要注明论文来源 · 不提供论文 PDF</span></footer></body></html>

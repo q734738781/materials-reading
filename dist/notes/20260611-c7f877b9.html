@@ -1,0 +1,59 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Harnessing AtomisticSkills for Agentic Atomistic Research · AI for Materials 文献精读</title><meta name="description" content="AI for Materials、原子模拟与科研智能体的中文文献解读"><link rel="stylesheet" href="../style.css"><link rel="icon" href="../icon.svg" type="image/svg+xml"></head><body><header><a class="brand" href="../index.html"><span class="mark">M</span><span>AI for Materials<small>文献精读 / RESEARCH NOTES</small></span></a><a class="header-link" href="../index.html#library">浏览文献 <span>↗</span></a></header><main class="article-layout"><aside><a href="../index.html#library">← 返回文献库</a><nav aria-label="文章目录"><a href="#section-1">Bibliographic status</a><a href="#section-2">One-line takeaway</a><a href="#section-3">What the paper asks</a><a href="#section-4">Methods</a><a href="#section-5">Main findings</a><a href="#section-6">Limitations and caveats</a><a href="#section-7">Possible actions</a></nav></aside><article><div class="eyebrow">RESEARCH NOTE / T8</div><h1>Harnessing AtomisticSkills for Agentic Atomistic Research</h1><div class="article-meta"><span>智能体技术与科研系统</span><span>收录 2026-06-11</span><span>8 分钟阅读</span></div><a class="original" href="https://arxiv.org/abs/2605.24002" target="_blank" rel="noopener noreferrer">论文原文 ↗</a><div class="prose"><h2 id="section-1">Bibliographic status</h2>
+<ul>
+<li><strong>Source PDF</strong>:</li>
+<li><strong>Parsed Markdown</strong>: <code>文献PDF与解析/260611/mineru_md_shortnames_no_formula_table/p04.pdf/auto/p04.pdf.md</code></li>
+<li><strong>Topic</strong>: AtomisticSkills / skill-library infrastructure for agentic atomistic research.</li>
+<li><strong>Status</strong>: arXiv preprint.</li>
+<li><strong>Priority note</strong>: 用户特别指出 AtomicSkills/AtomisticSkills 值得注意；本卡片重点展开。</li>
+</ul>
+<h2 id="section-2">One-line takeaway</h2>
+<p>AtomisticSkills 的核心不是再造一个单体“AI 科学家”，而是把计算材料、化学、药物发现和 MLIP 工作流拆成可复用 skill + MCP tools + rules 的层级 harness，让通用 coding agent 能在人工监督下执行多步 atomistic research；这与 nanobot skill-bank / CatMaster 工程化方向高度相关。</p>
+<h2 id="section-3">What the paper asks</h2>
+<p>文章要解决的痛点是：现有科学 agent 往往是 monolithic platform，围绕 LangChain 等框架重新实现提示词、子 agent 通信、UI、状态管理和工具接口，迁移和维护成本高；而 atomistic research 本身又高度依赖环境、脚本、数据库、HPC、模拟软件和领域规范。作者因此提出：是否可以把原子尺度科研中的常用操作模块化为 skills，让任意通用 coding agent 在统一约定下调用，从而更容易组合成端到端工作流？</p>
+<p>它关心三个层面：</p>
+<ol>
+<li><strong>覆盖度</strong>：现有计算材料/化学/药物发现文献中的常见操作，多少可以被 skill library 覆盖？</li>
+<li><strong>可执行性</strong>：skills 是否能真正驱动 agent 完成材料生成、筛选、MLIP benchmark/fine-tuning、GCMC、docking、XRD 分析、催化表面筛选等任务？</li>
+<li><strong>架构价值</strong>：skill + tool + rule 的层级 harness 是否比 monolithic scientific agents 更可迁移、更可演化、更适合作为未来长时程 agent 的执行层？</li>
+</ol>
+<h2 id="section-4">Methods</h2>
+<p>AtomisticSkills 架构包含三层：</p>
+<ul>
+<li><strong>MCP toolbox</strong>：底层工具通过 Model Context Protocol 暴露给 agent，包括文件操作、命令执行、数据库查询、结构处理、模拟调用、远程任务管理等。它们是较确定性的 primitive tools。</li>
+<li><strong>Skill library</strong>：中层 skill 是半程序化的研究单元，每个 skill 可包含 Markdown 指南、脚本、示例、输入输出规范和依赖说明。skill 把复杂科学操作封装为可被 agent 阅读和执行的 procedure。</li>
+<li><strong>Rules</strong>：上层规则定义科研标准和安全边界，例如计算合理性、验证步骤、报告要求、失败处理和人工确认点。</li>
+</ul>
+<p>文章还进行了两类验证：</p>
+<ol>
+<li><strong>文献 skill coverage analysis</strong>：从 500 篇 <code>npj Computational Materials</code> 文章中抽取操作技能，统计每篇论文需要多少 skills、最常见 skills 及 AtomisticSkills 的覆盖比例；还扩展到 J. Phys. Chem. Letters 和 drug discovery 文献。</li>
+<li><strong>案例工作流展示</strong>：包括 Li-ion solid electrolyte generative design、MOF CO2 capture screening、MLIP benchmark/fine-tuning、structure-based drug discovery docking、XRD screenshot digitization/phase analysis、Fe-oxide OER surface screening。</li>
+</ol>
+<h2 id="section-5">Main findings</h2>
+<ul>
+<li><strong>架构层面</strong>：Fig. 1 展示了 skill library 作为中间层的意义：底层 MCP tools 提供可执行 primitive，上层 skills 把领域流程组织成可复用模块，rules 保证科研规范。这样通用 coding agent 不必为每个科学任务重新发明 workflow。</li>
+<li><strong>文献覆盖分析</strong>：对 500 篇 <code>npj Computational Materials</code> 论文的 mining 显示，典型计算材料论文往往依赖少于 10 个互联 skills。AtomisticSkills 平均覆盖约 56.2% 的计算材料技能使用，约 15% 的论文可达到 100% operation mapping，同时约 12% 的论文 coverage 为 0，主要来自新算法、实验方法或特殊小众领域。</li>
+<li><strong>Li-ion SSE 生成设计</strong>：workflow 使用 MatterGen 生成 352 个 halide-based Li-ion SSE 候选，再用 UMA foundation MLIPs 和 DFT 评估热力学/电化学稳定性，并通过多温度 MD 与 diffusion analysis 提取离子电导和活化能。最终报告 LiErCl4 和 LiErBr4 两个此前未报道候选，预测室温电导分别约 63.4 和 4.5 mS cm^-1，活化能约 0.14 和 0.237 eV。作者也提醒 MD 只有约 20–100 ps，筛选阈值和超参数会影响可靠性。</li>
+<li><strong>MOF CO2 capture screening</strong>：agent 从 QMOF/ARC-MOF 取 10 个候选，用 Henry coefficient 和 heat of adsorption 初筛，再做 GCMC isotherm。候选 qmof-004080b 的 Henry 系数约 4.64×10^-5 mol kg^-1 Pa^-1，Qst 约 -26.0 kJ/mol，1–0.01 bar working capacity 约 3.0 mmol/g；但在 0.0004 bar DAC 区域 loading 很低，因此并不适合 DAC，只适合作为 physisorbent workflow demonstration。</li>
+<li><strong>MLIP benchmark/fine-tuning</strong>：workflow 组合 automatic PES sampling、remote HPC DFT、foundation potential selection、benchmark 和 fine-tuning。Li10GeP2S12 案例中 benchmark TensorNet、CHGNet、MACE、UMA 等 FPs，再使用 <code>ml-mace-finetune</code> skill 对 MACE-OMAT-0-small 进行 30 epoch fine-tuning，验证 energy/force MAE 可下降。</li>
+<li><strong>药物发现 workflow</strong>：在 DUD-E CDK2 benchmark 上执行 receptor preparation、redocking validation、large-scale docking、post-docking refinement。Vina active/decoy 分类 AUC 约 0.70，并进一步做 explicit-water MD 和 MM-GBSA 分析，说明 skill 概念可跨材料与药物发现。</li>
+<li><strong>XRD multimodal analysis</strong>：agent 从文献截图出发，通过 xrd-digitizer 进行曲线数字化，再调用 phase analysis/refinement 和 synthesis recommendation，展示 multimodal + domain tools 的组合潜力。</li>
+<li><strong>Fe-oxide OER surface screening</strong>：agent 使用 high-throughput virtual screening workflow，从 Fe-O bulk polymorphs 生成低指数表面，放置 OH*/O* 等吸附物，用 MLIP 估算 OER overpotential volcano descriptor，展示催化表面筛选能力。</li>
+<li><strong>Discussion 的核心观点</strong>：当前框架仍主要是 co-pilot：人类给高层目标、监督多日工作流、验证复杂结果。但 skill infrastructure 可以随通用长时程 agent 能力提升而升级，不需要从零训练或重写完整 agent 平台。</li>
+</ul>
+<h2 id="section-6">Limitations and caveats</h2>
+<ul>
+<li>案例大多是 workflow feasibility demonstration，不能把每个候选材料/药物/催化剂结果视为已验证科学发现。</li>
+<li>文献 coverage analysis 依赖自动 mining 和人工 mapping，skill 粒度定义会影响覆盖率。</li>
+<li>skill 能让 agent 更可靠地执行流程，但不能自动保证底层计算参数、势函数、DFT 设置、MD 长度和统计收敛都充分。</li>
+<li>对复杂长周期任务，仍需要人工 checkpoint；作者也承认目前 agent 主要受限于 short-horizon capability。</li>
+<li>多个案例使用 foundation MLIP 或短 MD 作为筛选，若要发表科学结论仍需更严格 DFT/实验验证。</li>
+</ul>
+<h2 id="section-7">Possible actions</h2>
+<ul>
+<li><strong>对 nanobot/CatMaster 很重要</strong>：该文直接支持“skills as reusable research procedures”的路线。CatMaster 可以强调 virtual ecosystem / skill-based execution layer，而不是 monolithic autonomous scientist。</li>
+<li><strong>对工程化设计</strong>：可借鉴 MCP toolbox + skill library + rules 三层结构，把通用远程接口、DFT/MLFF/HPC、文献、建模、报告都封装成 skills。</li>
+<li><strong>对汇报叙事</strong>：可把 AtomisticSkills 定位为竞品/平行路线：它偏“通用原子尺度 skill harness”，CatMaster 可突出“催化计算科研生态 + validation gates + provenance + HPC/DFT/ML workflow”。</li>
+<li><strong>对本地工作流</strong>：优先硬化高频 skills：PDF→文献卡片、DFT evidence package、fixed slab filling adsorption matrix、low-frequency computation patrol、MLFF smoke test triage。</li>
+<li><strong>需注意命名</strong>：用户说 AtomicSkills，但论文标题为 AtomisticSkills；汇报时可保留正确标题并在备注中说明。</li>
+</ul>
+</div><div class="credit">本文为辅助理解研究方法的中文解读。论文原图、图注及摘要内容归原作者和相应权利人；来源见文首论文链接。</div></article></main><script>window.MathJax={tex:{inlineMath:[['$','$'],['\\(','\\)']],displayMath:[['$$','$$'],['\\[','\\]']]},options:{skipHtmlTags:['script','noscript','style','textarea','pre','code']}};</script><script defer src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-mml-chtml.js"></script><footer><span>AI for Materials 文献精读</span><span>中文研究笔记 · 图与摘要注明论文来源 · 不提供论文 PDF</span></footer></body></html>

@@ -1,0 +1,52 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>AskChem: Claim-Centered Infrastructure for Chemistry Literature Synthesis · AI for Materials 文献精读</title><meta name="description" content="AI for Materials、原子模拟与科研智能体的中文文献解读"><link rel="stylesheet" href="../style.css"><link rel="icon" href="../icon.svg" type="image/svg+xml"></head><body><header><a class="brand" href="../index.html"><span class="mark">M</span><span>AI for Materials<small>文献精读 / RESEARCH NOTES</small></span></a><a class="header-link" href="../index.html#library">浏览文献 <span>↗</span></a></header><main class="article-layout"><aside><a href="../index.html#library">← 返回文献库</a><nav aria-label="文章目录"><a href="#section-1">What the paper asks</a><a href="#section-2">Methods</a><a href="#section-3">Main findings</a><a href="#section-4">Limitations and caveats</a><a href="#section-5">Possible actions</a></nav></aside><article><div class="eyebrow">RESEARCH NOTE / T8</div><h1>AskChem: Claim-Centered Infrastructure for Chemistry Literature Synthesis</h1><div class="article-meta"><span>智能体技术与科研系统</span><span>收录 2026-08-06</span><span>8 分钟阅读</span></div><a class="original" href="https://arxiv.org/abs/2607.28618" target="_blank" rel="noopener noreferrer">论文原文 ↗</a><div class="prose"><ul>
+<li><strong>Bibliographic status</strong>: Bing Yan, Gregory Wolfe, Stefano Martiniani, Kyunghyun Cho；2026；arXiv:2607.28618v1 <code>[cs.CL]</code>，提交于 2026-07-30；正式发表/同行评议状态待核对。在线系统 <code>https://askchem.org</code>，MIT 源码与 CC-BY index snapshot 已公开。</li>
+<li><strong>One-line takeaway</strong>: AskChem 将化学文献检索单位从“论文”改成带 DOI 与原文证据的 typed claim，并在 240 万 claims 上统一叠加多面 taxonomy、证据关系图和 agent API，显著改善引文可解析性，但其 provenance 保证的是可追溯而非 claim 语义正确或科学真实性。</li>
+<li><strong>High 类型</strong>: Incremental insight</li>
+</ul>
+<h2 id="section-1">What the paper asks</h2>
+<p>论文针对跨论文化学综述：答案往往由分散在多篇论文中的催化剂、条件、测量和机制片段拼成，而传统搜索只返回论文列表。作者问：能否把带来源证据的原子 claim 作为统一检索对象，使人和 AI agent 可直接搜索具体发现、检查引文、连接支持/矛盾关系并组装答案？同时评估该基础设施是否能在语料规模上运行，以及能否降低 DOI 幻觉、提高跨论文答案的引用密度与相关性。</p>
+<h2 id="section-2">Methods</h2>
+<ul>
+<li><strong>核心对象</strong>：Claim 是原子化 typed assertion，必含 source DOI 和 verbatim quote；若全文结构化证据无法对应连续原句，则用明确 <code>evidence_locator</code>。字段可含 reactants、roles、products、conditions、measurements/outcomes、materials、claim type、confidence。</li>
+<li><strong>共享身份与结构</strong>：Source 保存 venue/year/citations/authors（作者消歧来自 OpenAlex）；TreeNode 把同一 claim 放入一个或多个 taxonomy paths；Edge 记录 claim 间有向关系。搜索、浏览和图遍历返回同一 provenance-bearing claim ID。</li>
+<li><strong>抽取管线</strong>：高吞吐 abstract extractor 用 GPT-5-mini；deep full-text extractor 用 Gemini 3.1 Pro + Vertex AI batch native PDF；少量 legacy 数据来自 GPT-4o/mini。JSON constrained decoding 后做 schema、必需 provenance、数值范围和化学字段校验，失败自动重试。</li>
+<li><strong>规模</strong>：147K papers（1925–2026）、2.4M grounded claims、307K populated faceted nodes；SQLite/FTS5 + vector index，FastAPI 服务。证据图含 171,342 typed edges。</li>
+<li><strong>Evidence graph</strong>：第二遍抽取 <code>cites_as_evidence / supports / extends / contradicts / derives_from</code> 有向边，保留 confidence 和 provenance；对 148 条分层样本由领域专家审计。</li>
+<li><strong>Stabilized faceted taxonomy</strong>：语料摄取时归纳路径，再经 canonical L1 routing、同义词规范化、模糊聚类稳定为持久 L1/L2/L3。内容视图包括 reaction、substance、application、technique、mechanism；另有 claim type、data、time、author。</li>
+<li><strong>检索</strong>：Hybrid <code>/search</code> 将 FTS5 claim text、paper recall、taxonomy-node recall、dense-vector recall 用 reciprocal rank fusion 合并；claim 携带 view paths，支持分组、层级扩展和图邻域。</li>
+<li><strong>Living Taxonomy</strong>：探索性地把 paper-grounded leaves 放在 principle/theory/model/mechanism/phenomenon 下；4,931 nodes，覆盖 1.1M claims、361K paper placements，无法合适归类可 abstain 并提新 branch。</li>
+<li><strong>AskChem-Bench</strong>：30 个跨论文问题，分 condition aggregation、temporal tracking、contradiction surfacing 各 10。GPT-5.5 在 no retrieval、AskChem、Paperclip、Edison Scientific PaperQA-family、NotebookLM Deep Research 五设置回答。AskChem 将问题改写为 3–4 subqueries，最多多样化 40 claims；DOI 逐一 CrossRef 校验。Gemini 3.1 Pro relevance judge 用 100 个专家标签校准（93% agreement，κ=0.914）。</li>
+<li><strong>接口</strong>：同一对象通过 web UI、REST、SDK、MCP 暴露；API 支持 search、claim、neighborhood、source，并提供 benchmark snapshot 与重跑脚本。</li>
+</ul>
+<h2 id="section-3">Main findings</h2>
+<ol>
+<li><strong>Claim 级索引已经达到产品规模（Fig. 2–3）</strong>：2.4M claims 来自 147K papers，跨 1925–2026；所有 claim 均有 claim type、source DOI 和 quote/locator。注意 100% 是 schema/provenance completeness，不是 100% 语义正确。</li>
+<li><strong>三种结构互补而非互相替代（Fig. 2、4–5）</strong>：facets 回答“关于什么”，evidence graph 回答“发现之间如何关联”，Living Taxonomy 回答“由何种原则统摄”。统一 claim ID 避免搜索结果、层级摘要和关系图成为互不相干的数据副本。</li>
+<li><strong>证据关系抽取初步精度高</strong>：148 条分层审计中 2 条 undecidable；其余 146 条中 143 条 relation type 正确，precision <code>97.9%</code>。但这是边类型小样本精度，不代表边召回、claim 正确或整图可靠。</li>
+<li><strong>AskChem-Bench 的引用 groundedness 改善（Table 1、Fig. 6）</strong>：AskChem-grounded GPT-5.5 的 DOI 可解析率为 100%，no-retrieval 为 88.3%；在五系统中 citation density 最高，平均每答案 <code>18.1</code> 个 verified DOI，并获最高 mean relevance 和 recent high-impact coverage。代表案例中裸模型 14 个 DOI 有 6 个虚构，AskChem 后 22 个全部可解析。</li>
+<li><strong>开放、快速的 claim infrastructure 与深研究 agent 各有取舍</strong>：Edison Scientific 输出更多 citation-linked quantitative detail，on-topic rate 略高；AskChem 强项是 claim-level、open-data、交互速度和直接 agent tool access，并非所有答案质量指标都领先。</li>
+<li><strong>taxonomy 已进入检索链但独立贡献未证明</strong>：stabilized facets 既用于 browse/group，也提供 hybrid recall；然而论文没有单独消融 taxonomy recall。Living Taxonomy 有 663 个 open proposed branches，定位为探索性 overview，不是验证过的化学 ontology。</li>
+<li><strong>具体 schema 展示了可迁移粒度</strong>：例如电催化 CO₂→CO claim 同时编码 catalyst role、product、98% Faradaic efficiency、1622 h⁻¹ TOF、原句及 reaction path；这比 paper-level embedding 更适合条件聚合，但尚未强制结构/测量协议可比性。</li>
+</ol>
+<h2 id="section-4">Limitations and caveats</h2>
+<ul>
+<li>语料只覆盖化学文献一部分；大量数据来自摘要，无法获得全文中的限制、条件细节和反常结果，abstract/full-text claims 的信息深度不均。</li>
+<li>DOI + quote 证明“可定位”，不证明抽取正确、语义角色正确或 claim 为真；LLM 可能误解否定、条件范围、比较基准或因果性。</li>
+<li>AskChem-Bench 仅 30 问，主要衡量 citation groundedness/relevance，未全面评价事实准确性、数值可比性、矛盾处理质量和真实用户效用。</li>
+<li>与 paper-level 系统的 evidence budget/可见内容不完全同构；AskChem 按暴露 claims 评价，其他系统按标题/摘要与引文评价，不能将所有差异归因于 claim representation。</li>
+<li>evidence-edge 审计只有 146 个 decidable 样本，且仅 precision；没有 recall、跨关系混淆矩阵和下游增益消融。</li>
+<li>taxonomy string normalization 可能合并本应不同的类别或保留近重复；facet placement 和 Living Taxonomy placement 缺系统专家验证。</li>
+<li>论文描述 supports/contradicts，但未展示成熟的冲突裁决、证据权重、撤回/版本更新和 claim 生命周期管理。</li>
+<li>预印本与在线系统数据持续变化；卡片中的 corpus 数字对应论文版本，后续需用 recorded snapshot 才可复现。</li>
+</ul>
+<h2 id="section-5">Possible actions</h2>
+<ul>
+<li>为 CatMaster typed evidence graph 对照吸收字段：<code>claim_id / claim_type / subject-role / relation / object-value / unit / conditions / source_id / exact locator / extraction confidence / scope / version</code>。</li>
+<li>明确区分 literature-derived claim 与 calculation-derived claim；后者必须绑定结构哈希、计算软件/版本、输入协议、原始输出、parser 和收敛状态，不能只存自然语言 quote。</li>
+<li>采用 AskChem 的统一 identity 思路：检索 facet、证据关系、项目视图都引用同一 claim，不复制摘要；所有答案可回跳至原始计算或论文证据。</li>
+<li>做 50–100 条催化 claim 小型专家审计，分开报告 extraction precision、condition completeness、unit correctness、relation precision/recall 和 contradiction detection，而非只报“有 provenance”。</li>
+<li>为可比性增加硬字段/边：same_structure、same_reference_state、same_functional、comparable_conditions；不满足时禁止直接聚合能量或活性数值。</li>
+<li>对 AskChem API/MCP 做小规模试用：选 CO₂ 加氢或 MOF 吸附问题，检查 claim 搜索是否能减少人工定位时间，并人工核验 quote 与条件。</li>
+<li>增加 claim 生命周期（active/superseded/contradicted/retracted/deprecated）及事务式写入/回滚，可与 MemTxn 的治理层结合。</li>
+</ul>
+</div><div class="credit">本文为辅助理解研究方法的中文解读。论文原图、图注及摘要内容归原作者和相应权利人；来源见文首论文链接。</div></article></main><script>window.MathJax={tex:{inlineMath:[['$','$'],['\\(','\\)']],displayMath:[['$$','$$'],['\\[','\\]']]},options:{skipHtmlTags:['script','noscript','style','textarea','pre','code']}};</script><script defer src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-mml-chtml.js"></script><footer><span>AI for Materials 文献精读</span><span>中文研究笔记 · 图与摘要注明论文来源 · 不提供论文 PDF</span></footer></body></html>

@@ -1,0 +1,33 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Cross-Geometry Transferability Assessment of Universal Machine Learning Interatomic Potentials: From Bulk Materials to Atomic Nanowires · AI for Materials 文献精读</title><meta name="description" content="AI for Materials、原子模拟与科研智能体的中文文献解读"><link rel="stylesheet" href="../style.css"><link rel="icon" href="../icon.svg" type="image/svg+xml"></head><body><header><a class="brand" href="../index.html"><span class="mark">M</span><span>AI for Materials<small>文献精读 / RESEARCH NOTES</small></span></a><a class="header-link" href="../index.html#library">浏览文献 <span>↗</span></a></header><main class="article-layout"><aside><a href="../index.html#library">← 返回文献库</a><nav aria-label="文章目录"><a href="#section-1">What the paper asks</a><a href="#section-2">Methods</a><a href="#section-3">Main findings</a><a href="#section-4">Limitations and caveats</a><a href="#section-5">Possible actions</a></nav></aside><article><div class="eyebrow">RESEARCH NOTE / T6</div><h1>Cross-Geometry Transferability Assessment of Universal Machine Learning Interatomic Potentials: From Bulk Materials to Atomic Nanowires</h1><div class="article-meta"><span>机器学习势训练与泛化</span><span>收录 2026-08-16</span><span>3 分钟阅读</span></div><a class="original" href="https://doi.org/10.48550/arXiv.2608.06662" target="_blank" rel="noopener noreferrer">论文原文 ↗</a><div class="prose"><ul>
+<li><strong>Bibliographic status</strong>: Pedro H. M. Zanineli, Bruno Focassio, Gabriel R. Schleder. 2026. arXiv:2608.06662v1, Materials Science / Computational Physics preprint. DOI: <code>10.48550/arXiv.2608.06662</code>.</li>
+<li><strong>One-line takeaway</strong>: 通用 MLIP 在同一 ZrO₂ 化学体系内也会因几何环境由体相转向表面、颗粒、颈部和原子线而显著退化；部署前必须用覆盖目标结构流形的数据微调，并以具体物性和动力学而非平均能量/力误差验收。</li>
+</ul>
+<h2 id="section-1">What the paper asks</h2>
+<p>论文研究的是一个常被平均测试误差掩盖的问题：在元素组成不变时，通用或基础型 MLIP 能否跨越体相、表面、纳米颗粒、烧结颈部和原子级细线等不同配位与维度环境可靠迁移。作者以实验观察到的 ZrO₂ 去烧结过程为背景，将“结构几何改变”独立成评测轴，比较零样本推断、微调和从头训练，并检查监督误差的改善是否真的转化为弹性、振动、表面能和颈部动力学的可靠性。</p>
+<h2 id="section-2">Methods</h2>
+<p>作者构建了包含 bulk、slab、particle、neck、wire 五类几何的 DFT 数据集。颈部数据来自 300 K AIMD 下施加拉伸的双锥形 ZrO₂ 团簇，包含迁移、成键重排、配位降低与颈缩；原子线同时考虑化学计量与缺氧构型，并进行准静态拉伸和 300 K 热化。数据先按几何分层划分，再剔除单原子力大于 3 eV Å⁻¹ 的结构，最终约为 72%/18%/10% 的训练、验证和测试集。</p>
+<p>零样本阶段比较 26 个预训练势，并做参考能对齐。后续选 MACE 与 ORB 代表性检查点，在相同 50 epoch 条件下比较零样本、全参数微调和从头训练。迁移实验既做单几何微调，也在控制总原子环境数的前提下混合五类几何。最终的物理验证包括体相弹性和晶格动力学、不同取向表面能，以及远离平衡的颈部 MD；这一层级设计用于检验平均 RMSE 与实际科学任务是否一致。</p>
+<h2 id="section-3">Main findings</h2>
+<ol>
+<li>零样本误差具有显著几何依赖。ORB-V3 是文中最佳零样本模型，经参考能对齐后能量 RMSE 为 6 meV/atom、力 RMSE 为 197.3 meV/Å，但最大力误差集中在颈部和原子线。即使最好的力误差也高于常用于稳定、定量动力学的目标，因此不能因模型被称为 universal/foundation 就直接用于低配位动力学。</li>
+<li>在固定 50 epoch 的对比下，微调比从头训练得到更低的能量和力误差，而墙钟时间相近。这里证明的是预训练初始化在该受控设置中的优势，并不意味着任何微调策略都优于从头训练。</li>
+<li>单几何微调通常提高域内精度，却经常损害其他几何类别，出现负迁移。混合几何微调在控制数据量后仍能降低跨几何误差差异；MACE 的力 RMSE 随混合数据增加由约 100 降至 70 meV/Å。核心变量不是简单“更多数据”，而是目标模拟会经过哪些配位和维度环境。</li>
+<li>平均能量/力 RMSE 不能统一预测物性表现。零样本模型在部分弹性与振动性质上仍较好，适配模型在部分重叠的表面域改善更明显；颈部轨迹又暴露出静态聚合指标看不到的动力学差异。因而模型排序必须随任务和物理验证对象变化。</li>
+<li>对 CatMaster 的直接规则是：候选 MLIP 不能只过平均 RMSE 门。涉及表面重构、颗粒—颈部—低维结构连续变化时，训练/校准集必须覆盖这些几何，且验收至少包含结构 QC、目标物性与短时动力学稳定性；窄域微调不能默认用于跨域生产。</li>
+</ol>
+<h2 id="section-4">Limitations and caveats</h2>
+<ul>
+<li>体系只有 ZrO₂，且是强离子性、低维环境；几何覆盖的重要性具有一般意义，但具体模型排序和误差阈值不能外推到所有催化体系。</li>
+<li>MP-C 与 MP-NC 分组差异同时混合了预训练数据、架构、训练目标和参考能约定，论文无法把这些因素拆开归因。</li>
+<li>表面能测试部分具有插值性质，因为训练集中含有部分相同或近邻取向；不能将其当作严格 OOD 验证。</li>
+<li>颈部 MD 每个模型仅有一条初步轨迹，适合揭示风险，不足以形成稳定性统计结论。</li>
+<li>长程静电、力筛选、轨迹级相关性和训练是否充分收敛仍未分离。混合几何数据可改善结果，不代表短程模型的物理表示已足够。</li>
+</ul>
+<h2 id="section-5">Possible actions</h2>
+<ol>
+<li>将 CatMaster 的 MLIP 验证门固定为“几何分层误差 + 目标物性 + 动力学/结构 QC”，避免只按总能量和总力 RMSE 排名。</li>
+<li>对会经历表面、吸附、颈缩、断键或低配位环境的任务，先建立目标几何清单；微调数据必须按这些环境分层取样，而不是仅增加相近平衡结构。</li>
+<li>对窄域微调结果标注部署边界；一旦任务跨越训练几何，升级到混合域微调、主动学习或 DFT 回退。</li>
+<li>比较 UMA、MACE 或其他候选势时，保留 top-k，并用相同结构集合做属性级验证，不用单一平均指标宣布“最佳模型”。</li>
+</ol>
+</div><div class="credit">本文为辅助理解研究方法的中文解读。论文原图、图注及摘要内容归原作者和相应权利人；来源见文首论文链接。</div></article></main><script>window.MathJax={tex:{inlineMath:[['$','$'],['\\(','\\)']],displayMath:[['$$','$$'],['\\[','\\]']]},options:{skipHtmlTags:['script','noscript','style','textarea','pre','code']}};</script><script defer src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-mml-chtml.js"></script><footer><span>AI for Materials 文献精读</span><span>中文研究笔记 · 图与摘要注明论文来源 · 不提供论文 PDF</span></footer></body></html>

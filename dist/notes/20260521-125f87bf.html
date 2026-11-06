@@ -1,0 +1,220 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Information-entropy-driven generation of interpretable machine-learned interatomic potentials · AI for Materials 文献精读</title><meta name="description" content="AI for Materials、原子模拟与科研智能体的中文文献解读"><link rel="stylesheet" href="../style.css"><link rel="icon" href="../icon.svg" type="image/svg+xml"></head><body><header><a class="brand" href="../index.html"><span class="mark">M</span><span>AI for Materials<small>文献精读 / RESEARCH NOTES</small></span></a><a class="header-link" href="../index.html#library">浏览文献 <span>↗</span></a></header><main class="article-layout"><aside><a href="../index.html#library">← 返回文献库</a><nav aria-label="文章目录"><a href="#section-1">Bibliographic status</a><a href="#section-2">One-line takeaway</a><a href="#section-3">What the paper asks</a><a href="#section-4">Methods（展开方法细节）</a><a href="#section-11">Main findings（详细解读正文图与结果）</a><a href="#section-25">Limitations and caveats</a><a href="#section-26">Possible actions</a></nav></aside><article><div class="eyebrow">RESEARCH NOTE / T6</div><h1>Information-entropy-driven generation of interpretable machine-learned interatomic potentials</h1><div class="article-meta"><span>机器学习势训练与泛化</span><span>收录 2026-05-21</span><span>13 分钟阅读</span></div><a class="original" href="https://doi.org/10.1038/s41524-025-01602-9" target="_blank" rel="noopener noreferrer">论文原文 ↗</a><div class="prose"><ul>
+<li><strong>Source PDF</strong>:</li>
+<li><strong>Local extracted text</strong>: <code>_extracted_text/3097474.txt</code>; article web text saved as <code>_extracted_text/3097474_nature.md</code>; supplementary material under <code>_src/3097474/</code></li>
+</ul>
+<h2 id="section-1">Bibliographic status</h2>
+<ul>
+<li><strong>Title</strong>: <em>Information-entropy-driven generation of interpretable machine-learned interatomic potentials</em></li>
+<li><strong>Authors</strong>: Francesco Grasselli; Luke Avery; Yury Lysogorskiy; Stan Moore; Aidan P. Thompson; Rohit Batra; Danny Perez</li>
+<li><strong>Journal/status</strong>: npj Computational Materials, 2025, Article 147. DOI: <code>10.1038/s41524-025-01602-9</code>.</li>
+<li><strong>Paper type</strong>: methodology/data-selection paper for ML interatomic potentials; interpretable ACE potential construction.</li>
+<li><strong>Keywords</strong>: active learning, information entropy, MaxVol/D-optimality, ACE, SNAP, MLIAP, Rev-EM, Ni, materials dynamics, model training-set diversity.</li>
+</ul>
+<h2 id="section-2">One-line takeaway</h2>
+<p>这篇文章把MLIP训练集选择从“靠MD/active-learning采样更多结构”转成“最大化descriptor矩阵信息熵/多样性”的几何问题：通过按D-optimal/MaxVol思想选择最不冗余的原子环境，作者用约100个DFT构型训练出Ni的ACE势（ACE-1），在多项结构、热力学和动力学测试上接近大数据集主动学习势，并且更可解释、更省DFT成本。</p>
+<h2 id="section-3">What the paper asks</h2>
+<p>论文要回答的问题是：</p>
+<ol>
+<li><strong>训练MLIP时，怎样用尽量少的DFT数据覆盖最大的原子环境多样性？</strong> 传统做法常依赖MD轨迹、主动学习或人工经验；但这些数据集中经常有大量相似结构。</li>
+<li><strong>能否用信息论/线性代数原则直接选择训练结构？</strong> 作者提出选择能最大化信息熵、提升descriptor矩阵体积的构型，减少冗余。</li>
+<li><strong>这种数据选择是否能训练出可解释且准确的ACE势？</strong> 他们选择Ni作为测试体系，用少量高信息量结构训练ACE，并和SNAP、Rev-EM、MTP等势及大数据集训练势比较。</li>
+<li><strong>信息熵选择出来的结构是否对应物理上多样的局域环境？</strong> 作者不仅看RMSE，还分析了selected atoms/configurations在descriptor空间中的分布，以及它们对应的原子排列。</li>
+</ol>
+<h2 id="section-4">Methods（展开方法细节）</h2>
+<h3 id="section-5">1. 理论框架：从information entropy到D-optimal selection</h3>
+<p>作者把MLIP训练集看成一个由原子环境descriptor组成的矩阵问题。对于线性或近线性的MLIP（如SNAP/ACE的线性系数形式），训练数据的有效性取决于descriptor矩阵是否：</p>
+<ul>
+<li>覆盖足够多方向；</li>
+<li>行/环境之间不高度共线；</li>
+<li>对参数估计有较高信息量。</li>
+</ul>
+<p>在这种视角下，选择训练结构等价于选择一组能最大化矩阵体积/行列式的代表性环境。这与实验设计中的D-optimality和MaxVol思想相关：最大化信息矩阵的行列式，对应最大化参数估计的信息熵、最小化冗余。</p>
+<h3 id="section-6">2. 单原子环境选择：从large pool中挑representative atoms</h3>
+<p>流程大致是：</p>
+<ol>
+<li>构造一个包含多种Ni构型的候选池，包括晶体、缺陷、表面、液体/无序、高温结构等。</li>
+<li>对每个原子局域环境计算ACE/SNAP-like descriptor。</li>
+<li>形成descriptor矩阵。</li>
+<li>用information entropy / D-optimal / MaxVol标准选择一组最具线性独立性和信息量的原子环境。</li>
+<li>再把这些被选中的原子环境映射回其所在DFT构型，形成用于训练势的configurations集合。</li>
+</ol>
+<p>这一步非常关键：作者不是随机选构型，也不是按能量/力误差触发DFT；而是先看descriptor空间中哪些环境最能扩展训练集的span。</p>
+<h3 id="section-7">3. 从selected atoms到selected configurations</h3>
+<p>MLIP训练需要完整DFT构型的总能、力和应力，而不是单独原子环境标签。因此作者将被选中的informative atomic environments对应到完整configuration上。一个configuration可能因为其中某个局域环境很独特而被纳入训练集。</p>
+<p>这会产生两个效果：</p>
+<ul>
+<li>训练集大小以configuration计数约100个，但局域原子环境覆盖远大于100；</li>
+<li>被选构型往往包含缺陷、表面、液体、短程异常或高能局域结构，因为这些环境在descriptor空间中更“独特”。</li>
+</ul>
+<h3 id="section-8">4. 模型类型：ACE/SNAP等可解释MLIAP</h3>
+<p>论文主要围绕ACE（Atomic Cluster Expansion）势展开，并与其他势/训练集策略比较。</p>
+<ul>
+<li><strong>ACE</strong>具有系统的多体基函数展开，可线性拟合能量；相比黑箱深度势，descriptor/基函数和能量贡献更可追踪。</li>
+<li>作者训练多个ACE模型，例如ACE-1、ACE-2、ACE-3等，区别在训练数据选择、势参数/截断或数据扩展策略。</li>
+<li>还与SNAP、MTP、Rev-EM等Ni势比较，评估不同模型在晶体、缺陷、表面、弹性、声子、相变和液体等任务上的表现。</li>
+</ul>
+<h3 id="section-9">5. 训练/验证任务设计</h3>
+<p>作者没有只用train/test RMSE评价，而是做了一系列物理性质验证：</p>
+<ul>
+<li>低能晶体/多晶型和能量-体积曲线；</li>
+<li>弹性常数；</li>
+<li>空位、间隙、堆垛层错等缺陷能；</li>
+<li>表面能；</li>
+<li>声子谱；</li>
+<li>高压相变；</li>
+<li>熔化/液体性质；</li>
+<li>与DFT和已有势的对比。</li>
+</ul>
+<p>这种多任务验证非常重要，因为MLIP常出现“测试集RMSE好，但动力学/缺陷/表面崩”的问题。作者试图证明信息熵选择集不仅降低误差，也覆盖了物理应用空间。</p>
+<h3 id="section-10">6. Supplementary数据与参数</h3>
+<p>补充材料列出了不同势的训练集规模和拟合误差。例如Supplementary Table 1显示：</p>
+<ul>
+<li>SNAP：135 training configs，total energy RMSE约0.009 eV/atom，force RMSE约0.29 eV/Å。</li>
+<li>ACE-1：100 training configs，energy RMSE约0.004 eV/atom，force RMSE约0.20 eV/Å。</li>
+<li>ACE-2：127 training configs，energy RMSE约0.003 eV/atom，force RMSE约0.16 eV/Å。</li>
+<li>ACE-3：181 training configs，energy RMSE约0.004 eV/atom，force RMSE约0.16 eV/Å。</li>
+</ul>
+<p>补充图还展示了更大的energy cutoff（如25 eV/atom）如何扩展候选集并支持生成更多高能/液体/非平衡结构。</p>
+<h2 id="section-11">Main findings（详细解读正文图与结果）</h2>
+<h3 id="section-12">Figure 1：entropy maximization workflow示意图</h3>
+<p>Figure 1展示信息熵驱动训练集生成的整体流程。它把MLIP数据集构建拆成三个层级：</p>
+<ol>
+<li><strong>候选结构池</strong>：包含多种物理环境，例如晶体、缺陷、表面、液体或高温/非平衡构型。</li>
+<li><strong>descriptor空间选择</strong>：将每个局域原子环境映射到ACE/SNAP描述符向量，用MaxVol/D-optimality类算法选择最能增加descriptor矩阵体积的环境。</li>
+<li><strong>DFT训练集与MLIP拟合</strong>：把selected environments所在的完整构型拿去做DFT或进入训练集，再训练ACE势。</li>
+</ol>
+<p>这张图的核心结果不是数值，而是范式转变：active learning通常在模型误差高处请求新DFT，而这里先用信息几何最大化覆盖度，强调“少而不冗余”。</p>
+<h3 id="section-13">Figure 2：entropy-selected environments在descriptor空间中的多样性</h3>
+<p>Figure 2展示被选中的原子环境相对于候选池的分布。虽然原文图像细节包括降维/投影和选中点标记，但主要结论是：</p>
+<ul>
+<li>entropy selection不会只选热力学低能晶体附近的环境；</li>
+<li>被选点倾向落在descriptor空间的边界或稀疏区域；</li>
+<li>这些点对应的结构通常包含局域畸变、缺陷、表面、液态/无序和高能原子排列；</li>
+<li>随机或轨迹顺序采样更容易在高密度区域重复选择相似环境。</li>
+</ul>
+<p>解读：这支持作者“训练集冗余是MLIP低效的主要来源之一”的观点。对于MLIP泛化，真正有价值的不是更多相似MD帧，而是能够张成descriptor空间的少数极端/代表环境。</p>
+<h3 id="section-14">Figure 3：selected structures的物理可解释性</h3>
+<p>Figure 3进一步把selected environments可视化回真实Ni构型。它回答一个重要问题：MaxVol/D-optimal选择出来的点是否只是数学上异常、物理上无意义？作者展示这些环境对应可理解的物理类别，例如：</p>
+<ul>
+<li>表面或低配位原子；</li>
+<li>缺陷附近原子；</li>
+<li>高温液体或短程无序环境；</li>
+<li>压缩/拉伸晶格中的异常局域邻域；</li>
+<li>可能影响势能面外推的高能结构。</li>
+</ul>
+<p>因此，这种方法不仅是数学采样，也能产生物理可解释的数据集设计理由。对可解释MLIP而言，这是很重要的优点。</p>
+<h3 id="section-15">Figure 4：训练集大小/信息熵与模型误差关系</h3>
+<p>Figure 4讨论随着entropy-selected training set扩展，MLIP误差如何变化。主要信息是：</p>
+<ul>
+<li>早期加入的高信息量构型会快速降低energy/force RMSE；</li>
+<li>继续加入构型后边际收益下降；</li>
+<li>相比随机/普通采样，同样数量构型下entropy selection能给出更低误差或更稳定拟合；</li>
+<li>这说明训练集质量比简单数量更重要。</li>
+</ul>
+<p>Supplementary Table 1中的RMSE也支持这一点：ACE-1只用100个training configurations，就达到energy RMSE 0.004 eV/atom、force RMSE 0.20 eV/Å；增加到127/181个构型后force RMSE进一步降至约0.16 eV/Å，但收益开始变小。</p>
+<h3 id="section-16">Figure 5：ACE-1与DFT在低能晶体/能量体积曲线上的一致性</h3>
+<p>正文后续结果开始检验物理性质。Figure 5主要展示ACE-1等势对低能Ni结构的能量排序、晶格响应或energy-volume relation的预测。</p>
+<p>解读要点：</p>
+<ul>
+<li>对Ni这种相对简单的单元素金属，势必须准确描述fcc基态及相关晶体结构；</li>
+<li>ACE-1在训练集很小的情况下能重现DFT低能结构附近的势能面；</li>
+<li>如果势只记住训练点而没有正确局域曲率，就会在能量-体积曲线、弹性或声子中暴露问题。</li>
+</ul>
+<p>这部分结果说明entropy-selected结构足以约束低能bulk区域，而不仅是高能/边界环境。</p>
+<h3 id="section-17">Figure 6 和 Table 1：弹性常数、缺陷能、表面能等基本材料性质</h3>
+<p>Figure 6及Table 1比较了不同势对Ni基本性质的预测，包括：</p>
+<ul>
+<li>晶格常数/内聚能；</li>
+<li>弹性常数；</li>
+<li>空位形成能；</li>
+<li>间隙/缺陷形成能；</li>
+<li>表面能；</li>
+<li>堆垛层错或相关平面缺陷。</li>
+</ul>
+<p>主结论是ACE-1/ACE-2在许多性质上接近DFT和已有势；少量信息熵选择数据可以支撑较宽的性质预测。相比只看RMSE，这些性质更能说明势是否可用于真实材料模拟。</p>
+<p>需要注意的是，正文也显示不同性质对训练集覆盖的敏感性不同：某些表面/缺陷/高压结构可能需要额外训练构型或调整cutoff，不能仅靠最小100构型势一劳永逸。</p>
+<h3 id="section-18">Figure 7：声子谱/动力学稳定性</h3>
+<p>Figure 7测试ACE势是否能给出合理的Ni声子谱或振动态性质。声子是对势能面二阶导数的严格检验：</p>
+<ul>
+<li>能量RMSE低不一定保证声子正确；</li>
+<li>如果局域曲率或长波弹性不对，会出现虚频、频率偏移或声学支错误；</li>
+<li>ACE-1/ACE-2能较好复现DFT/参考声子趋势，说明训练集对近基态小扰动环境有足够覆盖。</li>
+</ul>
+<p>这证明信息熵选择并没有只关注大畸变/高能极端环境，也保留了对低能振动性质的描述能力。</p>
+<h3 id="section-19">Figure 8：堆垛层错/位错相关能量面</h3>
+<p>Figure 8关注Ni这类fcc金属中很重要的层错或剪切相关能量面。层错能对塑性、位错运动和机械性质很敏感。结果表明：</p>
+<ul>
+<li>ACE势能较好描述从fcc局部环境到faulted环境的能量变化；</li>
+<li>这类性质需要势识别局部配位变化，而不仅是bulk EOS；</li>
+<li>entropy-selected数据中包含的低配位/畸变环境有助于提升这类预测。</li>
+</ul>
+<p>对于材料动力学应用，这是比普通train/test error更有说服力的验证。</p>
+<h3 id="section-20">Figure 9：表面/低配位环境预测</h3>
+<p>Figure 9展示表面或低配位相关性质。表面能常是MLIP的难点，因为训练数据如果主要来自bulk MD，低配位原子覆盖不足。文章结果说明：</p>
+<ul>
+<li>信息熵选择倾向选取descriptor空间边界的低配位环境；</li>
+<li>因此ACE势对多种Ni表面能有较好可迁移性；</li>
+<li>但某些表面或重构环境仍可能需要专门补充训练数据。</li>
+</ul>
+<p>这对催化方向尤其相关：催化表面/吸附/缺陷环境往往正是普通bulk-trained MLIP外推失败的位置。</p>
+<h3 id="section-21">Figure 10：高温/液体Ni与非平衡动力学</h3>
+<p>Figure 10测试ACE势在高温液体或熔化相关场景中的表现。作者关注势是否能从有限训练集泛化到：</p>
+<ul>
+<li>液态短程有序；</li>
+<li>高温大位移；</li>
+<li>熔化或凝固附近的结构变化；</li>
+<li>能量/力分布更宽的非平衡区域。</li>
+</ul>
+<p>结果显示，ACE-1已经有一定能力，但扩展训练集/提高energy cutoff得到的ACE-2/ACE-3或Rev-EM类数据在部分高能/液体场景中更稳健。这说明信息熵方法可作为高效起点，但目标应用如果包含极端热力学状态，需要把候选池设计到对应区域。</p>
+<h3 id="section-22">Figure 11：相变/高压结构稳定性</h3>
+<p>Figure 11检验不同晶体相或压力/体积变化下的相对能量。对于Ni势来说，这类测试能看出模型是否只适合fcc附近，还是能正确处理hcp/bcc/其他高压结构。</p>
+<p>文章总体显示entropy-selected ACE能较好复现DFT相对趋势，但某些高能相和极端压缩区仍是误差来源。这与MLIP一般经验一致：训练集必须覆盖目标应用的结构流形，信息熵选择只能在候选池内部最优，不能替代候选池物理设计。</p>
+<h3 id="section-23">Figure 12：整体benchmark/与已有势对比</h3>
+<p>Figure 12把本文势与已有Ni势/数据集策略综合比较。主要结论是：</p>
+<ul>
+<li>ACE-1使用约100个training configurations就达到与更大数据集训练势可比的性能；</li>
+<li>ACE-2/ACE-3加入更多entropy-selected构型后在force RMSE和部分外推性质上进一步提升；</li>
+<li>与SNAP、MTP、Rev-EM等相比，本文方法的优势不是单项指标绝对第一，而是<strong>少数据、高覆盖、可解释、构建成本低</strong>。</li>
+</ul>
+<p>从应用角度看，这说明信息熵选择可以作为“第一版MLIP数据集”的高效生成策略，尤其适合还没有大量DFT轨迹的体系。</p>
+<h3 id="section-24">Supplementary Figures/Tables：补充验证与参数敏感性</h3>
+<p>补充材料进一步支持正文结论：</p>
+<ul>
+<li><strong>Supplementary Fig. 1</strong>：展示用更高energy cutoff（如25 eV/atom）扩展候选结构/训练集后的结构分布。</li>
+<li><strong>Supplementary Fig. 2</strong>：展示ACE-2在更广泛能量范围上的error或descriptor覆盖。</li>
+<li><strong>Supplementary Fig. 3</strong>：展示ACE-3在更大/更多样训练集上的表现。</li>
+<li><strong>Supplementary Fig. 4</strong>：比较弹性常数预测。</li>
+<li><strong>Supplementary Fig. 5</strong>：比较空位迁移/缺陷相关能量。</li>
+<li><strong>Supplementary Fig. 6</strong>：比较位错或堆垛层错相关能量。</li>
+<li><strong>Supplementary Fig. 7</strong>：展示液态/高温相关结构因子或动力学性质。</li>
+</ul>
+<p>补充表给出训练集大小和RMSE，显示ACE-1到ACE-3随着训练数据扩展，force RMSE从约0.20降到约0.16 eV/Å，但energy RMSE已在几meV/atom水平。这说明继续加数据主要改善力和外推稳定性。</p>
+<h2 id="section-25">Limitations and caveats</h2>
+<ol>
+<li><strong>候选池决定上限</strong>：entropy selection只能从已有candidate pool中选最有信息量的环境；如果候选池没有吸附、氧化物、裂纹、极端缺陷等目标环境，算法无法凭空生成覆盖。</li>
+<li><strong>Ni是相对简单的单元素金属</strong>：方法在多组分催化体系、氧化物、MOF、带电/磁性体系中的复杂性会高很多。</li>
+<li><strong>D-optimal/MaxVol依赖descriptor表示</strong>：选出的“信息量”是相对于当前descriptor basis定义的；换descriptor或cutoff，选择结果可能变化。</li>
+<li><strong>低RMSE不等于所有动力学都可靠</strong>：作者做了很多物理测试，但真正长时间MD、罕见事件、化学反应或高温失稳仍需额外验证。</li>
+<li><strong>解释性主要来自ACE和selected environment可视化</strong>：相比黑箱模型更透明，但不等于每个基函数贡献都有清晰化学含义。</li>
+<li><strong>高能结构纳入需谨慎</strong>：过多高能/非物理构型可能影响低能精度，需要energy cutoff和权重平衡。</li>
+<li><strong>主动学习不是被完全替代</strong>：信息熵选择适合作为初始/压缩数据集生成，但实际应用中仍可能需要基于模型误差的不确定性采样。</li>
+</ol>
+<h2 id="section-26">Possible actions</h2>
+<ol>
+<li><strong>对你关注的MLIP reliability非常相关</strong>：这篇可以放入“训练集覆盖/主动学习/不确定性与可靠性”文献库，重点是“信息覆盖”而非单纯误差拟合。</li>
+<li><strong>可借鉴到NFPP MLFF/催化MLFF数据集设计</strong>：在已有DFT结构池中先做descriptor-space diversity selection，减少冗余，再决定补算哪些构型。</li>
+<li><strong>适合与MACE fine-tuning文献对照</strong>：MACE fine-tuning强调加入5–10%高能扰动构型；本文提供了一个更原则化的“选哪些高信息构型”的思路。</li>
+<li><strong>可用于CatMaster/科研agent叙事</strong>：agent不一定只做LLM决策，也可以把MaxVol/information entropy作为tool，用于自动构建MLIP训练集。</li>
+<li><strong>如果未来做CeO2/NFPP/催化表面MLIP，建议步骤</strong>：
+<ul>
+<li>汇总已有relaxation/MD/defect/surface/adsorption结构池；</li>
+<li>用目标MLIP descriptor或foundation embedding计算局域环境表示；</li>
+<li>做MaxVol/D-optimal/diversity selection；</li>
+<li>人工检查selected structures是否物理合理；</li>
+<li>对selected +少量target OOD case补DFT；</li>
+<li>用物理性质测试而非只看random split RMSE。</li>
+</ul>
+</li>
+<li><strong>不宜直接照搬到PX-New/MOF吸附能解释</strong>：MOF/吸附体系多组分、长程色散和大孔道环境更复杂；可借鉴“多样性选择”而不是具体Ni ACE参数。</li>
+</ol>
+</div><div class="credit">本文为辅助理解研究方法的中文解读。论文原图、图注及摘要内容归原作者和相应权利人；来源见文首论文链接。</div></article></main><script>window.MathJax={tex:{inlineMath:[['$','$'],['\\(','\\)']],displayMath:[['$$','$$'],['\\[','\\]']]},options:{skipHtmlTags:['script','noscript','style','textarea','pre','code']}};</script><script defer src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-mml-chtml.js"></script><footer><span>AI for Materials 文献精读</span><span>中文研究笔记 · 图与摘要注明论文来源 · 不提供论文 PDF</span></footer></body></html>

@@ -1,0 +1,53 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>TSAgent: An LLM Agent for Automating Transition State Searches in Heterogeneous Catalysis · AI for Materials 文献精读</title><meta name="description" content="AI for Materials、原子模拟与科研智能体的中文文献解读"><link rel="stylesheet" href="../style.css"><link rel="icon" href="../icon.svg" type="image/svg+xml"></head><body><header><a class="brand" href="../index.html"><span class="mark">M</span><span>AI for Materials<small>文献精读 / RESEARCH NOTES</small></span></a><a class="header-link" href="../index.html#library">浏览文献 <span>↗</span></a></header><main class="article-layout"><aside><a href="../index.html#library">← 返回文献库</a><nav aria-label="文章目录"><a href="#section-1">Bibliographic status</a><a href="#section-2">One-line takeaway</a><a href="#section-3">What the paper asks</a><a href="#section-4">Methods</a><a href="#section-5">Main findings</a><a href="#section-6">Limitations and caveats</a><a href="#section-7">Possible actions</a></nav></aside><article><div class="eyebrow">RESEARCH NOTE / T8</div><h1>TSAgent: An LLM Agent for Automating Transition State Searches in Heterogeneous Catalysis</h1><div class="article-meta"><span>智能体技术与科研系统</span><span>收录 2026-06-11</span><span>4 分钟阅读</span></div><a class="original" href="https://arxiv.org/abs/2605.14154" target="_blank" rel="noopener noreferrer">论文原文 ↗</a><div class="prose"><h2 id="section-1">Bibliographic status</h2>
+<ul>
+<li><strong>Source PDF</strong>:</li>
+<li><strong>Parsed Markdown</strong>: <code>文献PDF与解析/260611/mineru_md_shortnames_no_formula_table/p01.pdf/auto/p01.pdf.md</code></li>
+<li><strong>Topic</strong>: LLM agent for heterogeneous-catalysis transition-state search; ASE + calculators + NEB/dimer-style workflow automation.</li>
+<li><strong>Status</strong>: arXiv preprint. This paper was also present in the 20260521 batch; this card is kept here to preserve the 260611 batch completeness.</li>
+</ul>
+<h2 id="section-2">One-line takeaway</h2>
+<p>TSAgent 将“吸附构型、初末态生成、路径插值、TS 搜索、频率/能垒验证”拆成可由 LLM 调度的工具链，证明 LLM agent 在异相催化 TS 搜索中可以减少人工搭流程的成本，但可靠性仍高度依赖几何合理性检查和明确的失败恢复规则。</p>
+<h2 id="section-3">What the paper asks</h2>
+<p>这篇文章试图回答一个很实际的问题：过渡态搜索是否可以从专家手工流程，转化为由 LLM agent 读取任务、调用 atomistic tools、自动生成初末态与反应路径、执行计算并解释结果的闭环流程。它面向异相催化场景，因为这类体系具有表面模型、吸附物、反应物/产物构型、约束、NEB 图像、振动验证等多个容易出错的环节。</p>
+<p>其核心问题不是单纯“LLM 能不能写脚本”，而是：</p>
+<ol>
+<li>LLM 是否能把自然语言反应任务分解成可执行的结构建模与 TS 搜索步骤；</li>
+<li>是否能在计算失败、构型异常或路径不合理时进行恢复；</li>
+<li>自动流程的 TS 结果是否具有可验证的物理含义，例如合理的虚频模式和反应坐标连接；</li>
+<li>这种 agent 框架相比传统脚本/工作流管理器的增量价值在哪里。</li>
+</ol>
+<h2 id="section-4">Methods</h2>
+<p>文章将 TSAgent 设计为围绕 atomistic simulation tools 的 LLM orchestration layer。典型流程包括：</p>
+<ul>
+<li><strong>任务解析与计划生成</strong>：agent 从用户给定的反应、表面、吸附物、目标计算级别等信息出发，生成反应路径搜索计划。计划不是一次性写死，而是会根据中间输出更新。</li>
+<li><strong>结构生成与处理</strong>：调用 ASE/Pymatgen 类工具构建 slab、放置吸附物、生成初态/末态，并对结构进行基本合法性检查，如键长、吸附高度、原子重叠、约束层等。</li>
+<li><strong>初末态优化</strong>：对反应物态和产物态分别进行几何优化，确保路径端点不是明显不收敛或非目标构型。</li>
+<li><strong>路径插值与 TS 搜索</strong>：使用 NEB、CI-NEB、dimer 或类似算法，从初末态构造中间图像并优化最低能量路径；agent 负责准备输入、监控输出、识别常见失败，并决定是否调整插值、增加图像数或重新放置吸附物。</li>
+<li><strong>过渡态验证</strong>：通过频率计算或振动模式分析检查 TS 是否只有一个与反应坐标一致的虚频；同时比较初态、末态、TS 的能量关系和路径连续性。</li>
+<li><strong>报告生成</strong>：把结构、能量、能垒、失败/重试记录和关键判断整理成可审计报告。</li>
+</ul>
+<p>方法上最值得注意的是：TSAgent 把“专家经验”拆进工具边界和检查项中，而不是完全依赖 LLM 即兴判断。这使得 LLM 主要承担 planning、glue code、异常解释和流程恢复，而几何优化、能量评估、频率验证仍由确定性模拟工具执行。</p>
+<h2 id="section-5">Main findings</h2>
+<ul>
+<li><strong>自动化 TS 搜索可行性</strong>：文章展示 TSAgent 能从较高层的反应任务描述出发，自动生成并执行一套 TS 搜索流程，减少人工准备输入、检查中间文件和反复改脚本的负担。</li>
+<li><strong>异相催化场景具有代表性</strong>：表面反应的难点在于初末态构型和吸附位点多样，TS 搜索比简单分子反应更容易出现路径不连通、图像坍塌或表面约束设置错误。TSAgent 的价值主要体现在这些 workflow glue 与诊断环节。</li>
+<li><strong>验证 gate 是核心</strong>：文章强调 TS 不能只看优化是否结束，必须检查虚频、反应坐标、端点连接和能垒合理性。这与用户当前 CatMaster / DFT 计算工作流中的经验一致：程序跑完不等于科学结果成立。</li>
+<li><strong>LLM 适合做 co-pilot，而不是无监督黑箱</strong>：结果说明 agent 可以减少人类在标准流程中的机械劳动，但人类仍需确认反应定义、结构合理性、计算级别和最终机理解释。</li>
+<li><strong>失败恢复比单次成功更重要</strong>：TS 搜索常见失败来自初末态不匹配、插值图像不合理、优化不收敛、吸附物漂移、虚频不对应目标反应等。TSAgent 的论文价值在于把这些失败模式纳入流程，而不是只展示一次成功案例。</li>
+</ul>
+<h2 id="section-6">Limitations and caveats</h2>
+<ul>
+<li>TS 搜索结果的科学可信度仍取决于底层势能面质量；若使用 MLFF 或低精度 calculator，最终仍需 DFT 级别复核。</li>
+<li>LLM 对几何化学的理解有限，不能替代专家对反应坐标、吸附位点和表面模型的判断。</li>
+<li>benchmark 的任务数量和复杂度可能不足以证明对大规模真实催化研究的普适性。</li>
+<li>多步反应网络中，TSAgent 仍可能面临组合爆炸：每个 elementary step 都需要多个可能初末态、吸附位点和路径候选。</li>
+<li>如果没有严格 provenance 和失败日志，自动 TS 搜索很容易变成不可复现的“agent 尝试史”。</li>
+</ul>
+<h2 id="section-7">Possible actions</h2>
+<ul>
+<li>对 CatMaster：可借鉴其“TS 搜索必须带验证 gate”的叙事，将 reaction mechanism module 表述为 evidence-generating workflow，而不是简单自动跑 NEB。</li>
+<li>对 PX-New：若后续需要扩展到甲苯/PX 迁移或释放路径，TSAgent 的流程可作为“路径搜索自动化”的参考，但现阶段 PX 的 PMF/MEP 证据线不能混同。</li>
+<li>对日常计算：可整理一个本地 TS/MEP checklist：初末态几何、约束、图像连续性、能垒、虚频、路径投影、失败恢复记录。</li>
+<li>对文献综述：可把该文放入“LLM agent + atomistic simulation workflow automation”小节，定位为 TS 搜索专用 agent。</li>
+</ul>
+</div><div class="credit">本文为辅助理解研究方法的中文解读。论文原图、图注及摘要内容归原作者和相应权利人；来源见文首论文链接。</div></article></main><script>window.MathJax={tex:{inlineMath:[['$','$'],['\\(','\\)']],displayMath:[['$$','$$'],['\\[','\\]']]},options:{skipHtmlTags:['script','noscript','style','textarea','pre','code']}};</script><script defer src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-mml-chtml.js"></script><footer><span>AI for Materials 文献精读</span><span>中文研究笔记 · 图与摘要注明论文来源 · 不提供论文 PDF</span></footer></body></html>

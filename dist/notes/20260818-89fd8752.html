@@ -1,0 +1,28 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Finite-Temperature Thermodynamics of Cu(100) Oxidation: Missing-Row Reconstruction, Defect States, and Order-Disorder Transition from Nested Sampling · AI for Materials 文献精读</title><meta name="description" content="AI for Materials、原子模拟与科研智能体的中文文献解读"><link rel="stylesheet" href="../style.css"><link rel="icon" href="../icon.svg" type="image/svg+xml"></head><body><header><a class="brand" href="../index.html"><span class="mark">M</span><span>AI for Materials<small>文献精读 / RESEARCH NOTES</small></span></a><a class="header-link" href="../index.html#library">浏览文献 <span>↗</span></a></header><main class="article-layout"><aside><a href="../index.html#library">← 返回文献库</a><nav aria-label="文章目录"><a href="#section-1">What the paper asks</a><a href="#section-2">Methods</a><a href="#section-3">Main findings</a><a href="#section-4">Limitations and caveats</a><a href="#section-5">Possible actions</a></nav></aside><article><div class="eyebrow">RESEARCH NOTE / T6</div><h1>Finite-Temperature Thermodynamics of Cu(100) Oxidation: Missing-Row Reconstruction, Defect States, and Order-Disorder Transition from Nested Sampling</h1><div class="article-meta"><span>机器学习势训练与泛化</span><span>收录 2026-08-18</span><span>5 分钟阅读</span></div><a class="original" href="https://arxiv.org/abs/2608.12787`" target="_blank" rel="noopener noreferrer">论文原文 ↗</a><div class="prose"><ul>
+<li><strong>Bibliographic status</strong>: Felix Riccius, Karsten Reuter, Hendrik H. Heenen, Jutta Rogal；2026；arXiv:2608.12787，<code>https://arxiv.org/abs/2608.12787</code>。模拟数据 DOI <code>10.5281/zenodo.21703740</code>。</li>
+<li><strong>One-line takeaway</strong>: MACE 加速的 canonical nested sampling 从随机初态恢复了氧诱导 Cu(100)-O missing-row reconstruction，并预测 300至600 K 的竞争缺陷、约 800 K 的缺陷增殖驱动有序到无序变化和约 1400 K 的表面熔化；固定组成、小胞、固定基底、MLIP 误差和 basin extinction 限制了结论强度。</li>
+</ul>
+<h2 id="section-1">What the paper asks</h2>
+<p>论文希望在不预设候选结构的情况下预测复杂表面重构，并判断 Cu(100) missing-row reconstruction 是否确由氧诱导。作者还要在有限温度下追踪理想重构如何演变为缺陷化与无序表面，区分实验中点状、L 形和正交 missing-row 图案究竟只是动力学陷获，还是具有平衡热力学概率。</p>
+<p>核心物理图景是：氧插入带来的应变释放稳定低温有序 MRR，升温后大量缺陷构型的构型熵逐渐超过理想结构的焓优势，驱动约 800 K 的有序到无序变化。</p>
+<h2 id="section-2">Methods</h2>
+<p>作者采用 canonical nested sampling。每个固定组成体系由一组 walkers 表示，从随机近似理想气体的原子初态开始。每轮删除最高能 walker，压缩可访问相空间，并在硬能量上限下克隆和去相关剩余 walker。保存的能量和相空间权重可重建配分函数、热容、结构概率与 Helmholtz 自由能。</p>
+<p>为跨越表面吸附位点势垒，MC 不仅使用 Galilean Monte Carlo，还加入随机重定位、Cu/O 身份交换、整数晶格平移，以及半晶格横移配合上下层移动。GPU 批处理相对 MPI ASE-MACE 基准在 H100 上约快六倍，但 24 个移动原子的体系仍约需一周，40 个移动原子约需一个月。</p>
+<p>能量和力由 MACE 提供。训练从通用 Cu-surface-oxide 势出发，经六轮主动学习加入 1200 个 c(4×4) Cu(100)-oxide 构型。测试能量和力 RMSE 分别为 1.7 meV/atom 和 45 meV/Å。</p>
+<p>表面胞为 c(4×4)，三层 Cu 基底固定，上方 15 Å 区域允许移动。比较 Cu-only 的 24 Cu、0.75 ML 和 Cu-O 的 24 Cu+16 O、0.75 ML Cu 与 0.5 ML O。两体系分别使用 1440 和 2400 walkers，各进行四次独立运行。Cu-O 四次运行合计约 560 万构型，并用 Cu-O 距离小于 2.5 Å 的连接图划分拓扑。</p>
+<h2 id="section-3">Main findings</h2>
+<p>Cu-only 的低能结构是 heart-shaped anti-island，没有 missing-row；相同 Cu 覆盖度下加入 0.5 ML O 后，最低能结构成为实验已知的 (2√2×√2)R45°-O MRR。这支持氧诱导重构。二维 RDF 中，纯 Cu 最近邻约 2.4 Å，Cu-O 体系移至约 2.6 Å，并出现沿、跨 missing row 及 Cu-O row 的 3.6、3.2 和 4.1 Å 特征，符合氧插入引起应变、missing rows 部分释放应变的解释。</p>
+<p>Cu-only 与 Cu-O 的表面熔化温度分别约为 1060 K 和 1400 K。正文同时称 1060 K 比 Cu 体相实验熔点 1357 K 低 313 K，但实际差值为 297 K，存在约 16 K 的内部不一致，需回查图 3 或正式版本。</p>
+<p>MRR 的 RDF 与 structure-factor 特征主要在 800 K 以下出现。300 K 以下理想 MRR 主导；300至600 K 两种缺陷态逐渐出现。双 Cu 桥联缺陷在 600 K 约占 22%，单 Cu 桥联中间态约占 8%。到 500至600 K，理想 MRR 降至约 60%。这些结构类似 STM 中的点状、L 形和正交图案，说明至少部分缺陷是热力学竞争态，而不必全部依赖动力学陷获。</p>
+<p>约 800 K 时热容出现肩部，理想 MRR 概率降至不高于 20%，大量低概率缺陷拓扑共同占据主要权重。1000 K 以上，理想 MRR 和两个主要缺陷的单独概率均低于 5%。体系在约 800至1400 K 形成宽约 600 K 的无序但未熔化表面区间。</p>
+<p>约 560 万个 Cu-O 构型被划分为超过 220 万种连接拓扑。这支持高温熵来自大量微观状态，但固定 2.5 Å 阈值会把热振动变体拆分，不能把该数字解释为 220 万个稳定缺陷。</p>
+<p>加入振动和构型熵后，Cu-O 相对 Cu-only 的相界温度比 0 K 近似提高约 30至270 K。但这只是两个固定组成之间的比较，不是完整开放氧环境相图；文中已知 0.25 ML O 等中间组成可能缩小 MRR 稳定区。</p>
+<h2 id="section-4">Limitations and caveats</h2>
+<p>模拟固定组成，未在采样中插入或删除 O，不能自动发现其他覆盖度、亚表面氧或 Cu2O-like 层。c(4×4) 小胞限制长尺度 domain wall、应变和稀疏缺陷，也没有有限尺寸标度，因此约 800 K 更稳妥地称为有限体系的转变区或 crossover。</p>
+<p>三层基底完全固定，排除了深层松弛、热膨胀和亚表面参与。MLIP 测试 RMSE 不能保证随机、高温、熔融和罕见缺陷构型都有相同 DFT 可靠性。每原子 60 个 walkers 是折中，补充材料报告两次运行发生次级缺陷 basin extinction，说明缺陷概率仍受采样分辨率影响。</p>
+<p>连接图只使用 Cu-O 2.5 Å 阈值，不编码 Cu-Cu 与 O-O；高温图断裂可能同时来自 roughening 与阈值敏感性。nested sampling 给出平衡概率，不提供转换速率，不能直接证明实验时间尺度内必然达到平衡。</p>
+<h2 id="section-5">Possible actions</h2>
+<p>对于重构、缺陷和无序态丰富的表面，可考虑“主动学习 MLIP、nested sampling、拓扑与连续序参量”的组合，而不是只比较 0 K 候选。晶格吸附位体系应加入晶格平移、跨层移动、随机重定位与身份交换，并用简并位点等概率测试验证去相关。</p>
+<p>关键缺陷需独立 DFT 复核，至少包括理想 MRR、600 K 的两个主要缺陷和 800至1000 K 的代表性无序构型。还应扩大表面胞、增加 walkers、测试不同 move 权重，并引入连续配位与 MRR 序参量，避免固定阈值造成拓扑碎片化。</p>
+<p>若要构建定量相图，最低限度需要加入 0.25 ML O、不同 Cu vacancy 浓度、亚表面氧和 Cu2O-like 层，或采用多组成乃至 grand-canonical nested sampling。当前结果适合作为有限温度表面结构搜索的强案例，不应被简化为完整 Cu/O 相图。</p>
+</div><div class="credit">本文为辅助理解研究方法的中文解读。论文原图、图注及摘要内容归原作者和相应权利人；来源见文首论文链接。</div></article></main><script>window.MathJax={tex:{inlineMath:[['$','$'],['\\(','\\)']],displayMath:[['$$','$$'],['\\[','\\]']]},options:{skipHtmlTags:['script','noscript','style','textarea','pre','code']}};</script><script defer src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-mml-chtml.js"></script><footer><span>AI for Materials 文献精读</span><span>中文研究笔记 · 图与摘要注明论文来源 · 不提供论文 PDF</span></footer></body></html>

@@ -1,0 +1,33 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Scholar Mail Digest 双日简报，2026-08-12 · AI for Materials 文献精读</title><meta name="description" content="AI for Materials、原子模拟与科研智能体的中文文献解读"><link rel="stylesheet" href="../style.css"><link rel="icon" href="../icon.svg" type="image/svg+xml"></head><body><header><a class="brand" href="../index.html"><span class="mark">M</span><span>AI for Materials<small>文献精读 / RESEARCH NOTES</small></span></a><a class="header-link" href="../index.html#library">浏览文献 <span>↗</span></a></header><main class="article-layout"><aside><a href="../index.html#library">← 返回文献库</a><nav aria-label="文章目录"><a href="#section-1">运行与核对</a><a href="#section-2">High，Direct competitor</a><a href="#section-5">High，Incremental insight</a><a href="#section-9">Medium</a><a href="#section-10">全文与语言验收</a></nav></aside><article><div class="eyebrow">RESEARCH NOTE / T8</div><h1>Scholar Mail Digest 双日简报，2026-08-12</h1><div class="article-meta"><span>智能体技术与科研系统</span><span>收录 2026-08-12</span><span>6 分钟阅读</span></div><div class="prose"><h2 id="section-1">运行与核对</h2>
+<p>人工最终分类为 High 5 篇、Medium 10 篇、Low 319 篇，合计 334 篇。两条通道中，Direct competitor 2 篇，Incremental insight 3 篇，Both 0 篇。High 不设配额。程序原始分数为 High 41 篇、Medium 80 篇、Low 213 篇，但人工分类按竞争关系和项目增量重新判断。</p>
+<h2 id="section-2">High，Direct competitor</h2>
+<h3 id="section-3">Hierarchical Server Architecture for Agentic Science</h3>
+<p>对应项目是 CatMaster。论文用分层服务器隔离上层科研代理与具体仪器或计算资源，与 CatMaster 的通用远程执行接口和多后端接入明显重叠。竞争威胁集中在“通用 agentic science server architecture”的新颖性。立即动作是加入架构竞争表，核查服务发现、错误传播、中断恢复和远程回执，并把 CatMaster 主张收窄到计算催化中的验证门、审计轨迹和证据注册。全文已下载、解析并生成中文精读卡。</p>
+<h3 id="section-4">Project2Task: Graph-Guided Project-Level Planning for Autonomous Research</h3>
+<p>对应项目是 CatMaster。论文把长期研究项目表示为图，再按依赖关系生成任务并传播状态，与 CatMaster 的 research graph 状态机及 evidence propagation 直接重叠。它可能影响“图驱动科研规划”的优先权和宽泛 claim。立即动作是逐项核对节点类型、证据传播、失败回滚和人工确认，并在投稿中正面引用，突出计算催化任务状态、产物状态和科学证据状态的分离。全文已下载、解析并生成中文精读卡。</p>
+<h2 id="section-5">High，Incremental insight</h2>
+<h3 id="section-6">Agentic self-driving microscopy benchmarks support qualification but do not necessarily generalize to unseen tasks</h3>
+<p>论文把规定任务上的资格验证与未见任务上的泛化分开评价。它补上 CatMaster 当前评价设计中的明确缺口：熟悉工作流的高成功率不能证明系统能处理新的结构异常、调度器反馈或收敛失败。可执行动作是建立原任务、单因素扰动和未见任务组合三层测试，并保存工具调用、恢复过程和人工接管原因。全文已下载、解析并生成中文精读卡。</p>
+<h3 id="section-7">Agentic Bayesian Optimization through Surrogate-Augmented Autoresearch</h3>
+<p>论文让语言模型负责提出研究方案，让数值代理模型根据已有观测选择下一次昂贵评估。它为 CatMaster 的候选筛选提供一个可量化基线：固定候选池和密度泛函理论预算，比较随机选点、通用代理直接选点和贝叶斯优化选点，并统计真实计算数、无效结构比例和验证通过率。全文已下载、解析并生成中文精读卡。</p>
+<h3 id="section-8">QMP-Bench: A Research-Level Benchmark for Autonomous End-to-End Quantum Many-Body Simulations</h3>
+<p>论文提供 100 个来自 21 篇论文的端到端量子多体仿真任务，用真实论文任务评价科研代理，而不是只测短题或工具调用。它可迁移到 CatMaster 的真实计算催化基准设计，尤其适合检验环境准备、程序执行、结果解析和证据交付是否完整。OpenReview PDF 本轮返回 HTTP 403，因此没有全文解析，也没有生成精读卡，当前仅记录为待人工获取。</p>
+<h2 id="section-9">Medium</h2>
+<p>以下 10 篇不是直接竞争文献，但包含可迁移方法或仍需核查的证据设计。</p>
+<ol>
+<li><strong>Benchmarking Universal Machine-Learning Interatomic Potentials for Accelerated Adsorption Energy Evaluation with DFT Single-Point Calculations</strong>：可用于界定机器学习势几何优化加密度泛函理论单点的适用边界，但需全文核对失效体系和结构筛除规则。</li>
+<li><strong>Physics-proxy self-supervised representation learning for unsupervised degradation-state clustering of palladium membrane SEM images</strong>：可为 Pd-TWC 的显微图像无监督状态分组提供方法参考，但对象是钯膜而非汽车尾气催化剂，不构成直接竞争。</li>
+<li><strong>Scientific Database Construction in the Age of AI: Benchmarking AI-Assisted and Expert Curation of a Battery Materials Database Yibin Xu1, Shintaro Morimoto2 …</strong>：标题在源记录中带作者残片，完整标题仍待元数据核对。它适合用于 CatMaster 数据库中机器辅助整理与专家整理的误差比较。</li>
+<li><strong>CliffordIP: Clifford algebra equivariant interatomic potentials for heterogeneous catalysis</strong>：与异相催化机器学习势直接相关，但在未核对正文中的跨体系泛化和失效案例前，不宜升为 High。</li>
+<li><strong>EviGraph: Evidence-Guided Autonomous Research Agents</strong>：证据引导的科研代理与 CatMaster 接近，但当前摘要不足以确认其是否覆盖计算催化、验证门或持久化回执，需全文后再判断竞争等级。</li>
+<li><strong>Large language model-assisted knowledge graph construction for catalytic systems: Challenges and practical insights</strong>：与催化知识图谱构建相关，可用于检查 CatMaster 的来源追踪和关系抽取误差，但目前未确认与 research graph 状态机存在核心 claim 重叠。</li>
+<li><strong>Cluster-based Bayesian optimization for application-specific interatomic potential training</strong>：可为任务特定机器学习势的数据选择提供 bounded test，需核对聚类和贝叶斯优化相对主动学习基线的真实收益。</li>
+<li><strong>Multi-Agent AI Converts Published Figures into Auditable Curve Evidence for Claim Validation and Scientific Analysis</strong>：与 CatMaster 的 Graph-FINDER 和图件证据审计相关，可能提供曲线数字化与 claim validation 的评价设计，需全文核查确定性提取和人工真值设置。</li>
+<li><strong>Toward Precise, Multiscale, and Process-Aware Catalysis Generation via Generative AI</strong>：与 CatDiT 的候选池富集定位相邻，可用于检查生成模型是否显式处理多尺度和过程条件，但当前未证明其构成同一候选验证漏斗。</li>
+<li><strong>Towards Human-Led, Agent-Driven Autonomous Laboratories for the Life Sciences</strong>：强调人主导和代理执行的边界，可用于完善 CatMaster 的人工监督说明；生命科学场景与计算催化仍有距离。</li>
+</ol>
+<p>其余 319 篇为 Low。它们均未同时满足直接竞争或项目扩展条件，主要是主题相邻、已知叙事、对象不匹配，或缺少边界清楚的迁移动作。Low 全部进入了人工候选池，没有只依赖程序报告筛选。</p>
+<h2 id="section-10">全文与语言验收</h2>
+<p>High 共 5 篇，成功下载全文 4 篇，成功解析 4 篇，生成中文全文精读卡 4 张。<code>QMP-Bench: A Research-Level Benchmark for Autonomous End-to-End Quantum Many-Body Simulations</code> 因 HTTP 403 待人工获取，未用摘要冒充全文精读。</p>
+<p>本轮不能判定为无缺陷整轮成功。抓取、完整候选复筛、4 篇全文精读和语言验收已完成；CSV 与 SQLite 的 334 条记录也已按哈希对齐。当前唯一未闭环项是 QMP-Bench 全文待人工获取。其余数量、标题、下载状态、解析状态和卡片状态已按实际产物核对。</p>
+</div><div class="credit">本文为辅助理解研究方法的中文解读。论文原图、图注及摘要内容归原作者和相应权利人；来源见文首论文链接。</div></article></main><script>window.MathJax={tex:{inlineMath:[['$','$'],['\\(','\\)']],displayMath:[['$$','$$'],['\\[','\\]']]},options:{skipHtmlTags:['script','noscript','style','textarea','pre','code']}};</script><script defer src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-mml-chtml.js"></script><footer><span>AI for Materials 文献精读</span><span>中文研究笔记 · 图与摘要注明论文来源 · 不提供论文 PDF</span></footer></body></html>

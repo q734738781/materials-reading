@@ -1,0 +1,58 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Co-Evolving LLM Decision and Skill Bank Agents for Long-Horizon Tasks · AI for Materials 文献精读</title><meta name="description" content="AI for Materials、原子模拟与科研智能体的中文文献解读"><link rel="stylesheet" href="../style.css"><link rel="icon" href="../icon.svg" type="image/svg+xml"></head><body><header><a class="brand" href="../index.html"><span class="mark">M</span><span>AI for Materials<small>文献精读 / RESEARCH NOTES</small></span></a><a class="header-link" href="../index.html#library">浏览文献 <span>↗</span></a></header><main class="article-layout"><aside><a href="../index.html#library">← 返回文献库</a><nav aria-label="文章目录"><a href="#section-1">1. 文献信息</a><a href="#section-2">2. 一句话总结</a><a href="#section-3">3. 研究问题</a><a href="#section-4">4. 方法框架</a><a href="#section-8">5. 实验设计</a><a href="#section-9">6. 主要结果</a><a href="#section-10">7. 局限与注意点</a><a href="#section-11">8. 对我当前工作的可能启发（不强行关联）</a></nav></aside><article><div class="eyebrow">RESEARCH NOTE / T8</div><h1>Co-Evolving LLM Decision and Skill Bank Agents for Long-Horizon Tasks</h1><div class="article-meta"><span>智能体技术与科研系统</span><span>收录 2026-04-29</span><span>3 分钟阅读</span></div><a class="original" href="https://arxiv.org/abs/2604.20987" target="_blank" rel="noopener noreferrer">论文原文 ↗</a><div class="prose"><h2 id="section-1">1. 文献信息</h2>
+<ul>
+<li>类型：arXiv preprint, cs.AI, 2026-04-22</li>
+<li>作者：Xiyang Wu, Zongxia Li, Guangyao Shi, Alexander Duffy, Tyler Marques, Matthew Lyle Olson, Tianyi Zhou, Dinesh Manocha</li>
+<li>代码：<a href="https://github.com/wuxiyang1996/COS-PLAY" target="_blank" rel="noopener noreferrer">https://github.com/wuxiyang1996/COS-PLAY</a></li>
+</ul>
+<h2 id="section-2">2. 一句话总结</h2>
+<p>这篇文章提出 COS-PLAY：让“决策 Agent”和“技能库 Agent”在交互式长程任务中共同迭代，前者学习何时检索/调用技能，后者从无标注 rollouts 中抽取、合并、修订可复用技能及其适用契约，从而提升 LLM Agent 在游戏类长程环境中的表现。</p>
+<h2 id="section-3">3. 研究问题</h2>
+<p>作者关注的是长程交互环境中 LLM Agent 的技能复用问题。普通 LLM 可以生成动作，但在延迟奖励、部分可观测、多步组合决策中不稳定；已有技能库方法往往把技能库构建和决策策略分开，导致技能库未必能被决策 Agent 可靠检索和执行。文章提出两个核心问题：</p>
+<ol>
+<li>技能库和决策 Agent 是否应联合学习，而不是分别训练/维护？</li>
+<li>什么样的技能库属性真正有助于改善决策？</li>
+</ol>
+<h2 id="section-4">4. 方法框架</h2>
+<p>COS-PLAY 包含两个相互耦合的 Agent：</p>
+<h3 id="section-5">4.1 Decision agent</h3>
+<ul>
+<li>在每一步根据当前观测、历史和任务目标生成动作。</li>
+<li>从技能库中检索相关技能，作为行动生成的中间结构化指导。</li>
+<li>学习的不只是动作本身，也包括“什么时候用哪个技能”。</li>
+</ul>
+<h3 id="section-6">4.2 Skill-bank agent</h3>
+<ul>
+<li>从决策 Agent 的无标注 rollouts 中发现候选技能。</li>
+<li>对技能进行归纳、去重、合并、重写和契约化。</li>
+<li>每个技能不仅是自然语言建议，还包含可用条件、执行步骤/策略、预期效果或失败条件等 contract 信息。</li>
+</ul>
+<h3 id="section-7">4.3 Co-evolution loop</h3>
+<p>系统不是先固定技能库再评估 Agent，而是在多个 episode 中形成闭环：</p>
+<ol>
+<li>当前决策 Agent 使用已有技能库完成任务 rollouts；</li>
+<li>skill-bank agent 从 rollouts 中抽取成功/失败经验；</li>
+<li>更新技能库；</li>
+<li>再让决策 Agent 在更新后的技能库上继续行动；</li>
+<li>通过反复迭代形成技能和决策策略的共同适配。</li>
+</ol>
+<p>这个思想的重点是：技能库是否“好”，不由人工可读性单独决定，而由它是否能被特定决策 Agent 检索、理解并转化为有效动作来决定。</p>
+<h2 id="section-8">5. 实验设计</h2>
+<p>实验覆盖 6 个游戏环境，用游戏作为安全、可复现且具备长程结构的交互沙盒。文中强调这些环境需要多步推理、技能链式调用、在延迟奖励和部分可观测条件下保持策略一致性。</p>
+<p>文章把 COS-PLAY 与 4 个 frontier LLM baseline 对比，并特别强调其 8B base model 在单人游戏 benchmark 上仍能取得平均奖励提升，同时在多人社会推理游戏上保持竞争力。论文摘要中给出的总结果是：COS-PLAY with an 8B base model 相比四个 frontier LLM baselines 在 single-player game benchmarks 上平均 reward 提升超过 25.1%。</p>
+<h2 id="section-9">6. 主要结果</h2>
+<ul>
+<li><strong>技能库确实能改善长程决策</strong>：外部技能库让 Agent 不必每次从零规划，而能调用可复用的行为协议。</li>
+<li><strong>共同迭代优于静态技能库</strong>：技能抽取和决策策略之间存在耦合；技能如果不符合决策 Agent 的检索和执行习惯，即使语义上合理也可能无效。</li>
+<li><strong>小模型可通过技能库获得较强表现</strong>：文章强调 8B base model 通过 COS-PLAY 可以接近或超过更强 LLM baseline 在部分环境中的表现，说明外部程序化/技能化记忆可以补偿模型参数能力不足。</li>
+<li><strong>技能 contract 很关键</strong>：技能不是简单经验片段，而需要明确适用条件和执行边界，才能避免在错误状态下被滥用。</li>
+</ul>
+<h2 id="section-10">7. 局限与注意点</h2>
+<ul>
+<li>环境以游戏为主，虽然适合研究长程决策，但迁移到开放科研任务时还需要处理更强的工具副作用、真实成本、数据噪声和安全约束。</li>
+<li>技能抽取质量依赖 rollouts；如果早期探索覆盖不足，技能库可能形成偏置。</li>
+<li>自然语言技能 contract 对 LLM 友好，但可验证性仍有限；在高风险任务中可能需要把技能转成更严格的程序、测试或前置条件检查。</li>
+<li>文章的核心指标是游戏 reward，不能直接等同于真实科学任务中的正确性、可复现性或物理合理性。</li>
+</ul>
+<h2 id="section-11">8. 对我当前工作的可能启发（不强行关联）</h2>
+<p>这篇文章适合启发“科研 Agent 的技能库维护机制”：与其把技能写成静态 SOP，不如让 Agent 在执行后沉淀成功/失败经验，并把技能的适用边界写清楚。若用于科研任务，需要额外加入可验证产物、日志审计、失败回放和 human review gate。</p>
+</div><div class="credit">本文为辅助理解研究方法的中文解读。论文原图、图注及摘要内容归原作者和相应权利人；来源见文首论文链接。</div></article></main><script>window.MathJax={tex:{inlineMath:[['$','$'],['\\(','\\)']],displayMath:[['$$','$$'],['\\[','\\]']]},options:{skipHtmlTags:['script','noscript','style','textarea','pre','code']}};</script><script defer src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-mml-chtml.js"></script><footer><span>AI for Materials 文献精读</span><span>中文研究笔记 · 图与摘要注明论文来源 · 不提供论文 PDF</span></footer></body></html>

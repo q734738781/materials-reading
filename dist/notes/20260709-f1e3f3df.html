@@ -1,0 +1,125 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Data-Driven Causal Discovery in Catalysis · AI for Materials 文献精读</title><meta name="description" content="AI for Materials、原子模拟与科研智能体的中文文献解读"><link rel="stylesheet" href="../style.css"><link rel="icon" href="../icon.svg" type="image/svg+xml"></head><body><header><a class="brand" href="../index.html"><span class="mark">M</span><span>AI for Materials<small>文献精读 / RESEARCH NOTES</small></span></a><a class="header-link" href="../index.html#library">浏览文献 <span>↗</span></a></header><main class="article-layout"><aside><a href="../index.html#library">← 返回文献库</a><nav aria-label="文章目录"><a href="#section-1">Bibliographic status</a><a href="#section-2">One-line takeaway</a><a href="#section-3">What the paper asks</a><a href="#section-4">Methods</a><a href="#section-5">Main findings</a><a href="#section-6">Limitations and caveats</a><a href="#section-7">Possible actions</a></nav></aside><article><div class="eyebrow">RESEARCH NOTE / T2</div><h1>Data-Driven Causal Discovery in Catalysis</h1><div class="article-meta"><span>合成与工艺</span><span>收录 2026-07-09</span><span>8 分钟阅读</span></div><a class="original" href="https://doi.org/10.26434/chemrxiv.15005588/v1" target="_blank" rel="noopener noreferrer">论文原文 ↗</a><div class="prose"><h2 id="section-1">Bibliographic status</h2>
+<ul>
+<li><strong>Title</strong>: Data-Driven Causal Discovery in Catalysis</li>
+<li><strong>Authors</strong>: Bárbara Alves Sequeira, Adèle H. Ribeiro, Catarina Barata, Carmen Bacariza, Pedro S. F. Mendes</li>
+<li><strong>Source/status</strong>: ChemRxiv preprint, posted 2026-07-02; DOI: <code>10.26434/chemrxiv.15005588/v1</code>; CC-BY 4.0; not peer reviewed.</li>
+<li><strong>Extraction note</strong>: Text extracted locally with <code>pypdf</code>; card based on the local PDF text.</li>
+</ul>
+<h2 id="section-2">One-line takeaway</h2>
+<p>这篇预印本的主要价值是一个负面/边界提醒：小数据、变量少、隐藏混杂强的催化数据集里，因果发现不应被直接当成稳定机制结论；得到的边关系常不稳定、与专家认知不完全一致，更适合作为“候选关系与不确定性提示”，而不是直接指导 claim。</p>
+<h2 id="section-3">What the paper asks</h2>
+<ul>
+<li>催化研究中常希望从合成变量、反应条件、材料性质和性能之间识别方向性关系，而不仅是相关性。</li>
+<li>但真实催化数据通常样本少、变量类型混合、实验空间覆盖有限，并且存在未观测因素。</li>
+<li>本文问题是：constraint-based causal discovery 是否能在两个催化数据案例中恢复有化学意义的 causal structures？这些结构相对专家知识是否稳定？</li>
+<li>两个案例：
+<ul>
+<li>oxidative coupling of methane (OCM) 反应数据集，较半受控，样本量 216。</li>
+<li>in-house metal-supported zeolite synthesis 数据集，样本量 30，更接近小数据合成场景。</li>
+</ul>
+</li>
+</ul>
+<h2 id="section-4">Methods</h2>
+<ul>
+<li>
+<p><strong>数据集 1：OCM reaction dataset</strong></p>
+<ul>
+<li>216 个实验观测，催化剂固定为 Mn–Na2WO4/SiO2。</li>
+<li>manipulated variables：temperature、argon flow rate、contact time、methane-to-oxygen ratio。</li>
+<li>performance variables：methane conversion、ethylene selectivity、ethane selectivity、CO2 selectivity。</li>
+<li>专家图假设 operating conditions 影响 methane conversion，后者进一步调控 product distribution。</li>
+<li>操作变量作为 ordinal，性能变量作为 continuous；只有 continuous variables 归一化。</li>
+</ul>
+</li>
+<li>
+<p><strong>数据集 2：metal-supported zeolite synthesis dataset</strong></p>
+<ul>
+<li>30 个 Ni-supported zeolite catalysts for CO2 methanation。</li>
+<li>synthesis variables：global Si/Al ratio、framework density、compensating cation ionic radius、impregnation solvent dielectric constant。</li>
+<li>characterization variables：mesoporous volume、external surface area、hydrophobicity index、fraction of reducible nickel species at 500 °C、average nickel particle size。</li>
+<li>作者构建基于专家知识的 hypothesized causal diagram/PAG 作为参考。</li>
+</ul>
+</li>
+<li>
+<p><strong>图表示：Partial Ancestral Graphs (PAGs)</strong></p>
+<ul>
+<li>PAG 表示在有 latent confounders 时，观测变量上可识别的 Markov equivalence class。</li>
+<li>directed edge 可表示稳定方向关系，bidirected edge 常表示潜在未观测共同原因，circle endpoints 表示方向不确定。</li>
+<li>这对催化小数据尤其重要，因为很多变量未被测量或不能充分随机化。</li>
+</ul>
+</li>
+<li>
+<p><strong>Conditional independence tests</strong></p>
+<ul>
+<li>Mixed CI test：用于 mixed ordinal/continuous data，基于 R 的 FCI.Utils；显著性阈值 <code>α = 0.05</code>。</li>
+<li>KCI test：kernel-based conditional independence test，连续变量用 RBF kernel，ordinal 变量用 delta kernel；100 permutations，<code>α = 0.05</code>。</li>
+<li>两类测试分别代表更参数化/线性假设与更灵活非线性假设。</li>
+</ul>
+</li>
+<li>
+<p><strong>Causal discovery algorithms</strong></p>
+<ul>
+<li>FCI：constraint-based causal discovery，可允许 latent confounding，输出 PAG。</li>
+<li>dcFCI：data-compatible FCI，在 CI testing 基础上保留多个 candidate PAGs，并用 score-based criterion 选择最 compatible 的结构；目标是减少单个 CI test 错误传播。</li>
+<li>组合方式为 FCI/dcFCI × Mixed CI/KCI，共四套配置。</li>
+</ul>
+</li>
+</ul>
+<h2 id="section-5">Main findings</h2>
+<ul>
+<li>
+<p><strong>CI testing 本身已经显示出不稳定与数据依赖性</strong></p>
+<ul>
+<li>各配置中正确识别 dependencies 的比例为 33–57%，通常高于正确识别 independencies。</li>
+<li>OCM 数据集用 Mixed CI 时，正确 independencies 只有 1%，说明很多本应分开的关系没有被可靠识别。</li>
+<li>synthesis 数据集样本量小、conditioning complexity 高，更容易因为统计功效不足而把关系判为 independent。</li>
+<li>KCI 能捕捉非线性关系，但在小样本和高维 conditioning set 下也更敏感，可能保留更多弱依赖。</li>
+</ul>
+</li>
+<li>
+<p><strong>OCM 数据集只恢复到有限但可解释的 causal backbone</strong></p>
+<ul>
+<li>FCI 的 Mixed CI 与 KCI 配置得到类似核心结构，但 retained bidirected edges 和 unresolved orientations 数量不同。</li>
+<li>Arflow–CT adjacency 保持未定向，说明 CI 信息不足以判断它是方向关系、混杂关系还是未测 operational mechanism 导致。</li>
+<li>dcFCI 中最稳定的 directed relation 是 <code>CH4conv → C2H6s</code>，符合 methane conversion 与 ethane selectivity 之间的预期联系。</li>
+<li>但 expert-defined reference PAGs 得分为零，说明专家图中的 independence structure 与 empirical CI evidence 并不兼容。</li>
+<li>大量 bidirected edges 暗示 latent confounding 可能来自氧覆盖动态、氧化态演化、热不均匀或反应器层面因素。</li>
+</ul>
+</li>
+<li>
+<p><strong>zeolite synthesis 小数据集几乎不能给出强方向机制</strong></p>
+<ul>
+<li>FCI 只稳定识别出 <code>SEXT → VMESO</code>，即 external surface area 与 mesoporous volume 之间的方向关系；这在多孔材料中有化学可解释性。</li>
+<li>dcFCI 给出结构稳定但信息量低的 saturated PAG，主要是 circle–circle edges，没有足够证据删除边或确定方向。</li>
+<li>作者解释为可靠 separating sets 稀缺，有限 CI 信息不足，而不是某个算法单独失败。</li>
+<li>expert-defined reference PAG 同样得到零支持，说明专家直觉与小数据 empirical dependency pattern 之间存在明显错配。</li>
+</ul>
+</li>
+<li>
+<p><strong>总体结论：因果发现更像不确定性显微镜，而不是自动机制发现器</strong></p>
+<ul>
+<li>在两个数据集中，只有少量 directed relations 被一致恢复。</li>
+<li>latent confounding、bidirected edges、circle endpoints 和 saturated PAGs 是主要输出特征。</li>
+<li>因果发现可以帮助比较经验依赖结构与专家假设，暴露 hidden confounding 和 unresolved dependencies。</li>
+<li>但在样本少、变量覆盖不足的催化数据中，不能把 PAG 直接解读为完整机制模型。</li>
+</ul>
+</li>
+</ul>
+<h2 id="section-6">Limitations and caveats</h2>
+<ul>
+<li>该文自身是 ChemRxiv 预印本，尚未同行评审。</li>
+<li>第二个 synthesis dataset 只有 30 个样本，统计功效非常有限；结论更适合作为方法边界展示。</li>
+<li>OCM 数据虽有 216 个观测，但不是随机化实验，operating condition support 有限，positivity 可能不足。</li>
+<li>约束型因果发现高度依赖 CI tests；小样本、非线性、混合变量、隐藏变量和 faithfulness violation 都会影响边删除和方向判定。</li>
+<li>expert-defined graph 得分为零并不必然说明专家知识错误，也可能说明数据覆盖不足、变量缺失、变量定义不匹配或 CI test 不适配。</li>
+<li>对我们自己的小数据催化项目，不能把因果图边直接当作可发表机制；更适合作为“候选相关因素/需要补实验或补计算的提示”。</li>
+</ul>
+<h2 id="section-7">Possible actions</h2>
+<ul>
+<li><strong>对 CatMaster/PX/Spin_SAC 的直接提醒</strong>：不要在小数据集上把 causal discovery 结果包装成稳健机制结论，尤其不要用单次 PAG 边方向支撑强 claim。</li>
+<li><strong>可用方式</strong>：把 causal discovery 作为 exploratory audit：哪些边稳定、哪些边因 test/algorithm 改变而消失、哪些边提示 latent confounders。</li>
+<li><strong>汇报措辞</strong>：可写成 “causal-discovery-inspired exploratory analysis suggests candidate dependencies, but edge orientations remain sensitive under small-data and latent-confounding conditions”。</li>
+<li><strong>图件判断</strong>：若未来画小数据因果图，必须同时展示 uncertainty marks、bootstrap/stability、不同 CI tests 对比，而不是只画一个确定 DAG。</li>
+<li><strong>与用户今日启发对应</strong>：边关系不稳定且常与人工认知不一致，说明它们最多作为其他因素或 hypothesis generator，不能替代机理判断、反应路径验证或独立实验/计算证据。</li>
+</ul>
+</div><div class="credit">本文为辅助理解研究方法的中文解读。论文原图、图注及摘要内容归原作者和相应权利人；来源见文首论文链接。</div></article></main><script>window.MathJax={tex:{inlineMath:[['$','$'],['\\(','\\)']],displayMath:[['$$','$$'],['\\[','\\]']]},options:{skipHtmlTags:['script','noscript','style','textarea','pre','code']}};</script><script defer src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-mml-chtml.js"></script><footer><span>AI for Materials 文献精读</span><span>中文研究笔记 · 图与摘要注明论文来源 · 不提供论文 PDF</span></footer></body></html>

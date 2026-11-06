@@ -1,0 +1,54 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Dataset-aware entropy-maximized active learning for machine-learned interatomic potentials · AI for Materials 文献精读</title><meta name="description" content="AI for Materials、原子模拟与科研智能体的中文文献解读"><link rel="stylesheet" href="../style.css"><link rel="icon" href="../icon.svg" type="image/svg+xml"></head><body><header><a class="brand" href="../index.html"><span class="mark">M</span><span>AI for Materials<small>文献精读 / RESEARCH NOTES</small></span></a><a class="header-link" href="../index.html#library">浏览文献 <span>↗</span></a></header><main class="article-layout"><aside><a href="../index.html#library">← 返回文献库</a><nav aria-label="文章目录"><a href="#section-1">Bibliographic status</a><a href="#section-2">One-line takeaway</a><a href="#section-3">What the paper asks</a><a href="#section-4">Methods</a><a href="#section-5">Main findings</a><a href="#section-6">Limitations and caveats</a><a href="#section-7">Possible actions</a></nav></aside><article><div class="eyebrow">RESEARCH NOTE / T6</div><h1>Dataset-aware entropy-maximized active learning for machine-learned interatomic potentials</h1><div class="article-meta"><span>机器学习势训练与泛化</span><span>收录 2026-06-11</span><span>6 分钟阅读</span></div><a class="original" href="https://arxiv.org/abs/2605.20384" target="_blank" rel="noopener noreferrer">论文原文 ↗</a><div class="prose"><h2 id="section-1">Bibliographic status</h2>
+<ul>
+<li><strong>Source PDF</strong>:</li>
+<li><strong>Parsed Markdown</strong>: <code>文献PDF与解析/260611/mineru_md_shortnames_no_formula_table/p03.pdf/auto/p03.pdf.md</code></li>
+<li><strong>Topic</strong>: MLIP active learning; entropy-maximized sampling; foundation-model fine-tuning.</li>
+<li><strong>Status</strong>: arXiv preprint.</li>
+</ul>
+<h2 id="section-2">One-line takeaway</h2>
+<p>作者提出“local entropy-biased MD + global dataset log-det entropy filtering”的 MLIP 主动学习策略，用结构 fingerprint 的数据集级信息增益选择训练点；它能显著提高同分布能量精度，但力/应力收益依赖测试分布，碳体系需加入 near-equilibrium anchor 才能避免过度偏向畸变构型。</p>
+<h2 id="section-3">What the paper asks</h2>
+<p>MLIP 训练的核心成本在于如何用尽量少的 DFT 标注覆盖目标构型空间。随机 MD 采样高度相关，已有 per-configuration entropy sampling 能让单个构型更“丰富”，但多个构型之间仍可能冗余。文章的问题是：能否让采样目标从“每个构型内部多样”升级为“整个训练集在 fingerprint 空间中最大化信息体积”？</p>
+<p>作者进一步关心：</p>
+<ol>
+<li>这种 dataset-aware entropy selection 是否比 random MD 更高效；</li>
+<li>能否同时覆盖有序晶体、无序构型、高压相变等不同结构类型；</li>
+<li>在 foundation model Allegro-OAM-L fine-tuning 场景下，少量 DFT 标签是否足以达到近 sub-meV/atom 精度；</li>
+<li>能量、力、应力在独立测试集上的收益是否一致。</li>
+</ol>
+<h2 id="section-4">Methods</h2>
+<p>方法由三层组成：</p>
+<ul>
+<li><strong>结构 fingerprint</strong>：使用 Gaussian overlap matrix (GOM) eigenvalue fingerprints。对每个原子收集 cutoff 内邻居，构建 damped overlap matrix，取最大若干 eigenvalues 作为局域环境描述符；多组分体系按元素对拼接。GOM 的优势是具有解析梯度，可用于 entropy-biased forces 和 stress。</li>
+<li><strong>Global entropy objective</strong>：用 fingerprint covariance matrix 的 log determinant 表示数据集在 fingerprint 空间中的体积，类似 D-optimal design。相较 per-configuration entropy，它关注新候选对已接受数据集的边际信息增益 ΔH。</li>
+<li><strong>Dual covariance modes</strong>：per-atom mode 跟踪局域原子环境多样性，偏向无序/畸变结构；per-config mode 跟踪构型平均 fingerprint，保留晶体级有序相差异。默认 MD run 约 60% per-atom、40% per-config。</li>
+<li><strong>Exploration-selection separation</strong>：探索阶段用 local entropy-biased MD，即在基础势能 <code>E_base</code> 上减去 <code>k*S_local</code>，通过 Langevin NVT MD 生成候选；选择阶段不再依赖轨迹顺序，而是计算每个候选对全局 covariance 的 ΔH，超过阈值才接受。</li>
+<li><strong>Refinement phase</strong>：对接近阈值的候选，使用 L-BFGS 在 global entropy surface 上短程优化，以提升信息增益。</li>
+<li><strong>Active learning loop</strong>：以 Allegro-OAM-L foundation model 为初始势，生成候选、选择、DFT 标注能量/力/应力、合并训练集、fine-tune，再循环。</li>
+</ul>
+<p>计算体系包括 carbon、silicon 和 NaCl，覆盖 covalent、metallic/covalent、ionic bonding 以及压力驱动相变。训练集规模约 100–800 entropy-selected DFT structures，并与 matched-size random MD sampling 比较。</p>
+<h2 id="section-5">Main findings</h2>
+<ul>
+<li><strong>同分布 holdout 上显著优于 random sampling</strong>：在 N=100–800 的训练规模下，entropy-driven sampling 在三种体系的 in-distribution energy MAE 上比 random MD 低约 3–10 倍，收益大小与键合类型和 random baseline 饱和程度有关。</li>
+<li><strong>代表性模型达到很高精度</strong>：结合 Allegro-OAM-L fine-tuning，少量 entropy-selected DFT 数据可以得到 near/sub-meV per atom 的能量精度，说明 foundation model + targeted active learning 是可行路径。</li>
+<li><strong>phonon spectra 可作为物理验证</strong>：文章通过 phonon spectra 检查训练势是否保留相稳定和动力学特征，避免仅凭能量 MAE 判断 MLIP 质量。</li>
+<li><strong>独立 curated test set 上的 force/stress 更敏感</strong>：energy MAE 的优势在三个体系中仍存在，但 force/stress 在碳体系上 entropy sampling 可能不如 random。原因是 entropy pool 过度代表畸变结构，而 curated test 更偏 near-equilibrium configurations。</li>
+<li><strong>mixed-pool remedy 有效</strong>：对 carbon，使用 80% entropy-driven + 20% near-equilibrium random-MD anchor，且筛选低力结构，可以在不增加 DFT 总量的情况下恢复 near-equilibrium force/stress 准确性。</li>
+<li><strong>方法区分 exploration 与 dataset selection</strong>：local entropy 负责把轨迹推向多样区域，global log-det 负责避免数据集冗余，这解决了早期 entropy-maximized sampling 的 self-averaging 问题。</li>
+</ul>
+<h2 id="section-6">Limitations and caveats</h2>
+<ul>
+<li>fingerprint-space diversity 不等同于目标应用分布；如果测试/生产 MD 主要在近稳态，纯 entropy sampling 可能过度采样畸变态。</li>
+<li>需要手动设置温度、压力、entropy weight、seed phases、阈值等 generation grid；这些参数本身可能决定覆盖范围。</li>
+<li>目前主要展示元素单质/简单二元体系；复杂多组分、表面、缺陷和反应体系的可扩展性仍需验证。</li>
+<li>依赖 GOM fingerprint 与基础 Allegro-OAM-L；换用其他 foundation model 或 descriptor 时表现可能变化。</li>
+<li>该方法提升训练集效率，但不能替代最终的 application-specific validation，如长时间 NVE/NVT 稳定性、扩散系数、相变路径等。</li>
+</ul>
+<h2 id="section-7">Possible actions</h2>
+<ul>
+<li>对 NFPP/MLFF：可借鉴 mixed-pool 设计，不要只追求多样畸变构型；需要保留 near-equilibrium/目标温度构型 anchor。</li>
+<li>对 CatMaster/MLIP 自动化：该文可作为“active learning 数据生成策略”的方法参考，与 MLIPilot 的 agentic training optimization 互补。</li>
+<li>对自旋/高熵数据库：如果后续构建 MLFF，可用 log-det fingerprint coverage 做训练集代表性诊断。</li>
+<li>对阅读后续：重点关注其 entropy weight grid、DFT 标注规模和 independent test set 定义是否可迁移到催化表面体系。</li>
+</ul>
+</div><div class="credit">本文为辅助理解研究方法的中文解读。论文原图、图注及摘要内容归原作者和相应权利人；来源见文首论文链接。</div></article></main><script>window.MathJax={tex:{inlineMath:[['$','$'],['\\(','\\)']],displayMath:[['$$','$$'],['\\[','\\]']]},options:{skipHtmlTags:['script','noscript','style','textarea','pre','code']}};</script><script defer src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-mml-chtml.js"></script><footer><span>AI for Materials 文献精读</span><span>中文研究笔记 · 图与摘要注明论文来源 · 不提供论文 PDF</span></footer></body></html>

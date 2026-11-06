@@ -1,0 +1,49 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Systematic Fine-Tuning of MACE Interatomic Potentials for Catalysis · AI for Materials 文献精读</title><meta name="description" content="AI for Materials、原子模拟与科研智能体的中文文献解读"><link rel="stylesheet" href="../style.css"><link rel="icon" href="../icon.svg" type="image/svg+xml"></head><body><header><a class="brand" href="../index.html"><span class="mark">M</span><span>AI for Materials<small>文献精读 / RESEARCH NOTES</small></span></a><a class="header-link" href="../index.html#library">浏览文献 <span>↗</span></a></header><main class="article-layout"><aside><a href="../index.html#library">← 返回文献库</a><nav aria-label="文章目录"><a href="#section-1">What the paper asks</a><a href="#section-2">Methods and data</a><a href="#section-3">Main findings</a><a href="#section-4">Key evidence</a><a href="#section-5">Limitations and caveats</a><a href="#section-6">Relevance to user projects</a><a href="#section-7">Possible actions</a><a href="#section-8">Citation notes</a></nav></aside><article><div class="eyebrow">RESEARCH NOTE / T6</div><h1>Systematic Fine-Tuning of MACE Interatomic Potentials for Catalysis</h1><div class="article-meta"><span>机器学习势训练与泛化</span><span>收录 2026-05-18</span><span>3 分钟阅读</span></div><a class="original" href="https://arxiv.org/abs/2605.09394" target="_blank" rel="noopener noreferrer">论文原文 ↗</a><div class="prose"><ul>
+<li><strong>Bibliographic status</strong>: Nima Karimitari, Jacob Clary, Derek Vigil-Fowler, Ravishankar Sundararaman, Gábor Csányi, Christopher Sutton, 2026, arXiv:2605.09394, 待核对正式发表状态。</li>
+<li><strong>One-line takeaway</strong>: 这篇直接讨论 MACE foundation model 在催化体系上的系统 fine-tuning，和用户 PX-New/NFPP/CatMaster 的 MLFF 叙事高度相关；值得标为 High。</li>
+</ul>
+<h2 id="section-1">What the paper asks</h2>
+<p>论文关注：已有 MACE foundation model 如何通过系统 fine-tuning 适配催化反应路径、表面吸附和过渡态相关任务；需要多少数据、什么采样策略、fine-tuning 后能否可靠描述 catalytic reaction pathways。</p>
+<h2 id="section-2">Methods and data</h2>
+<ul>
+<li>基于 MACE interatomic potentials。</li>
+<li>构建催化相关 fine-tuning 数据，文中出现 OER、CO2RR 等反应/表面任务。</li>
+<li>比较不同训练数据比例和采样策略；文本中出现 5%、10% 训练数据比例以及约 0.30 eV、0.19 eV、0.15 eV 等误差量级。</li>
+<li>讨论 perturbed structures、reaction pathway sampling、FT-All 等设置。</li>
+</ul>
+<h2 id="section-3">Main findings</h2>
+<ul>
+<li>对催化体系，foundation model 直接使用通常不够，需要面向目标 chemistry 的 fine-tuning。</li>
+<li>系统 fine-tuning 可以显著改善催化 reaction pathway 和吸附/过渡态相关预测。</li>
+<li>数据选择很关键；少量但覆盖关键反应构型的数据可能比盲目扩大随机数据更有效。</li>
+<li>对实际催化筛选，应把 MACE 作为快速势能面工具，并配合 DFT backing/validation。</li>
+</ul>
+<h2 id="section-4">Key evidence</h2>
+<ul>
+<li>摘要明确说 MLIPs 可快速洞察 catalytic reaction pathways，关键在于 fine-tuning。</li>
+<li>文中包含 OER、CO2RR、不同训练比例和误差对比，说明不是泛泛讨论 MLFF，而是面向催化反应路径的系统研究。</li>
+</ul>
+<h2 id="section-5">Limitations and caveats</h2>
+<ul>
+<li>具体误差数值、数据集规模（如 90,781 / 49,860 等）和表格结论需要引用前核对。</li>
+<li>该文面向典型催化表面反应，不一定直接等同 MOF 中 PX 吸附；PX-New 的色散主导相互作用仍需单独验证。</li>
+<li>Fine-tuned MACE 的可靠性仍依赖训练分布，不能替代最终 DFT。</li>
+</ul>
+<h2 id="section-6">Relevance to user projects</h2>
+<ul>
+<li><strong>PX-New</strong>：非常相关。可支撑“用 MACE 预筛和机制假说生成，但最终需要 DFT/fragment decomposition 验证”的叙事。</li>
+<li><strong>NFPP</strong>：与 MACE fine-tuning/MLFF 数据效率相关，可作为方法背景。</li>
+<li><strong>CatMaster</strong>：可作为 CatMaster ecosystem 中 MLFF module 的前沿例子，强调 validation gates。</li>
+<li><strong>CSR Review</strong>：应加入 MLIP fine-tuning for catalysis 相关段落。</li>
+</ul>
+<h2 id="section-7">Possible actions</h2>
+<ol>
+<li>标 High，建议手动审阅全文表格和图。</li>
+<li>抽取其 fine-tuning protocol，与用户现有 MACE/omat_pbe 使用方式对照。</li>
+<li>在 PX-New 稿件中谨慎引用：MACE 用于快速筛选/假说生成，DFT 用于确认。</li>
+</ol>
+<h2 id="section-8">Citation notes</h2>
+<ul>
+<li>arXiv:2605.09394；正式引用前核对作者顺序、数据集规模和关键误差。</li>
+</ul>
+</div><div class="credit">本文为辅助理解研究方法的中文解读。论文原图、图注及摘要内容归原作者和相应权利人；来源见文首论文链接。</div></article></main><script>window.MathJax={tex:{inlineMath:[['$','$'],['\\(','\\)']],displayMath:[['$$','$$'],['\\[','\\]']]},options:{skipHtmlTags:['script','noscript','style','textarea','pre','code']}};</script><script defer src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-mml-chtml.js"></script><footer><span>AI for Materials 文献精读</span><span>中文研究笔记 · 图与摘要注明论文来源 · 不提供论文 PDF</span></footer></body></html>

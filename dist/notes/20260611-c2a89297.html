@@ -1,0 +1,52 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Agentic Design of Compositional Descriptors via Autoresearch for Materials Science Applications · AI for Materials 文献精读</title><meta name="description" content="AI for Materials、原子模拟与科研智能体的中文文献解读"><link rel="stylesheet" href="../style.css"><link rel="icon" href="../icon.svg" type="image/svg+xml"></head><body><header><a class="brand" href="../index.html"><span class="mark">M</span><span>AI for Materials<small>文献精读 / RESEARCH NOTES</small></span></a><a class="header-link" href="../index.html#library">浏览文献 <span>↗</span></a></header><main class="article-layout"><aside><a href="../index.html#library">← 返回文献库</a><nav aria-label="文章目录"><a href="#section-1">Bibliographic status</a><a href="#section-2">One-line takeaway</a><a href="#section-3">What the paper asks</a><a href="#section-4">Methods</a><a href="#section-5">Main findings</a><a href="#section-6">Limitations and caveats</a><a href="#section-7">Possible actions</a></nav></aside><article><div class="eyebrow">RESEARCH NOTE / T8</div><h1>Agentic Design of Compositional Descriptors via Autoresearch for Materials Science Applications</h1><div class="article-meta"><span>智能体技术与科研系统</span><span>收录 2026-06-11</span><span>5 分钟阅读</span></div><a class="original" href="https://arxiv.org/abs/2605.14671" target="_blank" rel="noopener noreferrer">论文原文 ↗</a><div class="prose"><h2 id="section-1">Bibliographic status</h2>
+<ul>
+<li><strong>Source PDF</strong>:</li>
+<li><strong>Parsed Markdown</strong>: <code>文献PDF与解析/260611/mineru_md_shortnames_no_formula_table/p02.pdf/auto/p02.pdf.md</code></li>
+<li><strong>Topic</strong>: LLM coding agents for automatic compositional descriptor design in materials informatics.</li>
+<li><strong>Status</strong>: arXiv preprint; also appeared in the 20260521 batch, retained here for batch completeness.</li>
+</ul>
+<h2 id="section-2">One-line takeaway</h2>
+<p>这篇文章把 Karpathy-style autoresearch loop 移植到材料 composition-only descriptor 设计：固定随机森林模型和评估协议，让 LLM agent 反复提出、实现、验证并保留有用的化学描述符；结果说明 agent 能发现有化学含义的特征，但也暴露出 greedy accept/reject 容易膨胀特征维度和过拟合验证轨迹。</p>
+<h2 id="section-3">What the paper asks</h2>
+<p>文章关注材料信息学中的一个基础问题：当输入只有化学式、没有结构时，模型性能很大程度依赖人工设计的 composition descriptors。传统 AutoML 通常搜索模型、超参数或预定义特征组合，但很少自动发明新的化学描述符。作者因此提出：能否让 LLM coding agent 在受控评价环境中，自动提出并实现有化学意义的 compositional descriptors？</p>
+<p>具体问题包括：</p>
+<ol>
+<li>LLM agent 是否能仅凭任务描述和化学式数据，设计超越 fractional composition 和 Magpie 的描述符；</li>
+<li>自动设计出的描述符是否与目标性质具有可解释化学联系；</li>
+<li>这种 autoresearch loop 的失败模式是什么，尤其是特征维度膨胀、过拟合和局部贪心问题；</li>
+<li>该方法是否可作为 materials informatics 中“可审计特征工程”的新范式。</li>
+</ol>
+<h2 id="section-4">Methods</h2>
+<p>作者构建了 AUTOMAT 框架，核心是固定模型和评价流程，只允许 agent 改 descriptor generation code：</p>
+<ul>
+<li><strong>Autoresearch loop</strong>：每轮 agent 提出一个 descriptor idea，写入 <code>idea.md</code>，实现为 <code>idea.py</code>，运行固定随机森林评估；如果三折 CV MAE 优于当前 best，则接受并 checkpoint，否则回退。</li>
+<li><strong>两层验证协议</strong>：局部 accept/reject 使用 training/search set 上的 fixed-fold CV MAE；held-out validation set 不参与局部接受，只用于监控泛化、停止和最终 checkpoint 选择；test set 只在最终评估一次。</li>
+<li><strong>输入限制</strong>：agent 只能使用 chemical formula 和 Pymatgen 提供的元素属性，不允许使用晶体结构、外部数据库或 test labels。</li>
+<li><strong>模型固定</strong>：全部预测模型为 random forest，使性能差异主要来自 descriptor representation，而非模型结构/超参数。</li>
+<li><strong>任务设置</strong>：两个 composition-only regression 任务：实验 band gap 预测和永磁材料 Curie temperature 预测；每个任务分配 50 个 autoresearch iterations。</li>
+<li><strong>运行方式</strong>：可通过 OpenAI Codex 或 Claude Code 启动，<code>program.md</code> 约束 agent 行为，<code>run_status.py</code> 控制停止条件。</li>
+</ul>
+<h2 id="section-5">Main findings</h2>
+<ul>
+<li><strong>band gap 任务</strong>：AUTOMAT 在早期引入 oxidation-state、charge-balance、ionic splitting 等描述符，带来最大性能提升。这些特征编码可能氧化态、价态范围、电荷中性、阳离子/阴离子划分等信息，与 band gap 的离子性和电子结构直觉相符。</li>
+<li><strong>后期特征膨胀</strong>：band gap run 后期加入 thermodynamic、size-related、fractional array 和高维 co-occurrence features，CV MAE 继续小幅下降，但 held-out validation 不再稳定改善，描述符维度膨胀到两万以上。这说明贪心 CV 接受规则会奖励复杂度，必须依靠外层 validation 和复杂度惩罚控制。</li>
+<li><strong>Curie temperature 任务</strong>：agent 即使只收到一句任务描述，也识别出 transition metals、rare earths、actinides、magnetic sublattices、valence balance 和 periodic-block interactions 等磁性相关特征。最大改善之一来自 charge-balance features，最终选择的 checkpoint 包含约 261 个描述符。</li>
+<li><strong>最终性能优于 baseline</strong>：AUTOMAT descriptor set 在两个任务上均优于 fractional composition、Magpie 和 fractional+Magpie baseline，说明其生成的特征不只是随机数值变换。</li>
+<li><strong>可解释性是重要贡献</strong>：descriptor trajectory、accepted/rejected ideas 和实现文件形成可审计记录，能帮助研究者理解哪些化学假设被验证为有用。</li>
+</ul>
+<h2 id="section-6">Limitations and caveats</h2>
+<ul>
+<li>Greedy accept/reject 缺少显式复杂度惩罚，会偏好不断加特征，尤其在小数据或噪声任务中有过拟合风险。</li>
+<li>评估只覆盖 composition-only random forest，不代表该策略对结构图神经网络或深度模型同样有效。</li>
+<li>使用 held-out validation 选择 checkpoint 是必要的，但多轮观察 validation 仍可能产生选择偏差。</li>
+<li>LLM 生成的 descriptor code 需要审计，避免数据泄漏、错误化学假设或无意义高维展开。</li>
+<li>该框架展示的是“受控自动特征工程”，不能直接等同于自主科学发现。</li>
+</ul>
+<h2 id="section-7">Possible actions</h2>
+<ul>
+<li>对 CSR Review / agent 综述：可作为“autoresearch for scientific representation design”的例子，与 MLIPilot、AtomicSkills 分开讨论。</li>
+<li>对 CatMaster：可借鉴其 audit trail 设计，让 agent 的 idea、implementation、evaluation、accept/reject 都可追踪。</li>
+<li>对 PX-New 可解释性：如果未来做材料 family descriptor，不宜让 agent 无约束发明高维特征；应加入复杂度惩罚和 held-out family validation。</li>
+<li>对本地工具：可把 <code>program.md + run_status.py + fixed evaluator</code> 作为 agent 执行长循环的模板。</li>
+</ul>
+</div><div class="credit">本文为辅助理解研究方法的中文解读。论文原图、图注及摘要内容归原作者和相应权利人；来源见文首论文链接。</div></article></main><script>window.MathJax={tex:{inlineMath:[['$','$'],['\\(','\\)']],displayMath:[['$$','$$'],['\\[','\\]']]},options:{skipHtmlTags:['script','noscript','style','textarea','pre','code']}};</script><script defer src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-mml-chtml.js"></script><footer><span>AI for Materials 文献精读</span><span>中文研究笔记 · 图与摘要注明论文来源 · 不提供论文 PDF</span></footer></body></html>

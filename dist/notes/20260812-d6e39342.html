@@ -1,0 +1,23 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Project2Task: Graph-Guided Project-Level Planning for Autonomous Research · AI for Materials 文献精读</title><meta name="description" content="AI for Materials、原子模拟与科研智能体的中文文献解读"><link rel="stylesheet" href="../style.css"><link rel="icon" href="../icon.svg" type="image/svg+xml"></head><body><header><a class="brand" href="../index.html"><span class="mark">M</span><span>AI for Materials<small>文献精读 / RESEARCH NOTES</small></span></a><a class="header-link" href="../index.html#library">浏览文献 <span>↗</span></a></header><main class="article-layout"><aside><a href="../index.html#library">← 返回文献库</a><nav aria-label="文章目录"><a href="#section-1">What the paper asks</a><a href="#section-2">Methods</a><a href="#section-3">Main findings</a><a href="#section-4">Limitations and caveats</a><a href="#section-5">Possible actions</a><a href="#section-6">Competitive overlap and implications</a></nav></aside><article><div class="eyebrow">RESEARCH NOTE / T1</div><h1>Project2Task: Graph-Guided Project-Level Planning for Autonomous Research</h1><div class="article-meta"><span>材料生成与逆向设计</span><span>收录 2026-08-12</span><span>3 分钟阅读</span></div><a class="original" href="https://arxiv.org/abs/2608.05225" target="_blank" rel="noopener noreferrer">论文原文 ↗</a><div class="prose"><ul>
+<li><strong>Bibliographic status</strong>: 2026 年 arXiv 预印本，arXiv:2608.05225。作者与后续出版状态待核对。</li>
+<li><strong>One-line takeaway</strong>: 论文把长期研究项目显式表示为图，并据此拆解任务和传播状态；这与 CatMaster 的 research graph 和状态机重叠，应立即核查优先权与 claim 边界。</li>
+</ul>
+<h2 id="section-1">What the paper asks</h2>
+<p>作者研究长期自主研究中的项目级规划。许多科研代理擅长回答一次性问题，却难以管理跨多轮、存在依赖关系的研究项目。任务可能需要等待计算结果，也可能因为新证据而改变后续路线。如果系统只保存一段对话或一份线性待办，它很难判断哪些任务已经满足前置条件，哪些结论受到新失败影响。</p>
+<p>论文提出用图来表示项目。图中的节点对应目标、任务、产物或证据，边表示依赖关系。系统根据图的当前状态选择下一项可执行任务，并在结果返回后更新相关节点。作者希望借此减少遗漏、无效重复和顺序错误。</p>
+<h2 id="section-2">Methods</h2>
+<p>Project2Task 首先把项目目标转成结构化图，再从图中生成具体任务。规划器检查节点之间的依赖，选择已经满足条件的任务；执行结果进入图后，系统更新节点状态，并重新计算后续可执行项。与一次生成完整计划相比，这种方法允许系统在中途根据证据修改路线。</p>
+<p>作者设置项目级任务来比较图引导方法与线性或即时规划基线。评价关注任务完成度、依赖满足情况、计划一致性和最终项目结果，而不是只看单轮回答质量。正文还分析了图构建错误和状态更新错误，因为最初的依赖关系如果不准确，后续任务即使执行无误也可能沿着错误路线推进。</p>
+<h2 id="section-3">Main findings</h2>
+<p>论文报告图引导规划在长程任务上更容易保持依赖一致性，并能减少提前执行或遗漏前置步骤的情况。优势来自外显状态：系统无需从长对话中反复推断项目处于哪一步，而是直接读取节点和边的状态。任务返回后，相关依赖可以被重新评估。</p>
+<p>正文也表明，项目图不是自动正确的知识表示。若代理把弱证据写成已确认结论，错误会沿图传播；若依赖边漏掉关键条件，规划器会把尚未准备好的任务标为可执行。因而，图提供了可审计的结构，却不能代替证据质量判断。</p>
+<h2 id="section-4">Limitations and caveats</h2>
+<p>项目图的质量取决于节点定义、依赖类型和更新规则。复杂科研项目常包含互相冲突的证据、不同可信度的来源和需要人工裁决的分支。简单的完成或未完成状态不足以表达这些情况。图越大，维护成本和错误传播风险也越高。</p>
+<p>论文中的项目任务仍是受控评价，不能直接证明系统可以处理真实计算催化项目。真实场景还涉及队列等待、部分收敛、结构无效和后端失败。系统必须区分“程序完成”“产物存在”和“科学验收通过”，否则项目图会把工程状态误当成科学证据。</p>
+<h2 id="section-5">Possible actions</h2>
+<p>CatMaster 应把这篇论文列入 research graph 与长期规划模块的直接竞争文献。对比时需要检查节点类型、依赖表达、证据传播、失败回滚和人工确认。CatMaster 的图状态机应明确区分任务状态、产物状态和证据状态，并保存每次状态变化的来源。</p>
+<p>立即动作是完成优先权和措辞审计。如果 CatMaster 目前把“用 research graph 管理长期科研任务”写成核心新颖点，应改为更窄的主张，并用实验证明催化计算中的结构验证、证据门控、远程任务回执和人工监督带来了额外可靠性。</p>
+<h2 id="section-6">Competitive overlap and implications</h2>
+<p>对应项目是 CatMaster。重叠对象是长期自主研究项目，重叠方法是把项目表示为图、按依赖关系生成任务并在结果返回后更新状态，重叠主张是图结构可以改善项目级规划和长期一致性。这与 CatMaster 已完成的 research graph 状态机和 evidence propagation 明显重叠，因此应标记为直接竞争。</p>
+<p>竞争威胁主要落在新颖性和优先权，而不是立即替代 CatMaster 的全部能力。若对方已经公开完整方法和项目级基准，CatMaster 不能继续用宽泛的“图驱动科研规划”作为主卖点。投稿叙事应把边界收窄到计算催化的验证门、证据可信度传播、远程计算状态与科学验收分离，以及人类在关键节点的监督。下一步需要逐段核对双方公开时间、方法范围和评价指标，并在相关工作中正面引用。</p>
+</div><div class="credit">本文为辅助理解研究方法的中文解读。论文原图、图注及摘要内容归原作者和相应权利人；来源见文首论文链接。</div></article></main><script>window.MathJax={tex:{inlineMath:[['$','$'],['\\(','\\)']],displayMath:[['$$','$$'],['\\[','\\]']]},options:{skipHtmlTags:['script','noscript','style','textarea','pre','code']}};</script><script defer src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-mml-chtml.js"></script><footer><span>AI for Materials 文献精读</span><span>中文研究笔记 · 图与摘要注明论文来源 · 不提供论文 PDF</span></footer></body></html>

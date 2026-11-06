@@ -1,0 +1,130 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>ReactionAtlas: Ab origine exploration of chemical reaction networks with machine learning · AI for Materials 文献精读</title><meta name="description" content="AI for Materials、原子模拟与科研智能体的中文文献解读"><link rel="stylesheet" href="../style.css"><link rel="icon" href="../icon.svg" type="image/svg+xml"></head><body><header><a class="brand" href="../index.html"><span class="mark">M</span><span>AI for Materials<small>文献精读 / RESEARCH NOTES</small></span></a><a class="header-link" href="../index.html#library">浏览文献 <span>↗</span></a></header><main class="article-layout"><aside><a href="../index.html#library">← 返回文献库</a><nav aria-label="文章目录"><a href="#section-1">Bibliographic status</a><a href="#section-2">One-line takeaway</a><a href="#section-3">What the paper asks</a><a href="#section-4">Methods</a><a href="#section-5">Main findings</a><a href="#section-6">Limitations and caveats</a><a href="#section-7">Possible actions</a></nav></aside><article><div class="eyebrow">RESEARCH NOTE / T6</div><h1>ReactionAtlas: Ab origine exploration of chemical reaction networks with machine learning</h1><div class="article-meta"><span>机器学习势训练与泛化</span><span>收录 2026-07-09</span><span>8 分钟阅读</span></div><a class="original" href="https://arxiv.org/abs/2606.30778" target="_blank" rel="noopener noreferrer">论文原文 ↗</a><div class="prose"><h2 id="section-1">Bibliographic status</h2>
+<ul>
+<li><strong>Title</strong>: ReactionAtlas: Ab origine exploration of chemical reaction networks with machine learning</li>
+<li><strong>Authors</strong>: Stefan Gugler, Max Eissler, Khaled Kahouli, Klaus-Robert Müller</li>
+<li><strong>Source/status</strong>: arXiv preprint <code>arXiv:2606.30778v1 [cs.LG]</code>, 2026-06-29.</li>
+<li><strong>Extraction note</strong>: Text extracted locally with <code>pypdf</code>; card based on the local PDF text.</li>
+</ul>
+<h2 id="section-2">One-line takeaway</h2>
+<p>ReactionAtlas 的关键启发是：反应网络探索可以由“给定反应物和产物再找 TS”转向“从一个 minimum 出发，先用加噪/去噪生成 saddle-point 候选，再由 MLFF critic 与 IRC 验证接入网络”；这为未来把反应网络算法拓展到表面反应、催化微反应网络和自动 saddle search 提供了很有价值的路线参考。</p>
+<h2 id="section-3">What the paper asks</h2>
+<ul>
+<li>化学反应网络（CRN）天然是由 minima、transition states 和 elementary reactions 构成的图，但系统构建大型 CRN 需要寻找数万级 TS，传统 DFT 太慢。</li>
+<li>现有自动反应网络框架常依赖 reaction rules 或 double-ended TS search，需要预先给定反应物–产物对；这会把机制假设提前写入算法，且组合爆炸。</li>
+<li>本文问题是：能否从少量 seed molecules 出发，不使用手工反应规则，也不要求预给 product，通过 ML 生成式模型和 MLFF 自动扩展反应网络？</li>
+<li>示例体系是 prebiotic small carbohydrate chemistry / formose chemistry，从 8 个小分子/离子种子出发探索到 C4H8O4 相关化学空间。</li>
+</ul>
+<h2 id="section-4">Methods</h2>
+<ul>
+<li>
+<p><strong>总体框架：两个耦合循环共享一个 CRN graph</strong></p>
+<ul>
+<li>ReactionAtlas 从小 seed set 生长 CRN，两个 loop 读写同一张图。</li>
+<li><strong>Generative loop</strong>：提出 intermolecular reactions / TS candidates。</li>
+<li><strong>Potential-energy-surface loop</strong>：在已知 minimum 周围探索 PES transitions。</li>
+<li>两个 loop 都使用 machine-learned force field，并周期性计算 kinetic model，用 steady-state concentrations 引导后续探索资源。</li>
+</ul>
+</li>
+<li>
+<p><strong>Seed set 与探索目标</strong></p>
+<ul>
+<li>起始种子为 8 个 prebiotic species：<code>CH2O, H2O, OH−, H3O+, CO2, H2CO3, HCO3−, H</code>。</li>
+<li>目标不是只复现一个已知 formose cycle，而是构建可包含副反应、替代路径、charge/stereo 信息的大型小分子 CRN。</li>
+</ul>
+</li>
+<li>
+<p><strong>Single-ended generative transition-state proposer</strong></p>
+<ul>
+<li>使用 equivariant joint-time MoreRed formulation 的 denoising diffusion model，训练在 Grambow dataset 的 ωB97X-D3 transition states 上。</li>
+<li>与图像生成从纯噪声开始不同，模型从 reactant geometry <code>x0</code> 出发，先部分加噪到 <code>t ~ U(100,650)</code>，再由 learned reverse process 去噪，采样 TS candidate。</li>
+<li>这是严格 single-ended：不提供 product、driving coordinate 或 reaction template。</li>
+<li>候选 reactants 从当前网络中按 steady-state concentration 的 log-softmax 概率抽取，使生成器优先探索动力学相关区域。</li>
+</ul>
+</li>
+<li>
+<p><strong>MLFF critic 与 saddle validation</strong></p>
+<ul>
+<li>用 MD-ET transformer force field 给候选 TS 打分；MD-ET 预测 energy、force，并通过 force head 自动微分得到 Hessian。</li>
+<li>由于 MD-ET 不严格 energy-conserving，Hessian 可能非对称，作者对 Hessian 做 symmetrization 并丢弃非对称部分。</li>
+<li>验证条件包括：投影去除平移/转动模式后有显著负特征值；IRC 两端连接两个不同 minima；正反向 barrier 落在物理范围内。</li>
+<li>通过验证后，TS 和端点 minima 被加入 CRN graph。</li>
+</ul>
+</li>
+<li>
+<p><strong>PES loop：MD sampling + saddle optimization</strong></p>
+<ul>
+<li>对超过 concentration threshold 的新 minimum，跑短 Langevin trajectory at 300 K，抽取 frames 作为 batched P-RFO saddle optimization 的初始点。</li>
+<li>P-RFO 沿一个 follow mode 上坡，沿其他模式下坡，并使用 partitioned trust region。</li>
+<li>不需要 curvature 的 minimization 使用 FIRE。</li>
+<li>每个 validated saddle 沿 imaginary mode 两侧下坡到端点；若端点 bonding pattern 相同则作为 conformer transition，否则登记为 chemical reaction。</li>
+<li>minima 用 permutation-invariant Kabsch RMSD 和 NEB same-basin test 去重。</li>
+</ul>
+</li>
+<li>
+<p><strong>Kinetic exploration guidance</strong></p>
+<ul>
+<li>每接受一个 reaction 后，将 CRN 作为 mass-action system 积分到 long-time steady state。</li>
+<li>速率常数由 Eyring transition-state theory 基于 barrier 计算，并用 diffusion limit 截断。</li>
+<li>steady-state composition 一方面决定 proposer 的采样分布，另一方面给出 network 的 microkinetic read-out。</li>
+</ul>
+</li>
+<li>
+<p><strong>DFT recalculation 与数据发布</strong></p>
+<ul>
+<li>对 reactive TS，作者在 PBE0/def2-TZVPP 级别重新计算 barrier、TS/minima 绝对能量和 Hessian。</li>
+<li>若 DFT 指示 ML-predicted TS 无效，数据中还提供 corrected PBE0 TS。</li>
+<li>作者提供 full CRN structured dataset、dataset viewer 和 code。</li>
+</ul>
+</li>
+</ul>
+<h2 id="section-5">Main findings</h2>
+<ul>
+<li>
+<p><strong>规模与准确性</strong></p>
+<ul>
+<li>ReactionAtlas 从 8 个 seed 出发，发现约 47,000 个 reactions 和约 12,000 个 compounds。</li>
+<li>数据集包括 12,542 个 unique compounds，覆盖 191 个 molecular formulas；33,065 个 PES minima；24,134 个 intra-PES TS；44,657 个 elementary TS，折叠为 21,008 个 unique chemical reactions。</li>
+<li>MLFF TS 与 PBE0 reference 在 85% 情况下 RMSD 小于 0.5 Å，并且可进一步提升到 PBE0 level。</li>
+</ul>
+</li>
+<li>
+<p><strong>从 supplied product 转向 open-ended reaction discovery</strong></p>
+<ul>
+<li>传统 double-ended TS search 需要反应物–产物对；本文 generative proposer 从 minimum 出发直接提出 TS candidate。</li>
+<li>这降低了对反应模板和人工枚举规则的依赖，允许网络中新产物作为新种子继续扩展。</li>
+<li>对我们未来表面反应网络很关键：可把“先列所有反应式”改为“局部 minimum + 表面吸附构型 → 生成 saddle/路径候选 → MLFF/DFT gate 验证”。</li>
+</ul>
+</li>
+<li>
+<p><strong>formose chemistry 的网络级发现</strong></p>
+<ul>
+<li>ReactionAtlas 能映射小糖化学到 C4H8O4 规模，保留 charge 和 stereo 信息。</li>
+<li>作者强调其不仅能覆盖 formose cycle 的已知路径，也能发现 alternative reaction pathways。</li>
+<li>这说明 ML-guided CRN 不只是复现规则库，而能在复杂副反应网络里提出新的连接。</li>
+</ul>
+</li>
+<li>
+<p><strong>动力学引导让搜索不完全盲目</strong></p>
+<ul>
+<li>通过 steady-state concentrations 引导 proposer 选择 kinetically relevant reactants，避免只按图扩展而陷入低相关化学空间。</li>
+<li>这种“网络搜索—微动力学读出—反过来指导搜索”的闭环，对于 PX/MOF 或表面催化网络也有直接借鉴价值。</li>
+</ul>
+</li>
+</ul>
+<h2 id="section-6">Limitations and caveats</h2>
+<ul>
+<li>体系是小分子/预生物有机化学网络，不是表面催化；直接迁移到表面反应需要处理 slab 周期性、吸附位点、coverage、charge transfer、spin、surface reconstruction 等额外复杂性。</li>
+<li>MLFF critic 和 generative TS proposer 的训练域主要面向小分子 TS；表面反应需要新的训练集、表面/吸附态 equivariant representation 和更严格 DFT validation gate。</li>
+<li>MD-ET Hessian 来自 force head 自动微分且需对称化；这提示 MLFF saddle validation 仍有近似，不能把 ML TS 直接当最终 DFT 证据。</li>
+<li>网络规模巨大但仍受 seed set、采样策略、barrier cutoffs、diffusion cap 和 kinetic guidance 影响；“没发现某反应”不等于反应不存在。</li>
+<li>对表面反应而言，反应物浓度/coverage、溶剂、电势和温度等边界条件会更难定义，需要先从受控小网络做 proof-of-concept。</li>
+</ul>
+<h2 id="section-7">Possible actions</h2>
+<ul>
+<li><strong>表面反应网络路线启发</strong>：把 ReactionAtlas 抽象为 <code>adsorbed minimum → noisy TS proposal → MLFF/UMA critic → IRC/NEB/P-RFO validation → microkinetic graph update</code>。</li>
+<li><strong>PX-New/MOF 远期路线</strong>：对于表面释放、孔道进入、异构化或交换过程，可先用 UMA/MLFF 生成若干 saddle/path candidates，再用 DFT/PMF/NEB gate 验证，而不是默认手工指定单一路径。</li>
+<li><strong>CatMaster/agent 叙事</strong>：可作为“agentic computational catalysis ecosystem”中 reaction-network exploration module 的参考文献，强调需要 validation gates、audit trail 和 human supervision。</li>
+<li><strong>短期不宜做大工程</strong>：目前只记录为路线启发；若要启动，应先选一个极小表面反应 toy system，验证 single-ended TS proposal + MLFF critic 是否能给出化学合理候选。</li>
+<li><strong>方法迁移重点</strong>：不是照搬 formose 网络，而是借鉴其 search loop 设计：生成式候选、物理过滤、DFT 升级、动力学反馈和结构化数据发布。</li>
+</ul>
+</div><div class="credit">本文为辅助理解研究方法的中文解读。论文原图、图注及摘要内容归原作者和相应权利人；来源见文首论文链接。</div></article></main><script>window.MathJax={tex:{inlineMath:[['$','$'],['\\(','\\)']],displayMath:[['$$','$$'],['\\[','\\]']]},options:{skipHtmlTags:['script','noscript','style','textarea','pre','code']}};</script><script defer src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-mml-chtml.js"></script><footer><span>AI for Materials 文献精读</span><span>中文研究笔记 · 图与摘要注明论文来源 · 不提供论文 PDF</span></footer></body></html>

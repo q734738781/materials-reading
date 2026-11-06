@@ -1,0 +1,60 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>From Experiments to Expertise: Scientific Knowledge Consolidation for AI-Driven Computational Physics · AI for Materials 文献精读</title><meta name="description" content="AI for Materials、原子模拟与科研智能体的中文文献解读"><link rel="stylesheet" href="../style.css"><link rel="icon" href="../icon.svg" type="image/svg+xml"></head><body><header><a class="brand" href="../index.html"><span class="mark">M</span><span>AI for Materials<small>文献精读 / RESEARCH NOTES</small></span></a><a class="header-link" href="../index.html#library">浏览文献 <span>↗</span></a></header><main class="article-layout"><aside><a href="../index.html#library">← 返回文献库</a><nav aria-label="文章目录"><a href="#section-1">What the paper asks</a><a href="#section-2">Methods</a><a href="#section-3">Main findings</a><a href="#section-4">Limitations and caveats</a><a href="#section-5">Possible actions</a><a href="#section-6">Competitive overlap and implications</a></nav></aside><article><div class="eyebrow">RESEARCH NOTE / T2</div><h1>From Experiments to Expertise: Scientific Knowledge Consolidation for AI-Driven Computational Physics</h1><div class="article-meta"><span>合成与工艺</span><span>收录 2026-08-06</span><span>9 分钟阅读</span></div><a class="original" href="https://doi.org/10.5281/zenodo.20588420" target="_blank" rel="noopener noreferrer">论文原文 ↗</a><div class="prose"><ul>
+<li><strong>Bibliographic status</strong>: Haonan Huang；2026；accepted by ICML 2026 Workshop on AI for Physics（AI4Physics@ICML 2026）；arXiv:2603.13191v2 <code>[physics.comp-ph]</code>，2026-07-02 版本；代码 <code>QMatSuite/QMatSuite</code>，数据 Zenodo DOI <code>10.5281/zenodo.20588420</code>。</li>
+<li><strong>One-line takeaway</strong>: QMatSuite 用带 provenance、可复核/废弃的 findings→patterns→principles 科研记忆，把重复计算中的失败经验转化为跨会话能力；它显著减少调试并促进物理探索，但也实证揭示错误知识污染、检索遗漏和“照抄最佳 recipe”会让熟悉体系反而推理更差。</li>
+<li><strong>High 类型</strong>: Direct competitor</li>
+</ul>
+<h2 id="section-1">What the paper asks</h2>
+<p>论文认为“能执行计算”不等于“形成科研专长”，核心问题是：计算物理代理能否把多次独立运行中的数值结果、失败修复和方法经验持久化，经过专门反思纠错与跨体系抽象，再迁移到新材料？作者还问：（1）知识积累究竟改善效率、准确性还是行为模式；（2）未经审查的错误知识有什么可测代价；（3）高阶 pattern 会不会在任务执行中自然产生，还是需要独立 reflection；（4）知识能否跨模型、跨引擎、跨材料复用。</p>
+<h2 id="section-2">Methods</h2>
+<ul>
+<li><strong>平台架构</strong>：QMatSuite 提供 40+ MCP structured tools，分 Project/Config/Execute/Analysis/Knowledge 五类；以 engine-agnostic intermediate representation 映射至 QE、VASP、ORCA、LAMMPS、CP2K 等 15 个引擎。AI 通过 MCP、人类通过 GUI，共享 API、当前状态、provenance 和 engine dispatch。</li>
+<li><strong>知识表示</strong>：SQLite + FTS5；builtin 只读最佳实践、local 可写代理知识、community packs 三层。local entries 分 finding（单计算观察）、pattern（跨体系规律）、principle（一般规则），包含 scope tags、source calculation references、free-text reasoning；通过 ULID 建立引用，review verdict 有 confirmed/deprecated/promoted。</li>
+<li><strong>工作流 nudges</strong>：创建计算前提醒检索，错误恢复后提醒记录修复，结果摘要后提醒记录数值，列出 findings 时提醒合成。短自然语言 prompt 只说明科学目标，不给参数、软件语法或流程。</li>
+<li><strong>规模验证</strong>：Claude Sonnet 4.6 + QE 7.5/SSSP precision 对 135 种固体做结构弛豫和能带；GPT-5.4 + ORCA 6.1.1 对 98 个分子做几何优化。用于验证模型/引擎无关性，不是主要记忆因果实验。</li>
+<li><strong>Fe AHC 学习曲线</strong>：Claude Opus 4.6 完成 bcc Fe 异常霍尔电导的六步 <code>SCF→NSCF→wannierprep→pw2wannier90→wannier90→postw90</code>。相同 prompt、模型、全新 session/project；唯一跨运行变量为知识库：0、继承 6、继承 9 entries。屏蔽 web、教程/样例和 session persistence，并审计 trace。</li>
+<li><strong>知识审查</strong>：三次 Fe 运行累计 15 insights（13 正确、1 部分正确、1 数据正确但结论错误）。独立 reflection session 复核 <code>dis_froz_max=17 eV</code> 建议，结合收敛数据和官方教程决定废弃/替换。</li>
+<li><strong>跨材料迁移</strong>：用空库、15 条未审查 Fe 知识、21 条已审查 Fe 知识三种条件做 fcc Ni AHC，比较 pipeline executions、失败、tool calls、reasoning time 和文献偏差。</li>
+<li><strong>知识合成</strong>：19 种 zinc-blende 半导体、24 个 execution sessions 累计 25 findings；Sonnet/Opus 各自接受相同 12-word reflection prompt，观察是否形成 pattern；再让代理据 pattern 选择 InP 并做预测性计算。</li>
+<li><strong>行为统计</strong>：解析 398 个 execution traces，统计 nudge 到达、记录位置和 pattern 产生；材料/分子结果与实验或光谱基准比较。</li>
+</ul>
+<h2 id="section-3">Main findings</h2>
+<ol>
+<li><strong>平台能大规模执行，但复杂度仍决定完成率（Fig. 1、Fig. 6）</strong>：135 种固体中 115 完成（85.2%），20 个未完成均为 timeout；114 个晶格常数 MAE 1.02%，68 个非金属带隙 MAE 1.76 eV，42/42 金属识别正确，5 个强关联绝缘体被 PBE 判金属属于方法局限。98 个 ORCA 分子中 91 完成；参考支持的收敛子集键长 MAE <code>0.0069 Å（0.52%）</code>、键角 MAE <code>0.51°</code>。</li>
+<li><strong>持久知识造成单调学习曲线（Fig. 2）</strong>：Fe AHC 三次运行的 API reasoning time 从 42.8 降至 16.1 min（62%），tool calls 从 251 降至 143，pipeline attempts 从 23 降至 10；结果从 <code>−1100 S/cm（46.5% error）</code> 改善到 <code>−846.2（12.7%）</code> 和 <code>−771.5（2.7%）</code>。</li>
+<li><strong>关键收益来自避免重复踩坑，而非直接给最优参数（Fig. 2b、Fig. 4）</strong>：空库代理耗约 3.5 h、14 次 pipeline attempts 才发现 QE NSCF 必须显式设 non-zero starting magnetization，否则会静默成为非磁态并给出零 Berry curvature/AHC。后两次运行首算前检索此 finding，完全避免该 episode；一次未检索到已有 Fermi-energy finding 时又重现错误，支持“检索而非模型潜在记忆”为因果通道。</li>
+<li><strong>知识释放认知预算（Fig. 2c）</strong>：Run 03 很快获得有效值后，主动投入额外 19 h 做 7 轮收敛研究，发现 adaptive refinement 以约 1/7 计算成本优于暴力加密 mesh。行为由 debugger→solver→optimizer；因此 wall-time 并未单调减少，改进实质是把注意力从基础设施调试转向物理探索。</li>
+<li><strong>错误知识有实际成本且可被 reflection 纠正（Fig. 3a）</strong>：代理因 <code>dis_froz_max=17 eV</code> 偶然更接近文献而建议低 frozen window，忽略更高值收敛到约 <code>−628 S/cm</code>，属于 error cancellation。独立 review 结合 sweep 与官方教程废弃该 entry、保留 lineage；说明 provenance + deprecation 有用，但纠正不是自动发生。</li>
+<li><strong>经审查知识跨材料迁移（Fig. 3b–c）</strong>：Ni 空库条件 14 次执行、7 次失败、272 calls，约 10% error；15 条未审知识需 9 次执行并因坏建议多花 3 轮；21 条已审知识仅 3 次执行、零失败、66 calls、14.1 min，得到 <code>|σz|=2079 S/cm</code>，距约 2073 文献值 1.0%。</li>
+<li><strong>同材料 recipe 可能压制原则推理</strong>：六个熟悉 Fe reruns 都复制曾给最好数值的 17 eV，即使 deprecated warning 可见；陌生 Ni 没有“最佳 recipe”可抄，反而从全相对论赝势、NSCF 磁性和能窗原则出发，精度更好。这是对简单“更多记忆总更好”的重要反例。</li>
+<li><strong>高阶合成几乎不在 execution mode 发生（Fig. 5）</strong>：398 sessions 中 84.9% 收到记录 nudge，但仅 4.0% 有中途记录，95.3% 记录集中于最后 10% events，execution mode 产生 0 个 pattern；全库 41 个 patterns 均来自 dedicated reflection。</li>
+<li><strong>短 reflection 可把 findings 压缩为可预测 patterns（Fig. 5）</strong>：两种模型各用不到 3 min，从 25 findings 独立得到同三类规律：PBE 晶格高估随原子质量增长、窄带隙区 PBE 失效加剧、含 semicore 的变胞弛豫需 &gt;80 Ry 以避免 Pulay stress。随后预测 InP PBE gap 约 0.7 eV，实算 0.696 eV（数值偏差 0.6%），形成 observation→pattern→prediction 闭环。</li>
+</ol>
+<h2 id="section-4">Limitations and caveats</h2>
+<ul>
+<li>最关键 Fe 学习曲线只有一条顺序三运行链，无独立重复和方差；模型随机性与逐轮任务经验不能完全统计分离。</li>
+<li>Fe→Ni 仍在 3d 铁磁体家族内，只是温和 OOD；Ni 的 1% 可能部分来自误差抵消，且未完成系统收敛研究。</li>
+<li>未与长上下文 replay、原始日志 RAG、其他科研记忆系统做直接等预算基线，难以确定 graded hierarchy 本身贡献多少。</li>
+<li>反思并不天然可靠；作者为纠正 C6 逐层加强 review prompt，弱/开源模型的 review 鲁棒性未测。</li>
+<li>“纠正知识已可见但执行代理仍复制坏 recipe”表明 deprecation metadata 不足以改变行为，需要 retrieval/ranking 之外的决策门控。</li>
+<li>135 材料完成率把 timeout 计为未完成，但不同体系难度与统一预算耦合；物理结果准确度也受 PBE/赝势等传统误差支配。</li>
+<li>单作者 workshop 论文；开放 artifacts 有利复核，但核心新颖性与定量结论仍需更广泛独立复现。</li>
+</ul>
+<h2 id="section-5">Possible actions</h2>
+<ul>
+<li>将 CatMaster 经验单元明确分成 <code>finding / failure-recovery / pattern / principle / recipe</code>，所有条目绑定 calculation ID、结构、输入、输出、收敛证据和适用范围。</li>
+<li>把 execution 与 reflection 作为不同运行模式：日常计算只做低成本 finding capture；按项目里程碑独立做跨任务审查、矛盾发现、promote/deprecate。</li>
+<li>对 recipe 设“不可直接复用”门：跨体系应用前必须检查元素/结构、赝势、泛函、k 点、能量零点和目标性质可比性；deprecated 条目从可执行候选中硬排除。</li>
+<li>复现其最小因果 benchmark：同一 VASP 催化任务做空记忆、未审记忆、已审记忆三组，并重复多次；报告失败率、重算数、token/API time、wall-time、最终误差及错误知识恢复成本。</li>
+<li>为 pattern promotion 要求至少多个独立结构/任务支持、数值区间、反例和 scope；让 pattern 能产生一个前瞻预测，再用新计算验证。</li>
+<li>下载 Zenodo traces 和 QMatSuite schema，做字段级映射，优先吸收 provenance、review verdict 和 execution/reflection separation，而非重做引擎适配。</li>
+</ul>
+<h2 id="section-6">Competitive overlap and implications</h2>
+<ul>
+<li><strong>Project</strong>: CatMaster。</li>
+<li><strong>Overlap</strong>: 直接覆盖 CatMaster 的核心叙事：代理执行计算、跨会话沉淀失败经验、构造 provenance-linked 科研知识、复核错误、抽象跨体系规律并迁移到新任务；还覆盖 MCP 工具层、多引擎、统一状态和开放平台。</li>
+<li><strong>Novelty implications</strong>: “从自动执行走向科研专长”“失败经验跨任务复用”“findings 升级为 patterns”已被明确提出并用计算物理案例量化。CatMaster 不能只以 persistent memory/knowledge graph 作为区别；差异应转向催化专用的结构—能量—机理 typed evidence、可比性约束、事务恢复、DFT/实验联动和更严格反事实评测。</li>
+<li><strong>Priority implications</strong>: arXiv v2 时间戳 2026-07-02，且代码/完整 artifacts 已公开，优先权证据强。对外写作应引用并正面区分 QMatSuite，避免“首次让计算代理积累科研专长/反思形成规律”等宽主张。</li>
+<li><strong>Claim implications</strong>: CatMaster 的主张应可测且更窄，例如“在异相催化连续任务中，将结构、计算协议、能量与机理 claim 绑定，并通过可比性门控减少错误迁移”；需报告空/未审/已审记忆对照及知识污染成本。</li>
+<li><strong>Follow-up</strong>: 立即做竞争功能矩阵（knowledge grades、provenance、review/deprecation、retrieval、cross-task transfer、engine support、benchmark）；选一组连续吸附/反应路径任务，复现实验—反思交替，专门测试 QMatSuite 暴露的 retrieval miss、bad-recipe replication 和 error-cancellation 三类故障。</li>
+</ul>
+</div><div class="credit">本文为辅助理解研究方法的中文解读。论文原图、图注及摘要内容归原作者和相应权利人；来源见文首论文链接。</div></article></main><script>window.MathJax={tex:{inlineMath:[['$','$'],['\\(','\\)']],displayMath:[['$$','$$'],['\\[','\\]']]},options:{skipHtmlTags:['script','noscript','style','textarea','pre','code']}};</script><script defer src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-mml-chtml.js"></script><footer><span>AI for Materials 文献精读</span><span>中文研究笔记 · 图与摘要注明论文来源 · 不提供论文 PDF</span></footer></body></html>

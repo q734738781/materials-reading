@@ -1,0 +1,34 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Beyond the Training Domain: Robust Generative Transition State Models for Unseen Chemistry · AI for Materials 文献精读</title><meta name="description" content="AI for Materials、原子模拟与科研智能体的中文文献解读"><link rel="stylesheet" href="../style.css"><link rel="icon" href="../icon.svg" type="image/svg+xml"></head><body><header><a class="brand" href="../index.html"><span class="mark">M</span><span>AI for Materials<small>文献精读 / RESEARCH NOTES</small></span></a><a class="header-link" href="../index.html#library">浏览文献 <span>↗</span></a></header><main class="article-layout"><aside><a href="../index.html#library">← 返回文献库</a><nav aria-label="文章目录"><a href="#section-1">What the paper asks</a><a href="#section-2">Methods</a><a href="#section-3">Main findings</a><a href="#section-4">Limitations and caveats</a><a href="#section-5">Possible actions</a></nav></aside><article><div class="eyebrow">RESEARCH NOTE / T1</div><h1>Beyond the Training Domain: Robust Generative Transition State Models for Unseen Chemistry</h1><div class="article-meta"><span>材料生成与逆向设计</span><span>收录 2026-08-16</span><span>4 分钟阅读</span></div><a class="original" href="https://doi.org/10.1038/s43588-026-01034-5" target="_blank" rel="noopener noreferrer">论文原文 ↗</a><div class="prose"><ul>
+<li><strong>Bibliographic status</strong>: Samir Darouich, Jacob W. Toney, Weiliang Luo, Johannes Kästner, Mathias Niepert, Heather J. Kulik. 2026. Nature Machine Intelligence article; accessible preprint arXiv:2601.16469v1. Published article DOI: <code>10.1038/s43588-026-01034-5</code>; arXiv DOI: <code>10.48550/arXiv.2601.16469</code>.</li>
+<li><strong>One-line takeaway</strong>: 生成式过渡态模型对未见元素会产生短键、原子重叠和巨大能量误差；用目标化学域的平衡构象构造伪反应预训练，可把 Transition1x-TMC 的中位 TS RMSD 从 0.39 Å 降至 0.19 Å，并将反应微调数据需求最多降低 75%。</li>
+</ul>
+<h2 id="section-1">What the paper asks</h2>
+<p>现有生成式 TS 模型在 HCNO 小有机反应上接近化学精度，但这并不能说明它们理解了可跨元素和金属中心迁移的反应几何。论文把“未见元素”和“未见反应机制”设为明确压力测试：只改变一个元素或加入过渡金属配合物时，模型是否仍能生成物理合理的 TS；若失败，能否利用数量远多于 TS 数据的平衡构象，先让模型接触目标化学环境，再用少量真实反应微调。</p>
+<h2 id="section-2">Methods</h2>
+<p>作者以 Transition1x 为基础构建两个扩展基准。Transition1x-2p3p4p 通过同族元素替换引入 Si/P/S 与 Ge/As/Se；Transition1x-TMC 将原有 TS 作为配体接入 Ti、Zn、Ru、Rh、Pd、Ag、Os、Ir、Pt、Au 十类小型过渡金属配合物，得到约 3.64 万个反应。结构在 GFN2-xTB 水平用 P-RFO 定位 TS，并通过 IRC 获得反应物和产物；划分继承母反应的训练/测试归属，避免衍生反应泄漏。</p>
+<p>模型包括 OAReactDiff、React-OT 与 AEFM。除整体 RMSD 外，作者还比较反应中心和键长分布、bond distance MAE、Wasserstein-1 距离及生成结构与参考 TS 的单点能差。自监督方案从平衡结构的 CREST 构象中选择第二高能、高能和最低能构象，分别充当伪反应物、伪 TS 和伪产物；这些并非真实化学反应，只用于暴露目标元素与合理局部几何。随后再用真实反应微调。作者还以 DFT 重新优化部分参考和生成 TS，检查半经验训练能否支持 DFT 级后处理。</p>
+<h2 id="section-3">Main findings</h2>
+<ol>
+<li>未见元素是明确失效源。仅进行单原子同族替换，即使反应整体与 HCNO 母反应相似，React-OT 的中位 RMSD 也可从 0.04 Å 升至 0.18 Å；TMC 类似反应达到 0.39 Å，而对应 HCNO 类似物约 0.05 Å。模型常把 C–Si、C–Ge 等键拉向熟悉的 C–C 长度，生成原子重叠或过短键。</li>
+<li>扩大训练化学覆盖并不自动获得可靠外推。Transition1x-2p3p4p 或 TMC 微调在相关域内有帮助，但对全新配体或新机制仍可能负迁移；仅凭“训练数据更多、更杂”不能解除 OOD 风险。</li>
+<li>构象伪反应预训练显著改善目标化学域。Transition1x-TMC 相似反应的中位 RMSD 由 0.39 Å 降至 0.19 Å，bond distance MAE 由 0.26 Å 降至 0.10 Å；Transition1x-2p3p4p 的相应 RMSD 从 0.18 Å 降至 0.10 Å。</li>
+<li>数据效率提高具有定量证据。对 Transition1x-2p3p4p，预训练后使用 25% 反应数据可接近全数据模型；对 Transition1x-TMC 约需 50%。作者据此报告反应微调数据需求最多降低 75%。在 Pt 催化甲烷活化中，100 个伪反应加 50 个目标反应，将中位能量误差从 9.04 降至 5.06 kcal/mol，RMSD 从 0.16 降至 0.15 Å。</li>
+<li>GFN2-xTB 可用于大规模扩展，但不能替代末端 DFT 验证。其数据生成比 DFT 快 700 倍以上；然而在 TMC 与 Pt 体系上，xTB 和 DFT TS 几何差异更大。生成结构经 DFT 优化后，Transition1x-2p3p4p、TMC 与 Pt 集合分别约 75%、82%、76% 收敛到对应参考 TS，说明模型更适合作为高质量初猜生成器，而非最终能垒裁决器。</li>
+<li>对 CatMaster 的验证含义很直接：生成式 TS 候选必须经过键长/碰撞 QC、反应连接性和虚频/IRC 或等效验证、以及高水平能量精修。全局 RMSD 看起来不错时，局部未见元素仍可能导致巨大能量错误。</li>
+</ol>
+<h2 id="section-4">Limitations and caveats</h2>
+<ul>
+<li>大规模扩展数据主要基于 GFN2-xTB；尽管做了 DFT 子集检查，半经验势面对过渡金属的参考偏差仍会传入模型。</li>
+<li>伪反应由构象能量排序人为定义，并非真实反应坐标。它提供元素和局部几何先验，但不能独立教授成键变化或真实机制。</li>
+<li>过渡金属配合物由结构生成流程构造，覆盖的是有限配体、价态和自旋条件；异相表面、溶剂和多自旋通道尚未纳入。</li>
+<li>“75% 数据节省”来自特定模型、数据集和达到同等指标的定义，不能直接作为其他体系的固定预算。</li>
+<li>DFT 精修的成功率约为 75%–82%，仍有显著失败比例；生成完成不等于得到正确 TS。</li>
+</ul>
+<h2 id="section-5">Possible actions</h2>
+<ol>
+<li>在 CatMaster 的 TS 候选漏斗中增加硬性门：元素域/OOD 标记、最小原子距离与键长分布、反应中心连接性、能量异常、TS 优化、虚频和 IRC/端点映射。</li>
+<li>将生成模型定位为候选初猜器。所有能垒结论仍由 DFT 或经目标体系校准的高可信层确认，并记录每一级退出原因。</li>
+<li>若目标体系含训练中稀有元素或金属中心，优先收集该化学域的平衡构象做自监督适配，再用少量真实 TS 微调；不要只在 HCNO 模型上零样本生成。</li>
+<li>评测时同时报告局部 bond-DMAE、能量误差和 DFT 精修成功率，避免只展示整体 RMSD。</li>
+</ol>
+</div><div class="credit">本文为辅助理解研究方法的中文解读。论文原图、图注及摘要内容归原作者和相应权利人；来源见文首论文链接。</div></article></main><script>window.MathJax={tex:{inlineMath:[['$','$'],['\\(','\\)']],displayMath:[['$$','$$'],['\\[','\\]']]},options:{skipHtmlTags:['script','noscript','style','textarea','pre','code']}};</script><script defer src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-mml-chtml.js"></script><footer><span>AI for Materials 文献精读</span><span>中文研究笔记 · 图与摘要注明论文来源 · 不提供论文 PDF</span></footer></body></html>

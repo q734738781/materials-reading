@@ -1,0 +1,119 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>BrainPilot: Automating Brain Discovery with Agentic Research · AI for Materials 文献精读</title><meta name="description" content="AI for Materials、原子模拟与科研智能体的中文文献解读"><link rel="stylesheet" href="../style.css"><link rel="icon" href="../icon.svg" type="image/svg+xml"></head><body><header><a class="brand" href="../index.html"><span class="mark">M</span><span>AI for Materials<small>文献精读 / RESEARCH NOTES</small></span></a><a class="header-link" href="../index.html#library">浏览文献 <span>↗</span></a></header><main class="article-layout"><aside><a href="../index.html#library">← 返回文献库</a><nav aria-label="文章目录"><a href="#section-1">Bibliographic status</a><a href="#section-2">One-line takeaway</a><a href="#section-3">What the paper asks</a><a href="#section-4">Methods</a><a href="#section-5">Main findings</a><a href="#section-6">Limitations and caveats</a><a href="#section-7">Possible actions</a></nav></aside><article><div class="eyebrow">RESEARCH NOTE / T8</div><h1>BrainPilot: Automating Brain Discovery with Agentic Research</h1><div class="article-meta"><span>智能体技术与科研系统</span><span>收录 2026-07-22</span><span>6 分钟阅读</span></div><a class="original" href="https://arxiv.org/abs/2607.15079" target="_blank" rel="noopener noreferrer">论文原文 ↗</a><div class="prose"><h2 id="section-1">Bibliographic status</h2>
+<ul>
+<li><strong>Authors:</strong> Haoxuan Li, Tianci Gao, Jianhe Li, Yang Fan, et al.</li>
+<li><strong>Type:</strong> arXiv preprint, 2026; <strong>not peer reviewed</strong>.</li>
+<li><strong>Full text:</strong> arXiv:2607.15079. 本卡片基于本地 PDF 与 MinerU 全文解析。</li>
+<li><strong>Source files:</strong>
+<ul>
+<li>Parsed Markdown: <code>...\mineru_md_shortnames_no_formula_table\p01.pdf\auto\p01.pdf.md</code></li>
+</ul>
+</li>
+</ul>
+<h2 id="section-2">One-line takeaway</h2>
+<p>BrainPilot 的新意不只是“多 agent 做科研”，而是把 hypothesis、claim、supporting evidence、conflict 与 uncertainty 写成可追溯的 <strong>Graph of Trace</strong>，并用独立 auditor 做原子化 claim–evidence 检查；这为 CatMaster 正在考虑的 typed research graph 提供了一个“证据图 + 审计器”的较具体实现，但论文的真实科研增益仍主要依赖少数神经科学 case study 和内部自动评分。</p>
+<h2 id="section-3">What the paper asks</h2>
+<p>神经科学问题往往跨行为、成像、连接组、分子与文献，传统线性 workflow 很难在多尺度证据间保持可追溯性。论文提出三个问题：</p>
+<ol>
+<li>能否把开放式研究问题转成结构化、可执行、可审计的 hypothesis-driven workflow？</li>
+<li>能否让不同专业 agent 并行处理公共数据、文献与统计分析，同时避免证据冲突被“总结掉”？</li>
+<li>能否把每个结论绑定到数据、代码、图表和文献，而不是只交付一份流畅报告？</li>
+</ol>
+<h2 id="section-4">Methods</h2>
+<ol>
+<li>
+<p><strong>四阶段 research loop</strong></p>
+<ul>
+<li><strong>Ideation:</strong> 从研究问题与领域知识提出多个候选假设，并识别可证伪的预测。</li>
+<li><strong>Research design:</strong> 拆成文献、数据检索、分析与验证子任务，选择公开数据集和统计路径。</li>
+<li><strong>Iteration:</strong> 多 agent 并行执行，结果不一致时产生冲突记录并回到假设修订。</li>
+<li><strong>Finalization:</strong> 聚合证据、形成研究报告和 claim-level provenance。</li>
+</ul>
+</li>
+<li>
+<p><strong>多 agent 角色</strong></p>
+<ul>
+<li>文献检索、数据定位、代码/统计分析、可视化和综合写作由不同 worker 承担。</li>
+<li>论文强调 delegation 和 role specialization，但底层主要仍是 Claude Code / Codex 一类通用 coding agents 加领域 scaffold，并非新训练的科学模型。</li>
+</ul>
+</li>
+<li>
+<p><strong>Graph of Trace（GoT）</strong></p>
+<ul>
+<li>把 hypothesis、claim、evidence、artifact、citation、conflict、revision 和 confidence/uncertainty 组织成有向图。</li>
+<li>每个 claim 可追溯到具体分析产物或文献；冲突证据不被覆盖，而是保留为图中的挑战关系。</li>
+<li>GoT 同时作为工作流状态与最终审计对象，区别于仅在最终文稿中补引用。</li>
+</ul>
+</li>
+<li>
+<p><strong>Auditor</strong></p>
+<ul>
+<li>把复杂陈述拆成 atomic claims，逐条寻找支持、反证或缺失证据。</li>
+<li>对 claim–evidence alignment、引用覆盖、统计结果与文本描述进行检查，并把问题回写给研究 agent。</li>
+<li>论文用多轮 audit 提高报告可信度；它更接近可配置 verifier，而不是形式化证明器。</li>
+</ul>
+</li>
+<li>
+<p><strong>评测设计</strong></p>
+<ul>
+<li>BrainPilotBench 包含 21 个神经科学问题，比较 Claude Code、Codex 以及 BrainPilot scaffold。</li>
+<li>指标覆盖 correctness / completeness、执行与引用、证据可追溯性及成本；另有真实 case studies，例如跨数据集分析、fMRI/连接组和基因表达等任务。</li>
+<li>一部分评估由 LLM judge 与人工检查共同完成。</li>
+</ul>
+</li>
+</ol>
+<h2 id="section-5">Main findings</h2>
+<ol>
+<li>
+<p><strong>scaffold 在审计与完成度上优于 bare coding agent。</strong></p>
+<ul>
+<li>BrainPilot 的主要优势体现在完整研究路径、引用和 artifact 组织，而不是每个单点分析都超过领域专家。</li>
+<li>GoT + Auditor 减少 unsupported claims、缺失 citation 和结果—文本错配；这说明“状态/证据结构”本身可能比继续堆 prompt 更有增量。</li>
+</ul>
+</li>
+<li>
+<p><strong>并行执行降低时间，但会增加协调与审计成本。</strong></p>
+<ul>
+<li>多 agent 可以并行进行文献、数据和分析任务；论文报告总体用时和部分费用优于人类手动流程。</li>
+<li>但 cost 对模型、任务拆分和重试敏感，且真实的人工监督时间没有完全外部化量化。</li>
+</ul>
+</li>
+<li>
+<p><strong>Graph of Trace 保留了冲突和修订轨迹。</strong></p>
+<ul>
+<li>当不同数据源或分析给出不一致结果时，系统不强行汇总为单一结论，而是保留 competing evidence、重新运行或降低 claim confidence。</li>
+<li>这一点对 CatMaster 的 hypothesis portfolio / typed research state 比普通“知识库检索”更相关，因为它明确表示了 claim 被何种 evidence 支持或挑战。</li>
+</ul>
+</li>
+<li>
+<p><strong>case study 展示了端到端可运行性，但不是广泛科学发现验证。</strong></p>
+<ul>
+<li>论文给出若干神经科学任务，从问题定义到分析、图表和报告均可完成，并声称得到与既有文献一致或有潜在新意的结果。</li>
+<li>然而多数结果依赖公开数据再分析，缺少前瞻实验验证；“discovery”目前更接近自动化提出并检查可研究线索。</li>
+</ul>
+</li>
+<li>
+<p><strong>领域知识注入很重要。</strong></p>
+<ul>
+<li>domain skill / benchmark / data-source knowledge 对性能贡献显著；移除领域 scaffold 后，通用 agent 容易选错数据、统计路径或尺度。</li>
+<li>这支持 CatMaster 保留领域 tools/skills，但也意味着框架迁移到计算催化时需要重新建立 chemistry-specific auditors，而不能直接复制神经科学规则。</li>
+</ul>
+</li>
+</ol>
+<h2 id="section-6">Limitations and caveats</h2>
+<ul>
+<li>预印本、尚未同行评审，且作者生态与 benchmark 均集中于神经科学。</li>
+<li>BrainPilotBench 只有 21 个问题；重复运行可靠性、不同模型版本的波动和长任务失败率仍不足以估计生产稳定性。</li>
+<li>关键质量评价部分使用 LLM judge，可能偏好格式完整、引用丰富的输出；不能等同于独立领域专家确认科学结论正确。</li>
+<li>GoT 的 typed schema、冲突更新规则、confidence calibration 和数据库实现公开程度有限，无法确认能否无缝复现为通用 research kernel。</li>
+<li>报告称人工成本下降，但真实 PI 监督、数据清洗和争议结论复核成本没有统一核算。</li>
+<li>公共数据再分析离湿实验闭环较远；对计算催化而言，HPC receipt、结构合理性、收敛性和电子结构检查需要额外 verifier。</li>
+</ul>
+<h2 id="section-7">Possible actions</h2>
+<ul>
+<li><strong>对应缺口：CatMaster typed research graph 目前只有想法，没有 claim–evidence 审计对象。</strong> 可借鉴 GoT 的最小节点：<code>hypothesis / experiment / artifact / result / claim / evidence / conflict / revision / decision</code>，但不直接照搬完整 ontology。</li>
+<li><strong>最小迁移动作：</strong> 选 Spin_SAC 当前一句真实 claim（如“high complexity 提高 good Fe-site probability”）做单个 graph slice，把支持结果、medium 反例、outlier、计算 receipt、口径限制和人工 decision 连接起来；再让独立 auditor 回答“哪些 claim 只有相邻证据、哪些存在反例”。</li>
+<li><strong>与新 hypothesis-search 想法的关系：</strong> GoT 解决 persistent evidence state 与冲突保留，尚未解决成本/收益估计、MCTS 式分支扩展或预算回传；可以作为搜索控制器的知识层，不应误称为已经实现 scientific tree search。</li>
+<li><strong>为何不是相邻重复：</strong> ChemMate 更偏 typed research lifecycle 和执行 contract；BrainPilot 补充了 atomic claim decomposition、conflicting-evidence retention 与独立 auditor，这正是现有 CatMaster notes/research kernel 中缺失的结构。</li>
+<li><strong>停止规则：</strong> 若单个 Spin_SAC graph slice 不能比现有 notes 更快、更可靠地回答“claim 的支持、反例、边界和下一验证”，则不扩展到全项目知识图谱。</li>
+</ul>
+</div><div class="credit">本文为辅助理解研究方法的中文解读。论文原图、图注及摘要内容归原作者和相应权利人；来源见文首论文链接。</div></article></main><script>window.MathJax={tex:{inlineMath:[['$','$'],['\\(','\\)']],displayMath:[['$$','$$'],['\\[','\\]']]},options:{skipHtmlTags:['script','noscript','style','textarea','pre','code']}};</script><script defer src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-mml-chtml.js"></script><footer><span>AI for Materials 文献精读</span><span>中文研究笔记 · 图与摘要注明论文来源 · 不提供论文 PDF</span></footer></body></html>

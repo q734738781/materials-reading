@@ -1,0 +1,56 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Frontier LLMs are effective batch optimizers: Assessing reasoning models in continuous and discrete settings · AI for Materials 文献精读</title><meta name="description" content="AI for Materials、原子模拟与科研智能体的中文文献解读"><link rel="stylesheet" href="../style.css"><link rel="icon" href="../icon.svg" type="image/svg+xml"></head><body><header><a class="brand" href="../index.html"><span class="mark">M</span><span>AI for Materials<small>文献精读 / RESEARCH NOTES</small></span></a><a class="header-link" href="../index.html#library">浏览文献 <span>↗</span></a></header><main class="article-layout"><aside><a href="../index.html#library">← 返回文献库</a><nav aria-label="文章目录"><a href="#section-1">原始摘要完整中文翻译</a><a href="#section-2">文献信息与全文证据</a><a href="#section-3">为什么要把“会推理”与“会优化”分开测试</a><a href="#section-4">必要公式与指标：低遗憾、早得到高分，不等于实验成功</a><a href="#section-5">测试设计：反馈、预算和对照到底是否相同</a><a href="#section-6">决定性证据：总体有竞争力，细看有明确失败区域</a><a href="#section-10">这篇方法论文实际改变了什么认识</a></nav></aside><article><div class="eyebrow">RESEARCH NOTE / T2</div><h1>Frontier LLMs are effective batch optimizers: Assessing reasoning models in continuous and discrete settings</h1><div class="article-meta"><span>合成与工艺</span><span>收录 2026-09-09</span><span>9 分钟阅读</span></div><a class="original" href="https://arxiv.org/abs/2609.03177" target="_blank" rel="noopener noreferrer">论文原文 ↗</a><div class="prose"><h2 id="section-1">原始摘要完整中文翻译</h2>
+<p>前沿大语言模型（LLM）通过大规模预训练获得了应对多种优化情境的能力，因此成为颇具吸引力的优化先验。然而，现代推理型大语言模型在批量优化情境中的有效性仍缺少充分研究。本文考察当代前沿大语言模型在连续和离散情境中充当批量优化器的表现。我们发现，虽然大语言模型在数值测试函数上是具有竞争力的零样本批量优化器，但与经典的非大语言模型优化方法相比，它们的表现较为脆弱。另一方面，大语言模型先验在语义丰富的情境中表现明显更好，表明当模型在结构上最接近其预训练数据的离散空间中搜索和推理时，其批量优化行为具有很高的有效性。</p>
+<h2 id="section-2">文献信息与全文证据</h2>
+<ul>
+<li><strong>作者</strong>：Frank Hu、Shriram Chennakesavalu、David Graff；Genentech 的 Prescient Design 团队。</li>
+<li><strong>版本</strong>：2026 年预印本，arXiv:2609.03177v1，2026-09-02 提交。</li>
+<li><strong>DOI</strong>：<code>10.48550/arXiv.2609.03177</code>；arXiv 记录列出并标注 DataCite 注册待完成，不是期刊 DOI。</li>
+<li><strong>证据等级</strong>：数值函数与分子评分函数的计算基准；不是真实药物合成、活性测定或实验室闭环，更不是算法普适成功率或全局收敛的证明。</li>
+</ul>
+<h2 id="section-3">为什么要把“会推理”与“会优化”分开测试</h2>
+<p>黑箱优化面对的是一个可以查询、却不能直接读取内部结构的评分函数。每次提出候选，拿到分数，再决定下一次查询什么。在真实药物设计中，一次查询可能是昂贵的合成和生物测定；在本文中，作者用便宜且确定性的计算评分函数来模拟这种有限预算的决策问题。这里的预算限制是实验设计施加的，而不是实际开展了昂贵湿实验。[第 1—4 页]</p>
+<p>连续问题中，候选是一组数值坐标，困难来自多峰景观、未知最优点以及有限反馈。批量问题要求一次提交多个点，这些点在同批结果返回前不能相互利用新反馈。因此总查询数相同，批量越大，反馈轮数越少。离散问题中，候选是一串表示分子连接关系的 SMILES 字符串，模型需提出可解析结构，再根据已返回评分调整分子设计。SMILES 有语法和化学结构含义，较可能与预训练知识对接，但字符串有效不等于可合成，更不等于成药。[第 2—4、31 页]</p>
+<p>LLM 优化另有特殊困难：一个著名测试函数即使没有被告知名称，也可能从数值形状被认出，模型再调用记忆中的最优点。这会使“零样本优化成绩”混合在线搜索能力与预训练记忆。本文同时改变输入坐标与输出尺度，正是为了检验这种脆弱性，而不只是做一张模型排行榜。[第 3、5、17 页]</p>
+<h2 id="section-4">必要公式与指标：低遗憾、早得到高分，不等于实验成功</h2>
+<p>以下为<strong>论文原式</strong>，来自第 2—3 页 §3.1：</p>
+<p>\[
+h^*=\arg\max_{h\in\mathcal H} f(h),\qquad
+r_i=f(h^*)-f(h_i),\qquad r=\min_i r_i.
+\]</p>
+<p>\(\mathcal H\) 是候选空间，\(h\) 是一个候选，\(f\) 为评分函数，\(h^*\) 为全局最优候选；\(r_i\) 是第 \(i\) 次查询的瞬时遗憾，\(r\) 是整条轨迹的简单遗憾，即最好候选仍距离最优分数多远。遗憾具有与目标分数相同的单位，本基准按数值分数处理，不对应能量或产率。连续测试函数的最优值已知，因而可以计算遗憾；PMO 分子评分函数没有已知解析最优解，作者改用已找到分子的排名分数，不能直接宣称找到全局最优分子。</p>
+<p>第 3 页式（1）的<strong>论文原式</strong>是输入伪装变换：</p>
+<p>\[
+T=P\circ F\circ W,
+\]</p>
+<p>\(W\) 对每一无量纲坐标作幂变换，\(F\) 独立随机翻转坐标，\(P\) 置换坐标轴。为避免原文重复使用字母 \(a\) 造成混淆，以下仍按原定义但将幂指数写作 \(\gamma_i\)、输出缩放写作 \(a_s\)：\(W(h_i)=h_i^{\gamma_i}\)，\(\gamma_i\) 从 0.5—2.0 均匀抽样；\(F(h_i)=(1-B_i)h_i+B_i(1-h_i)\)，\(B_i\) 是概率 0.5 的伯努利变量。输出又经 \(S(y)=a_sy+b\)，其中 \(y=f(h)\)，\(a_s&gt;0\) 从 1/3—3 对数均匀抽样，\(b\) 从 −10—10 均匀抽样。输入双射保留最优可达分数但改变其位置和景观；正输出缩放保留排序。附录表 A3 将伪装后的遗憾除以 \(a_s\) 恢复到可与原问题比较的尺度。[第 3、16 页]</p>
+<p>经典对照 GP-EI 使用高斯过程（GP）拟合未查询位置的评分分布，再通过期望改进（EI）选择下一点，权衡利用高均值区域与探索不确定区域。LLM 则直接把已有“候选—评分”记录和剩余轮数映射成下一批候选，没有在此设置中额外训练代理模型。[第 2—3 页]</p>
+<p>对分子任务，Top-10 均值是预算耗尽时最好十个分子的平均评分；Top-10 AUC 是运行中该均值曲线的面积指标，衡量高分出现得早不早。以下为<strong>卡片概念表达，不冒充作者未公开的离散积分实现</strong>：</p>
+<p>\[
+m_{10}(n)=\frac1{10}\sum_{j=1}^{10}s_{(j)}(n).
+\]</p>
+<p>\(n\) 为累计评分调用数，\(s_{(j)}(n)\) 是截至此时第 \(j\) 高的分子分数，\(m_{10}\) 为其均值；分数及本文汇总指标均为无量纲。AUC 对这条曲线随预算的变化作积分式汇总，但 PDF 没有给出所有积分归一化和不足十个候选时的实现细节。本卡直接引用原表指标，不反推精确实现。模型获得 0.9 分不能翻译成 90% 的药物成功率。[第 4、19—24 页]</p>
+<h2 id="section-5">测试设计：反馈、预算和对照到底是否相同</h2>
+<p>连续测试包括二维 Branin、三维 Hartmann-3、六维 Hartmann-6，以及五维 Ackley 和 Rastrigin；各自设原始和伪装版本，共十个任务。坐标归一到单位立方体，统一最大化方向。模型为 Sonnet 4.6、Opus 4.8、Opus 5，分别用单轮重建提示和多轮保留对话两种模式，批量大小为 1、2、4，每种条件五个随机种子；与 GP-EI、随机采样比较。[第 3、14—16 页]</p>
+<p>预算表述有一个需保留的细节：正文称总预算 \(N=120\)，同时给出 \(2d\) 个初始点；表 A2、A3 写每条轨迹有 \(120/q\) 批，第 30—31 页示例在展示四个初始点后仍写剩余 120 批。因此从 PDF 不能完全统一“120 是否包含初始点”的口径。本卡把它称为作者报告的 120 次预算框架，不自行断定总评估数精确为 120 或 120 加初始点。</p>
+<p>分子测试使用实用分子优化基准 PMO 的全部 23 个评分函数，包括异构体、再发现、相似性、多性质优化及活性代理任务。每次先从 ZINC 250K 抽 10 个初始分子，再提出 20 批、每批 10 个候选，明确合计 210 次调用；各模型和模式均五个种子。提示不告诉模型目标函数名称，只给 SMILES—评分历史；“零样本”是没有额外针对该任务训练，不是没有初始观测或没有反馈。[第 4—6、31 页]</p>
+<p>作者以同为 210 次的截断轨迹比较样本效率，也让其他方法在各自最长、至多 10,000 次的预算中追赶 LLM 的最终水平。后者是“达到同一分数需要多少查询”，不是相同预算的最终胜负，且各方法是否早停也会影响结果。[第 7—8、20、27—29 页]</p>
+<h2 id="section-6">决定性证据：总体有竞争力，细看有明确失败区域</h2>
+<h3 id="section-7">连续数值优化的胜负依赖于问题呈现方式</h3>
+<p><strong>观察到的结果</strong>：图 1 中 Opus 5 多轮模式在批量 1、2、4 时，分别在 10/10、8/10、6/10 个任务上获得比 GP-EI 更低的平均简单遗憾。这是十个固定任务的平均成绩比较，不是每次运行都成功的比例，也未给出逐任务显著性胜负检验。[第 4 页，图 1]</p>
+<p>变化最能暴露边界。例如在六维 Hartmann 的伪装任务、批量 4 下，Opus 5 多轮的最终遗憾为 <strong>0.404 ± 0.13</strong>，GP-EI 为 <strong>0.138 ± 0.037</strong>；前者反而更差。批量 1 的原始 Hartmann-6 遗憾约为 <strong>2.00×10⁻⁶</strong>，而伪装后为 <strong>0.0240 ± 0.024</strong>。原始五维 Ackley 和 Rastrigin 在部分条件能达到机器精度意义的零遗憾，伪装后不再如此。以上误差为五种子均值的一个标准误。[第 15—16 页，表 A2、A3]</p>
+<p><strong>作者的解释</strong>：模型能从景观识别熟悉函数并利用先验最优信息。附录 A3 将“首次提到函数名称”的推理轨迹事件对齐，发现原始问题在该时刻附近遗憾常骤降，而伪装问题下降更慢。[第 17 页，图 A1]</p>
+<p><strong>卡片推断</strong>：这些结果支持记忆参与优化，但不是排除了所有替代解释的因果证明。坐标幂变换本身也改变搜索景观，GP 的核先验和 LLM 的数值推理都会受影响；按函数名提及对齐属于事后事件分析，不等于对记忆通道作随机干预。此外，增大批量同时减少反馈轮数，不能把下降完全归因于“一次生成多个点”本身。</p>
+<h3 id="section-8">分子任务中的强表现，不等于领先专用方法</h3>
+<p><strong>观察到的结果</strong>：在六个 LLM 条件内部，Opus 5 多轮按 Top-10 AUC 在 17/23 项最高，按最终 Top-10 均值在 20/23 项最高；其跨任务均值分别为 <strong>0.422</strong> 和 <strong>0.596</strong>。单轮 Opus 5 分别为 <strong>0.357</strong> 和 <strong>0.464</strong>。[第 19 页，表 A6、A7]</p>
+<p>但全方法比较不同：在相同 210 次预算下，GenMol 的平均 AUC 为 <strong>0.500</strong>，ExLLM 为 <strong>0.450</strong>，都高于 Opus 5 的 0.422；最终 Top-10 均值为 Opus 5 <strong>0.596</strong>、GenMol <strong>0.590</strong>、ExLLM <strong>0.738</strong>。在完整 34 方法面板中，AUC 最高的任务数为 Opus 5 <strong>3</strong>、GenMol <strong>13</strong>、ExLLM <strong>7</strong>，不是 Opus 5 赢了 17 个专用方法对照。[第 21、24 页，表 A8、A11；表内并列计入各方]</p>
+<p>负结果也有信息量：QED 类药性评分中，Opus 5 多轮最终均值 <strong>0.729 ± 0.020</strong>，低于其单轮的 <strong>0.939 ± 0.007</strong>；更长的持续推理不是单调收益。异构体 <code>isomers_c9h10n2o2pf2cl</code> 中，Opus 5 AUC <strong>0.097 ± 0.037</strong>，明显低于 ExLLM <strong>0.551 ± 0.002</strong>。[第 19、21 页，表 A6—A8]</p>
+<p><strong>作者的解释</strong>：分子字符串蕴含化学语义，使通用预训练先验有效；专用架构、分子数据训练或更复杂的搜索框架仍能取得更好成绩。</p>
+<p><strong>卡片推断</strong>：本研究支持“轻量提示的通用 LLM 是值得比较的低预算分子优化基线”，不支持“无需专用方法”。这里没有针对未知化学空间的严格分布外划分，也未直接测量哪些预训练知识造成了增益；连续与离散任务不同，不能仅凭两组成绩证明模型对所有离散空间都天然更强。</p>
+<h3 id="section-9">查询效率倍率的分母和筛选条件很重要</h3>
+<p><strong>观察到的结果</strong>：以达到 Opus 5 在 210 次时的最终 Top-10 均值为目标，在 thiothixene 再发现任务中，GP-BO 需要 <strong>8.70 倍</strong>预算、REINVENT <strong>17.52 倍</strong>、GenMol <strong>2.26 倍</strong>，ExLLM 则仅 <strong>0.51 倍</strong>。图 5 是在达到目标的种子集合内，对第一次达标步数取中位数；未达标方法另标注。[第 8 页图 5，第 27、29 页表 A14、A16]</p>
+<p>这同时说明 LLM 相对某些老基线节省查询，以及专用策略可能更省。不能把这个倍率当成所有种子均达标的保证，更不能把 10,000/210≈47.6 当作本文普遍实现的加速倍数。不同方法需要的模型推理时间、令牌成本和计算资源也不包含在评分调用数中。</p>
+<h2 id="section-10">这篇方法论文实际改变了什么认识</h2>
+<p><strong>观察层面</strong>，输入呈现方式、反馈保留方式、批量大小和任务类型都能改变 LLM 优化表现；好成绩不是模型固定不变的属性。<strong>作者解释层面</strong>，预训练知识让模型在有语义的搜索空间有效，并使它在著名数值函数上可能利用识别与记忆。<strong>本卡推断层面</strong>，评价优化器必须把“利用已有知识快速命中”与“面对未知景观稳健搜索”分开；对熟悉函数的近零遗憾不能单独说明后一能力。</p>
+<p>这里得到的是关于优化策略的有限知识，而不是关于药物作用机制、可合成性或生物学规律的新发现。PMO 评分的确定性保证同一个候选可得到可重复的计算评价，却不能保证代理模型忠实对应真实活性。全文没有湿实验、临床或现实仪器验证，也没有形式化最优性保证。</p>
+<p>还应保留跨预算比较的边界：附录 A4、A5 将 210 次的 Opus 5 与 1,000 次的 LICO、10,000 次的 GP-MoLFormer-SIM 比较；AUC 总和比值约 66.0% 和 63.7%，不是等预算胜负，也不是相应比例的化学成功率，且作者明确缺少后两者可用代码或完整轨迹。[第 17—18 页] 每条件仅五种子、只测试一个商业模型家族、连续问题至多六维；这些结果不能外推为高维、有噪声、约束未知或随时间漂移的真实实验中的普适表现。</p>
+</div><div class="credit">本文为辅助理解研究方法的中文解读。论文原图、图注及摘要内容归原作者和相应权利人；来源见文首论文链接。</div></article></main><script>window.MathJax={tex:{inlineMath:[['$','$'],['\\(','\\)']],displayMath:[['$$','$$'],['\\[','\\]']]},options:{skipHtmlTags:['script','noscript','style','textarea','pre','code']}};</script><script defer src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-mml-chtml.js"></script><footer><span>AI for Materials 文献精读</span><span>中文研究笔记 · 图与摘要注明论文来源 · 不提供论文 PDF</span></footer></body></html>

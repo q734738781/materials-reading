@@ -1,0 +1,28 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Reliable Machine Learning Screening of Adsorption Energies Is Better Assessed with Formula-Grouped Cross-Validation · AI for Materials 文献精读</title><meta name="description" content="AI for Materials、原子模拟与科研智能体的中文文献解读"><link rel="stylesheet" href="../style.css"><link rel="icon" href="../icon.svg" type="image/svg+xml"></head><body><header><a class="brand" href="../index.html"><span class="mark">M</span><span>AI for Materials<small>文献精读 / RESEARCH NOTES</small></span></a><a class="header-link" href="../index.html#library">浏览文献 <span>↗</span></a></header><main class="article-layout"><aside><a href="../index.html#library">← 返回文献库</a><nav aria-label="文章目录"><a href="#section-1">这篇工作解决什么问题</a><a href="#section-2">方法与关键公式</a><a href="#section-3">主要发现</a><a href="#section-4">证据定位</a><a href="#section-5">局限</a><a href="#section-6">对当前项目的用处</a><a href="#section-7">一句话判断</a></nav></aside><article><div class="eyebrow">RESEARCH NOTE / T5</div><h1>Reliable Machine Learning Screening of Adsorption Energies Is Better Assessed with Formula-Grouped Cross-Validation</h1><div class="article-meta"><span>电子结构学习</span><span>收录 2026-08-26</span><span>2 分钟阅读</span></div><a class="original" href="https://doi.org/10.3390/catal16080742" target="_blank" rel="noopener noreferrer">论文原文 ↗</a><div class="prose"><ul>
+<li><strong>原始序号</strong>：8</li>
+<li><strong>作者</strong>：Wenjie Wu; Mingling Yang; Ping Cheng; Yangning Wang</li>
+<li><strong>来源</strong>：Catalysts 16, 742（2026-08-20）</li>
+<li><strong>标识符</strong>：10.3390/catal16080742</li>
+<li><strong>原始链接</strong>：https://scholar.google.com/scholar_url?url=https://www.mdpi.com/2073-4344/16/8/742&amp;hl=zh-CN&amp;sa=X&amp;d=682556886460977166&amp;ei=tUiMavK-KqHWieoPsbnhsA8&amp;scisig=AIVdB-xN_Lg72B_iHB9vHllP2Vds&amp;oi=scholaralrt&amp;hist=Qqxzy1UAAAAJ:17161998875107665524:AIVdB-xexEgwVzzumiKe0iGaPd9Z&amp;html=&amp;pos=7&amp;folt=cit</li>
+<li><strong>本地 PDF</strong>：</li>
+</ul>
+<h2 id="section-1">这篇工作解决什么问题</h2>
+<p>很多吸附能机器学习论文使用随机 K 折验证，导致同一化学式的样本同时出现在训练集和测试集。结果看似准确，实际可能只是识别了已见组成。</p>
+<h2 id="section-2">方法与关键公式</h2>
+<p>作者汇集 936 条 CatApp DFT 吸附能，覆盖 H*、O* 和 OH*，并拼接 Materials Project 体相描述符。比较两种验证：随机 K 折，以及按化学式分组的 GroupKFold。后者要求一个化学式的全部样本只能落在同一折，更接近预测新催化剂组成。</p>
+<h2 id="section-3">主要发现</h2>
+<ul>
+<li>随机切分系统性高估泛化，H*、OH* 的协议虚高差最高约 0.8。</li>
+<li>H* 与 OH* 只有 20 和 31 个唯一化学式，分组结果只能视为方向性证据。</li>
+<li>O* 可用体相特征做有限域内的粗筛；H*/OH* 更依赖表面局域电子结构。</li>
+<li>推荐同时报告随机与化学式分组交叉验证。</li>
+</ul>
+<h2 id="section-4">证据定位</h2>
+<p>PDF 第 1 页 Abstract；第 1–2 节解释表面局域因素与验证设计；结果章节报告不同吸附物的协议差。</p>
+<h2 id="section-5">局限</h2>
+<p>样本和唯一化学式都偏少，且体相描述符并不能表示晶面、覆盖度、重构和局域配位。不能把这篇论文解释成“体相特征足以预测表面吸附”。</p>
+<h2 id="section-6">对当前项目的用处</h2>
+<p>Spin-SAC/HESAC 和 CatAI 类小样本任务应按组成/结构家族分组，而不是随机拆分；最好增加 leave-family-out 和重复分组评估。</p>
+<h2 id="section-7">一句话判断</h2>
+<p>直接审计吸附能机器学习筛选的泛化评估；按化学式分组交叉验证揭示随机切分的明显乐观偏差。</p>
+</div><div class="credit">本文为辅助理解研究方法的中文解读。论文原图、图注及摘要内容归原作者和相应权利人；来源见文首论文链接。</div></article></main><script>window.MathJax={tex:{inlineMath:[['$','$'],['\\(','\\)']],displayMath:[['$$','$$'],['\\[','\\]']]},options:{skipHtmlTags:['script','noscript','style','textarea','pre','code']}};</script><script defer src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-mml-chtml.js"></script><footer><span>AI for Materials 文献精读</span><span>中文研究笔记 · 图与摘要注明论文来源 · 不提供论文 PDF</span></footer></body></html>

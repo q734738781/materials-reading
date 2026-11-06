@@ -1,0 +1,50 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Meta-LegNet: A Transferable and Interpretable Framework for Surface Adsorption Prediction via Self-Defined Adsorption-Environment Learning · AI for Materials 文献精读</title><meta name="description" content="AI for Materials、原子模拟与科研智能体的中文文献解读"><link rel="stylesheet" href="../style.css"><link rel="icon" href="../icon.svg" type="image/svg+xml"></head><body><header><a class="brand" href="../index.html"><span class="mark">M</span><span>AI for Materials<small>文献精读 / RESEARCH NOTES</small></span></a><a class="header-link" href="../index.html#library">浏览文献 <span>↗</span></a></header><main class="article-layout"><aside><a href="../index.html#library">← 返回文献库</a><nav aria-label="文章目录"><a href="#section-1">What the paper asks</a><a href="#section-2">Methods and data</a><a href="#section-3">Main findings</a><a href="#section-4">Key evidence</a><a href="#section-5">Limitations and caveats</a><a href="#section-6">Relevance to user projects</a><a href="#section-7">Possible actions</a><a href="#section-8">Citation notes</a></nav></aside><article><div class="eyebrow">RESEARCH NOTE / T8</div><h1>Meta-LegNet: A Transferable and Interpretable Framework for Surface Adsorption Prediction via Self-Defined Adsorption-Environment Learning</h1><div class="article-meta"><span>智能体技术与科研系统</span><span>收录 2026-05-18</span><span>2 分钟阅读</span></div><a class="original" href="https://arxiv.org/abs/2605.04102" target="_blank" rel="noopener noreferrer">论文原文 ↗</a><div class="prose"><ul>
+<li><strong>Bibliographic status</strong>: Li Yifan et al., 2026, arXiv:2605.04102, 待核对正式发表状态。</li>
+<li><strong>One-line takeaway</strong>: 该文提出用“自定义吸附环境”来提升表面吸附能预测的可迁移性和可解释性，对催化 ML/GNN 表面建模有参考价值，但与当前 PX/CatMaster 主线不是立即打断型文献。</li>
+</ul>
+<h2 id="section-1">What the paper asks</h2>
+<p>论文针对表面吸附预测中常见的两个问题：</p>
+<ol>
+<li>不同金属表面、位点和吸附物之间泛化困难；</li>
+<li>黑箱模型虽然能预测吸附能，但难以解释哪些局部环境决定吸附强度。</li>
+</ol>
+<h2 id="section-2">Methods and data</h2>
+<ul>
+<li>提出 Meta-LegNet 框架。</li>
+<li>核心概念是 self-defined adsorption-environment learning：不只把整体 slab/adsorbate 交给模型，而是显式学习吸附位点附近的局部环境。</li>
+<li>面向多种表面与吸附物体系进行迁移预测。</li>
+<li>文中强调 interpretability，可用于识别影响吸附的局部结构因素。</li>
+</ul>
+<h2 id="section-3">Main findings</h2>
+<ul>
+<li>局部吸附环境定义可以帮助模型在不同材料/位点之间迁移。</li>
+<li>相比只依赖全局结构特征的方法，吸附环境学习更贴近催化吸附能的物理来源。</li>
+<li>该思路适合用于解释吸附位点，而不只是做数值预测。</li>
+</ul>
+<h2 id="section-4">Key evidence</h2>
+<ul>
+<li>题名和摘要均强调 transferable、interpretable、surface adsorption prediction 和 self-defined adsorption-environment learning。</li>
+<li>论文围绕表面吸附能这一催化核心 property 展开，属于与催化 AI 算法高度相关的模型方法文献。</li>
+</ul>
+<h2 id="section-5">Limitations and caveats</h2>
+<ul>
+<li>目前只做快速精读，具体数据集规模、MAE/RMSE、跨体系 split 方式需在引用前核对表格。</li>
+<li>若其泛化测试主要仍在相近表面/吸附物内，不能过度宣传为真正 out-of-domain catalyst discovery。</li>
+<li>对 PX-New 的 MOF/分子吸附不一定可直接迁移，因为表面金属吸附与 MOF 孔道色散主导吸附机制不同。</li>
+</ul>
+<h2 id="section-6">Relevance to user projects</h2>
+<ul>
+<li><strong>CSR Review / 催化 AI 算法</strong>：可放在 adsorption-energy prediction / interpretable local environment learning 小节。</li>
+<li><strong>PX-New</strong>：概念上支持“局部吸附环境解释”，但不直接替代 fragment interaction/deformation decomposition。</li>
+<li><strong>CatMaster</strong>：可作为 domain-specific modeling tool 的例子，而非 agent 系统竞品。</li>
+</ul>
+<h2 id="section-7">Possible actions</h2>
+<ol>
+<li>如果 CSR Review 写到 adsorption prediction，可进一步核对其数据集、split、metric。</li>
+<li>暂不纳入 PX-New 的立即执行队列。</li>
+</ol>
+<h2 id="section-8">Citation notes</h2>
+<ul>
+<li>arXiv ID: 2605.04102；作者和机构需引用前核对。</li>
+</ul>
+</div><div class="credit">本文为辅助理解研究方法的中文解读。论文原图、图注及摘要内容归原作者和相应权利人；来源见文首论文链接。</div></article></main><script>window.MathJax={tex:{inlineMath:[['$','$'],['\\(','\\)']],displayMath:[['$$','$$'],['\\[','\\]']]},options:{skipHtmlTags:['script','noscript','style','textarea','pre','code']}};</script><script defer src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-mml-chtml.js"></script><footer><span>AI for Materials 文献精读</span><span>中文研究笔记 · 图与摘要注明论文来源 · 不提供论文 PDF</span></footer></body></html>

@@ -1,0 +1,28 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Are You Still the Agent I Authorized? Earned Authority under a Fixed Ceiling for Evolving Agents · AI for Materials 文献精读</title><meta name="description" content="AI for Materials、原子模拟与科研智能体的中文文献解读"><link rel="stylesheet" href="../style.css"><link rel="icon" href="../icon.svg" type="image/svg+xml"></head><body><header><a class="brand" href="../index.html"><span class="mark">M</span><span>AI for Materials<small>文献精读 / RESEARCH NOTES</small></span></a><a class="header-link" href="../index.html#library">浏览文献 <span>↗</span></a></header><main class="article-layout"><aside><a href="../index.html#library">← 返回文献库</a><nav aria-label="文章目录"><a href="#section-1">Bibliographic status</a><a href="#section-2">One-line takeaway</a><a href="#section-3">What the paper asks</a><a href="#section-4">Methods</a><a href="#section-5">Main findings</a><a href="#section-6">Limitations and caveats</a><a href="#section-7">Possible actions</a></nav></aside><article><div class="eyebrow">RESEARCH NOTE / T8</div><h1>Are You Still the Agent I Authorized? Earned Authority under a Fixed Ceiling for Evolving Agents</h1><div class="article-meta"><span>智能体技术与科研系统</span><span>收录 2026-08-04</span><span>1 分钟阅读</span></div><a class="original" href="https://arxiv.org/abs/2607.23586" target="_blank" rel="noopener noreferrer">论文原文 ↗</a><div class="prose"><ul>
+<li><strong>High 类型</strong>：High—Incremental insight</li>
+</ul>
+<h2 id="section-1">Bibliographic status</h2>
+<p>Huang et al., arXiv:2607.23586 (2026)，预印本；15 页。</p>
+<h2 id="section-2">One-line takeaway</h2>
+<p>把“智能体在运行中演化”转成授权连续性问题：原授权只在能力、工具和委托效果仍落在可证明边界内时有效。</p>
+<h2 id="section-3">What the paper asks</h2>
+<p>当长时智能体会学习、升级模型、接入新工具并继续委托时，怎样避免旧授权被能力增长悄然放大？</p>
+<h2 id="section-4">Methods</h2>
+<p>概念/形式化安全框架；定义 capability envelope、authorization continuity、effect ceiling、transition envelope 与 attenuating delegation，并用反例讨论升级和委托。</p>
+<h2 id="section-5">Main findings</h2>
+<ul>
+<li>授权应约束可产生的外部效果，而非只绑定静态身份或一次性动作。</li>
+<li>状态跃迁若越过 transition envelope，应触发重新授权；委托链中的权限必须衰减而不能放大。</li>
+<li>持续监控应证明当前能力仍处在原风险预算内。</li>
+</ul>
+<h2 id="section-6">Limitations and caveats</h2>
+<ul>
+<li>主要是形式化立场与设计原则，缺少真实科研智能体部署和定量攻击/故障基准。</li>
+<li>effect ceiling 如何在复杂工具/HPC 环境中操作化仍未解决。</li>
+</ul>
+<h2 id="section-7">Possible actions</h2>
+<ul>
+<li>为 CatMaster 列出模型升级、工具新增、远程 worker 和 subagent delegation 四类授权失效事件。</li>
+<li>设计一项窄测试：旧任务 receipt 在工具/模型变化后是否自动失效并要求 HITL 重新授权。</li>
+</ul>
+</div><div class="credit">本文为辅助理解研究方法的中文解读。论文原图、图注及摘要内容归原作者和相应权利人；来源见文首论文链接。</div></article></main><script>window.MathJax={tex:{inlineMath:[['$','$'],['\\(','\\)']],displayMath:[['$$','$$'],['\\[','\\]']]},options:{skipHtmlTags:['script','noscript','style','textarea','pre','code']}};</script><script defer src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-mml-chtml.js"></script><footer><span>AI for Materials 文献精读</span><span>中文研究笔记 · 图与摘要注明论文来源 · 不提供论文 PDF</span></footer></body></html>

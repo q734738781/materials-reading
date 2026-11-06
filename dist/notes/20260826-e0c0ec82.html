@@ -1,0 +1,28 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Symposium: Trust via Auditable Records for Communities of AI Scientist Agents · AI for Materials 文献精读</title><meta name="description" content="AI for Materials、原子模拟与科研智能体的中文文献解读"><link rel="stylesheet" href="../style.css"><link rel="icon" href="../icon.svg" type="image/svg+xml"></head><body><header><a class="brand" href="../index.html"><span class="mark">M</span><span>AI for Materials<small>文献精读 / RESEARCH NOTES</small></span></a><a class="header-link" href="../index.html#library">浏览文献 <span>↗</span></a></header><main class="article-layout"><aside><a href="../index.html#library">← 返回文献库</a><nav aria-label="文章目录"><a href="#section-1">这篇工作解决什么问题</a><a href="#section-2">核心设计</a><a href="#section-3">主要贡献</a><a href="#section-4">证据定位</a><a href="#section-5">局限</a><a href="#section-6">对 CatMaster 的用处</a><a href="#section-7">一句话判断</a></nav></aside><article><div class="eyebrow">RESEARCH NOTE / T8</div><h1>Symposium: Trust via Auditable Records for Communities of AI Scientist Agents</h1><div class="article-meta"><span>智能体技术与科研系统</span><span>收录 2026-08-26</span><span>2 分钟阅读</span></div><a class="original" href="https://arxiv.org/abs/2608.19511" target="_blank" rel="noopener noreferrer">论文原文 ↗</a><div class="prose"><ul>
+<li><strong>原始序号</strong>：76</li>
+<li><strong>作者</strong>：Dexter Pratt</li>
+<li><strong>来源</strong>：arXiv（2026-08-20）</li>
+<li><strong>标识符</strong>：arXiv:2608.19511</li>
+<li><strong>原始链接</strong>：https://scholar.google.com/scholar_url?url=https://arxiv.org/pdf/2608.19511&amp;hl=zh-CN&amp;sa=X&amp;d=15696345677618335839&amp;ei=tUiMaqzqD8G2ieoP5MbdyQk&amp;scisig=AIVdB-zYu3PzUNS_Yt_q5maqOFif&amp;oi=scholaralrt&amp;hist=Qqxzy1UAAAAJ:17128064860086250455:AIVdB-wwl5dFkl3y1nKNGizxnor3&amp;html=&amp;pos=1&amp;folt=cit</li>
+<li><strong>本地 PDF</strong>：</li>
+</ul>
+<h2 id="section-1">这篇工作解决什么问题</h2>
+<p>科研智能体会产生大量分析、假设和数据，但模型会更换，输出也可能包含伪造引用或隐蔽假设。仅保存最终答案，后续的人和智能体都无法判断该信任什么。</p>
+<h2 id="section-2">核心设计</h2>
+<p>Symposium 把共同体的持久历史与具体智能体分开。记录对象包括结构化主张、细粒度证据引用、假设、分析过程、数据、科学讨论，以及材料是否允许作为证据的声明。记录需要长期、不可变、可审计。</p>
+<h2 id="section-3">主要贡献</h2>
+<ul>
+<li>提供正式框架和可运行实现，而不只是原则倡议。</li>
+<li>允许不同代际、不同供应商的智能体在同一记录上工作。</li>
+<li>让新智能体能够复审旧智能体，而不是无条件继承结论。</li>
+<li>明确信任是依任务而定的评估，不是单一全局分数。</li>
+</ul>
+<h2 id="section-4">证据定位</h2>
+<p>PDF 第 1 页 Abstract；第 1–2 页 Introduction 讨论信任、错引、证据选择和跨智能体继承。</p>
+<h2 id="section-5">局限</h2>
+<p>论文主要证明框架与实现可用，并没有证明不可变记录会自动带来更正确的科学结论。细粒度记录也会增加录入、存储和审查成本。</p>
+<h2 id="section-6">对 CatMaster 的用处</h2>
+<p>可直接对照 research graph：把 claim、evidence、assumption、禁止作为证据的材料和 agent identity 设为一等对象。真正需要评测的是错误定位时间、错误传播范围和复审成本，而不是“日志是否存在”。</p>
+<h2 id="section-7">一句话判断</h2>
+<p>为科研智能体提供长期不可变、可审计的分析—假设—证据记录，与 CatMaster 的 provenance/research graph 直接相关。</p>
+</div><div class="credit">本文为辅助理解研究方法的中文解读。论文原图、图注及摘要内容归原作者和相应权利人；来源见文首论文链接。</div></article></main><script>window.MathJax={tex:{inlineMath:[['$','$'],['\\(','\\)']],displayMath:[['$$','$$'],['\\[','\\]']]},options:{skipHtmlTags:['script','noscript','style','textarea','pre','code']}};</script><script defer src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-mml-chtml.js"></script><footer><span>AI for Materials 文献精读</span><span>中文研究笔记 · 图与摘要注明论文来源 · 不提供论文 PDF</span></footer></body></html>

@@ -1,0 +1,28 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Graph-FINDER: multimodal AI for extracting materials data from scientific figures at scale · AI for Materials 文献精读</title><meta name="description" content="AI for Materials、原子模拟与科研智能体的中文文献解读"><link rel="stylesheet" href="../style.css"><link rel="icon" href="../icon.svg" type="image/svg+xml"></head><body><header><a class="brand" href="../index.html"><span class="mark">M</span><span>AI for Materials<small>文献精读 / RESEARCH NOTES</small></span></a><a class="header-link" href="../index.html#library">浏览文献 <span>↗</span></a></header><main class="article-layout"><aside><a href="../index.html#library">← 返回文献库</a><nav aria-label="文章目录"><a href="#section-1">What the paper asks</a><a href="#section-2">Methods</a><a href="#section-3">Main findings</a><a href="#section-4">Limitations and caveats</a><a href="#section-5">Possible actions</a></nav></aside><article><div class="eyebrow">RESEARCH NOTE / T1</div><h1>Graph-FINDER: multimodal AI for extracting materials data from scientific figures at scale</h1><div class="article-meta"><span>材料生成与逆向设计</span><span>收录 2026-08-06</span><span>5 分钟阅读</span></div><a class="original" href="https://doi.org/10.1038/s41524-026-02247-y" target="_blank" rel="noopener noreferrer">论文原文 ↗</a><div class="prose"><ul>
+<li><strong>Bibliographic status</strong>: Young-ok Cha et al., <em>npj Computational Materials</em> (2026)；DOI: <code>10.1038/s41524-026-02247-y</code>；本地版本为已接收但尚未完成最终编辑的 Article in Press，CC BY 4.0。</li>
+<li><strong>Screening status</strong>: 2026-08-04 Scholar Digest 的 High（Incremental insight）；本次因用户补充全文而生成卡片。</li>
+<li><strong>One-line takeaway</strong>: Graph-FINDER 把视觉语言模型限制在坐标轴和图例解释上，再用确定性图像算法提取曲线数值，适合建立可审计的多曲线数据抽取流程，但现有证据主要覆盖坐标规整、颜色可分的二维折线图。</li>
+</ul>
+<h2 id="section-1">What the paper asks</h2>
+<p>材料文献中大量实验数据只存在于图中，尤其是电阻随温度变化、滞回环和光谱曲线。人工数字化每张图都要校准坐标、识别图例并逐条描线，难以扩展到数百篇论文。纯文本抽取又无法恢复完整曲线。作者希望建立一条端到端流程，把文献检索、材料与掺杂关系抽取、图件筛选、坐标和图例解释、曲线分割、坐标转换以及后续预测连接起来，并检验这套方法能否跨越 VO₂ 和 Ge-Sb-Te 两类相变材料。</p>
+<p>论文的核心并不是让大语言模型直接目测数值。它把模型用于理解图件元数据，例如横纵轴名称、范围、单位以及图例与颜色的对应关系；真正的像素分割和数值转换由可重复的图像算法完成。这种分工可以保留原图、元数据、颜色掩膜、CSV 和重绘曲线之间的证据链。</p>
+<h2 id="section-2">Methods</h2>
+<p>文献通过 ScienceDirect Search API V2 获取。文本侧先识别主体材料、掺杂剂和性质名称，再根据句法和规则判断主体与掺杂剂关系，并合并化学式、全称和缩写。作者在 VO₂ 检索中获得 874 篇文章和 1998 个相关句子，在两组 GST 相关检索中分别获得 1242 和 955 篇文章。材料实体识别准确率为 89.6%，掺杂剂实体识别准确率为 91.2%，说明文本关系并非完全可靠。</p>
+<p>图像侧先用 OpenCV 和光学字符识别筛选含目标坐标标题的图件，再寻找接近闭合矩形的主绘图区，清除子图、文字和额外坐标轴。每幅图最多处理八个绘图区。裁出的区域随后交给经过微调的 GPT 模型，读取轴标签、范围、刻度、单位和图例颜色。模型输出必须通过单调性、刻度一致性、数字格式和颜色唯一性检查；不合格的结果会被拒绝或转入人工复核，而不是强制产生数值。</p>
+<p>元数据通过后，图像从 BGR 转换到 HSV 颜色空间，系统按照图例颜色生成二值掩膜，将每条曲线分开。然后在绘图区叠加虚拟网格，把曲线像素位置转换成真实坐标，输出结构化数值和 CSV。最后重新绘制单条和合并曲线，与原图进行视觉核对。这个方法特别适合彩色曲线，因为即使两条曲线相交，颜色仍能保留各自身份。</p>
+<p>作者用两组人工数字化数据评价误差。第一组是四篇相变材料论文中的 44 张光学性质折线图，第二组是三篇论文中的 43 张电磁性质折线图。人工真值由 WebPlotDigitizer 获得。归一化均方根误差衡量点值相对于纵轴动态范围的偏差，Spearman 相关系数衡量曲线形状和点序是否一致。两者需要一起看，因为高形状相关不代表绝对数值一定准确。</p>
+<h2 id="section-3">Main findings</h2>
+<p>Graph-FINDER 对人工真值的平均 Spearman 相关系数高于 0.92，平均归一化均方根误差为 0.018，意味着平均逐点误差约为纵轴动态范围的 1.8%。作者还与 LineEX 比较。LineEX 在少数高对比图中可以达到约 0.92 的相关系数，但在复杂图中的最差值约为 0.3；Graph-FINDER 在多曲线靠近或相交时更稳定。不过，LineEX 仍需人工输入坐标范围，两者并不是完全相同的自动化任务。</p>
+<p>本地图像处理和数字化阶段平均每幅图耗时 5.8 秒，顺序运行约可处理每小时 621 幅图。这个数字不包含 GPT 接口调用、网络等待和人工复核时间，不能当作完整文献到数据库流程的总耗时。图例文字识别准确率为 92.4%，坐标单位检测准确率为 95.8%，图注解析准确率为 87.3%。这些结果说明，系统仍可能在单位、图例映射和样品身份上出错，需要保留验证门。</p>
+<p>在 VO₂ 案例中，系统处理了 874 篇相关文章中的 815 幅图件，分析了 800 多条电阻或透射率随温度变化的曲线，得到 4 万多个数据点。文献汇总显示，W 和 Fe 往往对应较窄滞回，Cr 和 Ru 的滞回较宽；Mo 和 Fe 的绝缘态与金属态电阻比可达到 <code>10^3-10^6</code>。这些曲线数据被用于比较神经形态、光学和射频开关所需的相变温度、滞回宽度和电阻比。</p>
+<p>作者把掺杂元素属性和浓度编码后，用多层感知机预测完整的 VO₂ 电阻率曲线。模型在留出测试集上的中位 RMSE 为 0.070，余弦相似度为 0.994，Pearson 相关系数为 0.989。随后，模型在 20 种有文献基础的掺杂剂和 0-5 at.%浓度范围内搜索应用候选。Mo 1.6 at.%被预测为神经形态应用候选，滞回宽度 12.62 ℃、相变温度 44.44 ℃。密度泛函理论显示，约 1.56 at.% Mo 将单斜 VO₂ 的计算带隙从 1.07 eV 降到 0.37 eV，为提高导电性的趋势提供了一致性解释，但没有直接验证滞回宽度或相变温度。</p>
+<p>部分所谓“候选”只是离目标最近，并没有真正落入目标窗口。例如 VO₂ 射频候选 Cr 0.4%、Ni 0.6%和 Nb 0.4%的预测滞回较窄，但相变温度分别只有 49.59、45.35 和 44.08 ℃，均低于论文设定的 60 ℃下限。因此，表格中的推荐需要逐项核对，不能把排名靠前自动解释成满足全部要求。</p>
+<p>在 GST 案例中，作者检索和分析了 350 多篇研究，但实际用于曲线预测的只有 95 条文献曲线，测试集为 19 条。测试集的中位 RMSE 为 0.012，余弦相似度和 Pearson 相关系数均为 0.999。模型根据晶化温度和转变宽度提出 Al、Al₂O₃、W、ZnO、N、SiO₂、Ti、As 和 In₂Se₃等候选。这个结果展示了流程可以迁移到另一种材料，但样本规模仍小，且预测没有实验验证。</p>
+<h2 id="section-4">Limitations and caveats</h2>
+<p>现有高精度结果主要来自坐标规整、颜色可分的二维折线图。灰度曲线、同色不同线型、极细曲线、粗曲线与坐标轴重合、双纵轴、对数轴误判、密集网格和不规则子图都可能失败。柱状图、散点云、等高线、显微图、反应示意图和复杂谱峰并未进入本文基准，不能把折线图结果外推到所有科学图件。</p>
+<p>基准真值本身来自人工看图数字化，并非实验仪器原始数据，所以结果证明的是系统接近熟练人工从图中恢复数值，而不是重建了原始测量。Spearman 相关系数主要反映曲线形状，存在尺度偏差时仍可能很高，必须同时查看归一化误差、坐标单位和重绘图。</p>
+<p>工作流依赖 ScienceDirect 接口和专有 GPT 端点。作者公开了提示词、输出格式和后处理规则，但微调模型端点不能直接分发。论文也没有报告全部候选图件的接受率、拒绝率和人工复核比例，因此成功抽取的 800 多条曲线不能代表 874 篇论文中的目标图全部被恢复。后续 VO₂ 和 GST 预测还受到文献实验条件差异影响，薄膜厚度、基底、应变、缺陷和测量协议并未完整进入模型。</p>
+<h2 id="section-5">Possible actions</h2>
+<p>对 CatMaster 或 Pd-TWC，合理的第一步是限定“可自动抽取曲线白名单”。只处理有清晰矩形坐标轴、彩色曲线、无遮挡图例和可确认线性或对数坐标的转化率-温度、选择性-温度或稳定性-时间曲线。先选约 10 张图，用 WebPlotDigitizer 建立人工真值，再比较归一化均方根误差、形状相关、单位识别、图例映射和重绘结果。未通过任一检查的图直接转人工，不追求虚假的全自动覆盖率。</p>
+<p>数据库不能只保存曲线点。每条数据还应绑定论文完整标题、图号和子图编号、样品名称、轴范围、单位、老化条件、气氛、空速、升温程序、抽取置信度和重绘核对图。Graph-FINDER 证明了图像数字化可以提速，但没有解决催化实验条件的完整归一化。如果方法段和图注无法确认关键条件，应明确留空或标记待核对，不能只根据曲线形状比较催化剂优劣。</p>
+</div><div class="credit">本文为辅助理解研究方法的中文解读。论文原图、图注及摘要内容归原作者和相应权利人；来源见文首论文链接。</div></article></main><script>window.MathJax={tex:{inlineMath:[['$','$'],['\\(','\\)']],displayMath:[['$$','$$'],['\\[','\\]']]},options:{skipHtmlTags:['script','noscript','style','textarea','pre','code']}};</script><script defer src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-mml-chtml.js"></script><footer><span>AI for Materials 文献精读</span><span>中文研究笔记 · 图与摘要注明论文来源 · 不提供论文 PDF</span></footer></body></html>

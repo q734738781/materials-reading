@@ -1,0 +1,52 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Out-of-Distribution Robust Active Learning of Message-Passing Potentials for Extreme Non-Equilibrium Iron Dynamics · AI for Materials 文献精读</title><meta name="description" content="AI for Materials、原子模拟与科研智能体的中文文献解读"><link rel="stylesheet" href="../style.css"><link rel="icon" href="../icon.svg" type="image/svg+xml"></head><body><header><a class="brand" href="../index.html"><span class="mark">M</span><span>AI for Materials<small>文献精读 / RESEARCH NOTES</small></span></a><a class="header-link" href="../index.html#library">浏览文献 <span>↗</span></a></header><main class="article-layout"><aside><a href="../index.html#library">← 返回文献库</a><nav aria-label="文章目录"><a href="#section-1">What the paper asks</a><a href="#section-2">Methods</a><a href="#section-3">Main findings</a><a href="#section-4">Limitations and caveats</a><a href="#section-5">Possible actions</a></nav></aside><article><div class="eyebrow">RESEARCH NOTE / T7</div><h1>Out-of-Distribution Robust Active Learning of Message-Passing Potentials for Extreme Non-Equilibrium Iron Dynamics</h1><div class="article-meta"><span>采样与高性能原子模拟</span><span>收录 2026-08-14</span><span>8 分钟阅读</span></div><a class="original" href="https://doi.org/10.21203/rs.3.rs-10492256/v1" target="_blank" rel="noopener noreferrer">论文原文 ↗</a><div class="prose"><ul>
+<li><strong>Bibliographic status</strong>: Ahmad Atif Fikri, Heru Suryanto, Avita Ayu Permanasari, Rio Anugrah Vidyanto, Ahmad Al Kafi, Poespitasari Hazanah Ndaru, Mohd Sayuti Ab Karim, Dani Harmanto. Research Square preprint/article, posted 2026-08-06. DOI: <code>10.21203/rs.3.rs-10492256/v1</code>. CC BY 4.0；未见期刊同行评审信息。数据：Zenodo <code>10.5281/zenodo.21275017</code>；代码：<code>https://github.com/Atif-FT/OODR-AL-Iron-Dynamics</code>。</li>
+<li><strong>One-line takeaway</strong>: 论文提出一个闭环主动学习流程：四个 MACE 模型的力方差负责触发采样，MACE 潜空间中的最远点采样用于去重，物理过滤保证候选可由 DFT 标注，0 K 静态形变和应力损失则用于减轻遗忘。作者声称，仅约 300 个 DFT 构型即可兼顾 1800 K 极端铁动力学稳定性和 0 K 弹性精度，但“真正 OOD 泛化”、磁性处理和基线公平性仍需更严格复核。</li>
+</ul>
+<h2 id="section-1">What the paper asks</h2>
+<p>面向 BCC 铁的冲击、快速剪切、相变和局域非晶化，常规近稳态数据训练的机器学习原子势在轨迹进入未覆盖区域后可能出现异常大力、能量漂移和模拟崩溃。直接把大量高温畸变构型加入训练集又可能使模型遗忘 0 K 晶格、状态方程和弹性常数。</p>
+<p>论文关注三个问题：在极端 MD 中怎样识别有价值而非病态的 OOD 构型，怎样用有限的 DFT 预算覆盖多样的高能局域环境，以及怎样在提高高温非平衡稳定性的同时保留基态力学性质。作者将这套方案称为 OOD Robust Active Learning（OODR-AL）。</p>
+<h2 id="section-2">Methods</h2>
+<ol>
+<li><strong>模型架构</strong>：从预训练 <code>MACE-MP-0 (medium)</code> 微调；截断半径 <code>5.0 Å</code>，<code>Lmax=2</code>，两层 message passing，相关阶数 <code>ν=3</code>，8 个 Bessel 径向基。使用四个独立初始化的 MACE 模型组成 deep ensemble，并结合 stochastic weight averaging。</li>
+<li><strong>不确定性触发</strong>：以 ensemble 预测力的方差 <code>σF</code> 作为 epistemic uncertainty proxy。第 <code>k</code> 轮阈值为 <code>τk=max(τmin, τ0 α^k)</code>，其中 <code>τ0=0.12 eV Å⁻¹</code>、<code>α=0.85</code>、<code>τmin=0.05 eV Å⁻¹</code>。连续探索轨迹均不再出现 OOD 候选时终止循环。</li>
+<li><strong>多样性选择</strong>：将被阈值标记的候选投影到 MACE 自身潜在描述符空间，以 Farthest Point Sampling（FPS）选取彼此最远的一批构型，避免仅在同一 uncertainty hotspot 重复标注。</li>
+<li><strong>物理可行性过滤</strong>：拒绝最小 Fe-Fe 距离 <code>&lt;1.8 Å</code> 的构型，并把密度限制在 <code>5.0-9.5 g cm⁻³</code>，目标是过滤原子重叠、异常晶胞和易导致 DFT SCF 失败的数值病态样本。作者称原始候选早期约 15% 会 SCF 失败，过滤后 DFT 标注成功率达到 100%。</li>
+<li><strong>DFT oracle</strong>：Quantum ESPRESSO，自旋极化 GGA-PBE，PAW 赝势 <code>Fe.pbe-spn-kjpaw_psl.0.2.1.UPF</code>；波函数/电荷密度截断 <code>50/400 Ry</code>；初始磁矩 <code>2.2 μB/Fe</code>；16 原子主动学习晶胞采用 <code>2×2×2</code> k 点，54 原子强畸变验证胞采用 Γ 点；Marzari-Vanderbilt cold smearing <code>0.03 Ry</code>。总训练集约 300 个 DFT 标注构型。</li>
+<li><strong>防灾难性遗忘</strong>：训练集混合 1800 K 主动学习样本与专门构造的 0 K 静态形变；损失权重为 energy <code>1.0</code>、force <code>100.0</code>、virial stress <code>0.05</code>。作者把显式应力监督视为保持体模量和弹性常数的关键。</li>
+<li><strong>MD 协议</strong>：LAMMPS，步长 <code>1 fs</code>。1800 K 下对晶胞施加最高 10% 三轴剪切，Nosé-Hoover 温控、<code>Tdamp=0.1 ps</code>；热冲击测试把温度瞬时升至 1800 K，随后进行 5000 步 NVE 松弛。</li>
+<li><strong>验证设计</strong>：检查 0 K EOS、晶格常数和 <code>C11/C12/C44</code>；从冲击和剪切轨迹选取 20 个强畸变、<code>dmin≈1.99 Å</code> 的未见快照做后验 DFT；同时考察高温剪切轨迹不崩溃、NVE 能量守恒、空位形成能，并与 EAM 或未增强的 baseline MACE 作定性比较。</li>
+</ol>
+<h2 id="section-3">Main findings</h2>
+<ol>
+<li><strong>数据效率</strong>：主动学习在约 300 个 DFT 构型处收敛；作者将其与被动采样的数千构型及文献中常见的 <code>&gt;2000</code> 构型相比，认为 force-variance + latent FPS 显著减少了冗余。</li>
+<li><strong>0 K 性质保持良好</strong>：报告的 MACE/DFT 结果分别为 <code>C11 228.4/229.0 GPa</code>、<code>C12 134.1/135.0 GPa</code>、<code>C44 116.8/117.0 GPa</code>、体模量 <code>165.5/166.3 GPa</code>、晶格常数 <code>2.831/2.830 Å</code>。空位形成能为 <code>2.05 eV</code>，参考 DFT 为 <code>2.02 eV</code>。EOS 曲线也被描述为在压缩和膨胀区间贴近 DFT。</li>
+<li><strong>强畸变快照误差</strong>：20 个冲击/剪切快照上的能量 RMSE 为 <code>78.5 meV/atom</code>、力 RMSE 为 <code>0.221 eV Å⁻¹</code>；冲击和剪切能量 RMSE 分别为 <code>52.3</code> 与 <code>94.8 meV/atom</code>，后者更高，被归因于剪切诱导的拓扑无序。</li>
+<li><strong>动力学稳定性</strong>：作者称普通 MACE 在 1800 K 下数百步内能量爆炸，而 OODR-AL 势在 10% 连续剪切及 5000 步热冲击后 NVE 松弛中保持轨迹稳定和较好能量守恒；OVITO 图显示没有原子重叠或直接崩溃。</li>
+<li><strong>潜空间采样的作用</strong>：FPS 直接使用网络自身的高阶等变表示，而非手工 SOAP。候选因此按模型实际使用的局域环境表示分散开来，不会只按不确定性大小聚集在同一个热点。论文把约 300 个构型的数据集主要归功于这一组合。</li>
+<li><strong>应力监督的作用</strong>：加入少量 0 K 形变和 <code>0.05</code> stress loss weight 后，高温样本没有明显破坏弹性性质。作者认为应力作为能量对应变的导数，可约束低温谐性盆地和宏观力学响应。</li>
+<li><strong>过滤提高工作流可运行性</strong>：密度与最短距离筛选据称将 DFT SCF 标注成功率从约 85% 提高到 100%，提示极端条件主动学习不仅需要“找最不确定样本”，还必须控制 oracle 可计算性。</li>
+<li><strong>效率定位</strong>：文中估计 54 原子体系的 5000 步 AIMD 需约 <code>15,000-50,000 CPU-core-hours</code>，而单 GPU MACE 约 <code>20-60 s</code>，声称可获得 <code>10³-10⁵</code> 倍加速；这些主要是估算和文献尺度比较，不是统一硬件上的严格 benchmark。</li>
+</ol>
+<h2 id="section-4">Limitations and caveats</h2>
+<ul>
+<li><strong>预印本状态</strong>：稿件尚无同行评审信息；多处结论措辞很强，应优先通过公开代码、Zenodo 数据和独立复算确认。</li>
+<li><strong>“OOD”定义偏弱</strong>：20 个验证快照来自相同目标协议的冲击/剪切轨迹，且主动学习本身就在覆盖该域。它们对训练集可能是未见样本，但未必构成相对于整个主动学习探索分布的真正外推。更严格测试应使用独立应变路径、不同温压、缺陷、相态和更大体系。</li>
+<li><strong>验证样本过少</strong>：仅 20 个强畸变构型不足以表征尾部最大误差；稳定 MD 更取决于罕见最大力错误，而非平均 RMSE。文中把 <code>&lt;100 meV/atom</code> 视为稳定阈值，但该阈值并非普适充分条件。</li>
+<li><strong>不确定性仍可能共同失明</strong>：作者承认 deep ensemble 在 far-OOD 区域会相关外推并产生低方差高误差。FPS 只在“已被方差标记”的候选中选多样样本，若所有模型一致地漏报某一新区域，FPS 本身不能保证发现它。需报告 uncertainty-true error calibration、漏检率和 failure recall。</li>
+<li><strong>基线比较不完整</strong>：文本称 baseline MACE 会崩溃，但主要动态能量图又与 EAM 比较；缺少在相同训练预算、超参数和轨迹上的 random sampling、variance-only、FPS-only、no-filter、no-stress 等消融，因而无法分离各模块贡献。</li>
+<li><strong>物理机制结论超出验证证据</strong>：稳定地生成类似非晶化、BCC-HCP 胚或位错相关结构，不等于准确再现相变势垒、相界或位错芯。稿件未展示针对这些机制的独立 DFT 路径或实验基准。</li>
+<li><strong>磁性近似是核心风险</strong>：1800 K 高于 Fe 的 Curie 温度 <code>1043 K</code>。采用共线自旋极化 DFT 可保留局域磁矩，却忽略非共线涨落、磁熵与 spin-lattice coupling；因此高温自由能、相稳定和力学响应的物理准确性不能仅由结构轨迹稳定证明。</li>
+<li><strong>体系范围窄</strong>：仅覆盖纯 α-Fe；对 Fe-C、Fe-Cr、Fe-Ni、氧化物界面或氢脆环境没有直接迁移保证。MACE 的短程截断也不适合未经扩展地描述显著长程电荷转移。</li>
+<li><strong>时空尺度差距</strong>：模拟应变率约在 MD 可达的 <code>10⁸-10¹⁰ s⁻¹</code>，不能直接外推到工程塑性、蠕变、疲劳与扩散控制过程。</li>
+<li><strong>阈值与终止条件需复核</strong>：<code>τ0=0.12</code>、<code>τmin=0.05 eV Å⁻¹</code>、<code>dmin=1.8 Å</code> 和密度窗口均是体系特定经验选择；“连续轨迹零 OOD”只证明在已选探索策略和阈值下无触发，不等同于 PES 完备。</li>
+</ul>
+<h2 id="section-5">Possible actions</h2>
+<ol>
+<li>下载代码与 Zenodo 数据，先做可复现性审计：确认约 300 构型的具体组成、每轮新增数、训练/验证划分、ensemble 初始化差异、SCF 失败记录及所有图的生成脚本。</li>
+<li>建立最小消融矩阵：random、variance-only、variance+FPS、再加 physics filter、最后加 0 K/stress；统一 DFT 调用数和 MACE 容量，比较 OOD 漏检率、最大力误差、轨迹崩溃时间及 0 K 弹性偏差。</li>
+<li>把“不确定性校准”作为独立验收项：在每轮保留一批不参与采样决策的 DFT 探针，画 <code>σF</code> 对真实 force error 的 reliability/recall 曲线，尤其统计低 <code>σF</code> 高误差的 confident failures。</li>
+<li>采用跨协议外部测试：未参与主动学习的温度、单轴/简单剪切路径、压缩率、空位/间隙、表面、晶界及 BCC-HCP 转化路径；报告 RMSE 之外的 95/99 分位和最大误差。</li>
+<li>对极端铁问题，把磁性模型误差与 MLIP 误差分开。至少比较不同局域磁矩初始化或 disordered-local-moment 参考；若关注 Curie 温度附近行为，应考虑显式磁自由度或 magnetic MACE。</li>
+<li>工程上可以把流程拆为四步：触发采样、在表示空间去重、过滤 oracle 无法可靠计算的候选、加入基态锚点。迁移到表面或多孔材料时，需要按具体体系重设物理过滤器，不能照搬 Fe 的密度和最短距离阈值。</li>
+</ol>
+</div><div class="credit">本文为辅助理解研究方法的中文解读。论文原图、图注及摘要内容归原作者和相应权利人；来源见文首论文链接。</div></article></main><script>window.MathJax={tex:{inlineMath:[['$','$'],['\\(','\\)']],displayMath:[['$$','$$'],['\\[','\\]']]},options:{skipHtmlTags:['script','noscript','style','textarea','pre','code']}};</script><script defer src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-mml-chtml.js"></script><footer><span>AI for Materials 文献精读</span><span>中文研究笔记 · 图与摘要注明论文来源 · 不提供论文 PDF</span></footer></body></html>

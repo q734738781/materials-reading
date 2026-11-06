@@ -1,0 +1,33 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Capable language models can outgrow the benefits of collaboration · AI for Materials 文献精读</title><meta name="description" content="AI for Materials、原子模拟与科研智能体的中文文献解读"><link rel="stylesheet" href="../style.css"><link rel="icon" href="../icon.svg" type="image/svg+xml"></head><body><header><a class="brand" href="../index.html"><span class="mark">M</span><span>AI for Materials<small>文献精读 / RESEARCH NOTES</small></span></a><a class="header-link" href="../index.html#library">浏览文献 <span>↗</span></a></header><main class="article-layout"><aside><a href="../index.html#library">← 返回文献库</a><nav aria-label="文章目录"><a href="#section-1">Bibliographic status</a><a href="#section-2">One-line takeaway</a><a href="#section-3">What the paper asks</a><a href="#section-4">Methods</a><a href="#section-5">Main findings</a><a href="#section-6">Limitations and caveats</a><a href="#section-7">Competitive overlap and implications</a><a href="#section-8">Possible actions</a></nav></aside><article><div class="eyebrow">RESEARCH NOTE / T8</div><h1>Capable language models can outgrow the benefits of collaboration</h1><div class="article-meta"><span>智能体技术与科研系统</span><span>收录 2026-08-04</span><span>2 分钟阅读</span></div><a class="original" href="https://doi.org/10.1038/s42256-026-01268-y" target="_blank" rel="noopener noreferrer">论文原文 ↗</a><div class="prose"><ul>
+<li><strong>High 类型</strong>：High—Direct competitor</li>
+</ul>
+<h2 id="section-1">Bibliographic status</h2>
+<p>Kim et al., “Capable language models can outgrow the benefits of collaboration,” <em>Nature Machine Intelligence</em> (2026), DOI:10.1038/s42256-026-01268-y；开放获取正式论文，正文与扩展数据 16 页。</p>
+<h2 id="section-2">One-line takeaway</h2>
+<p>在提示、工具和总计算预算匹配时，多智能体是否优于强单智能体主要取决于单智能体基线、任务可分解性与协调开销，而不是“更多 agent”本身。</p>
+<h2 id="section-3">What the paper asks</h2>
+<p>何时多智能体协调真正提高 agentic task 表现，何时只引入信息碎片化、错误传播与成本？</p>
+<h2 id="section-4">Methods</h2>
+<p>260 个配置、6 个 agentic benchmarks、5 种架构、3 个模型家族；匹配每系统计算预算和工具，回归协调指标，做 cluster-robust/Holm 校正，并分析 execution traces。</p>
+<h2 id="section-5">Main findings</h2>
+<ul>
+<li>跨任务 MAS 相对 SAS 从 +80.8% 到 −70.0%；Finance 的并行分解获益，而严格顺序 PlanCraft 全面退化。</li>
+<li>约 45% 的单智能体基线阈值对 SWE-bench/Terminal-Bench 16 个配置的 MAS 增益符号预测率为 94%，但作者明确把它作为选择规则而非普适 scaling law。</li>
+<li>模型在同域 held-out 配置中选择最佳架构的准确率 87%，但跨域 LODO R² = −2.09，不能外推绝对表现。</li>
+<li>trace error amplification：独立 MAS 17.2×、集中式 4.4×；集中验证能截断错误。</li>
+<li>token 效率 SAS 67.7 successes/1000 tokens；集中式 21.5、去中心化 23.9、混合 13.6。</li>
+</ul>
+<h2 id="section-6">Limitations and caveats</h2>
+<ul>
+<li>只有 6 个 benchmark cluster，若干 tool/overhead 作用在 cluster-robust 后不显著。</li>
+<li>SWE-bench 和 Terminal-Bench 每配置仅 20 个样本；工具、共享 Docker 状态和公开 adapter 与上游精确复现存在范围差异。</li>
+<li>45% 阈值和 87% 选择率属于被测域内规则，不应直接当作 CatMaster 的固定阈值。</li>
+</ul>
+<h2 id="section-7">Competitive overlap and implications</h2>
+<p><strong>对应项目：CatMaster。</strong> 本文直接审计 subagent/MAS 的价值边界，威胁“多智能体/委托天然增强科研能力”的叙事。CatMaster 应将 subagent delegation 降为需要基线证明的可选机制：以强单 agent 为默认对照，在相同工具、提示和总预算下报告收益、协调税与错误传播，并正面引用此文。</p>
+<h2 id="section-8">Possible actions</h2>
+<ul>
+<li>CatMaster benchmark 必须做 matched-budget SAS vs MAS，对科研任务按自然可分解性和顺序依赖分层。</li>
+<li>保留集中式 validation bottleneck；仅在可并行证据流上 delegation，并记录协调 token、延迟、返工和 error amplification。</li>
+</ul>
+</div><div class="credit">本文为辅助理解研究方法的中文解读。论文原图、图注及摘要内容归原作者和相应权利人；来源见文首论文链接。</div></article></main><script>window.MathJax={tex:{inlineMath:[['$','$'],['\\(','\\)']],displayMath:[['$$','$$'],['\\[','\\]']]},options:{skipHtmlTags:['script','noscript','style','textarea','pre','code']}};</script><script defer src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-mml-chtml.js"></script><footer><span>AI for Materials 文献精读</span><span>中文研究笔记 · 图与摘要注明论文来源 · 不提供论文 PDF</span></footer></body></html>

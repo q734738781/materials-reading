@@ -1,0 +1,48 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>How Underspecified Prompts Shape Tool-Calling LLM Agents in Scientific Workflows · AI for Materials 文献精读</title><meta name="description" content="AI for Materials、原子模拟与科研智能体的中文文献解读"><link rel="stylesheet" href="../style.css"><link rel="icon" href="../icon.svg" type="image/svg+xml"></head><body><header><a class="brand" href="../index.html"><span class="mark">M</span><span>AI for Materials<small>文献精读 / RESEARCH NOTES</small></span></a><a class="header-link" href="../index.html#library">浏览文献 <span>↗</span></a></header><main class="article-layout"><aside><a href="../index.html#library">← 返回文献库</a><nav aria-label="文章目录"><a href="#section-1">What the paper asks</a><a href="#section-2">Methods and data</a><a href="#section-3">Main findings</a><a href="#section-4">Key evidence</a><a href="#section-5">Limitations and caveats</a><a href="#section-6">Relevance to user projects</a><a href="#section-7">Possible actions</a><a href="#section-8">Citation notes</a></nav></aside><article><div class="eyebrow">RESEARCH NOTE / T8</div><h1>How Underspecified Prompts Shape Tool-Calling LLM Agents in Scientific Workflows</h1><div class="article-meta"><span>智能体技术与科研系统</span><span>收录 2026-05-18</span><span>3 分钟阅读</span></div><div class="prose"><ul>
+<li><strong>Bibliographic status</strong>: Ahmed Osama Mohamed Muharram, Master’s thesis, University of Pennsylvania, 2026.</li>
+<li><strong>One-line takeaway</strong>: 该硕士论文研究“提示不充分”如何影响科学 workflow 中 tool-calling agent 的行为，结论可用于 CatMaster 的 prompt/protocol design 和任务 disambiguation。</li>
+</ul>
+<h2 id="section-1">What the paper asks</h2>
+<p>在真实科学 workflow 中，用户给 agent 的指令常常是不完整、模糊或默认省略上下文的。论文问的是：这类 underspecified prompts 会怎样改变 tool-calling LLM agent 的路径选择、工具调用、结果稳定性和错误类型。</p>
+<h2 id="section-2">Methods and data</h2>
+<ul>
+<li>围绕科学 workflow 中的 tool-calling agent 进行实验。</li>
+<li>文本中出现 LAMINA、PathFinder 等工作流/系统名。</li>
+<li>比较不同 prompt specification 下的 agent 行为、flip rate、F1 等指标。</li>
+<li>论文后部给出 design recommendations，包括 disambiguation、catalog grounding、incremental validation 等。</li>
+</ul>
+<h2 id="section-3">Main findings</h2>
+<ul>
+<li>Prompt underspecification 会显著影响 agent 选择的工具路径和最终答案。</li>
+<li>相同或相近任务可能因为缺少约束而出现路径翻转或不可重复行为。</li>
+<li>对科学 workflow，最有效的缓解方式不是让模型自由发挥，而是提供清晰的工具目录 grounding、步骤级 disambiguation 和增量验证。</li>
+<li>Agent 应在关键分歧点提问或验证，而不是默认填补所有隐含条件。</li>
+</ul>
+<h2 id="section-4">Key evidence</h2>
+<ul>
+<li>论文题名明确聚焦 underspecified prompts 和 tool-calling LLM agents in scientific workflows。</li>
+<li>搜索到的结论段落包含 design recommendations：disambiguation、catalog grounding、incremental validation。</li>
+<li>指标包括 flip rate 和 F1，说明其不只是概念讨论，也尝试量化行为变化。</li>
+</ul>
+<h2 id="section-5">Limitations and caveats</h2>
+<ul>
+<li>这是硕士论文，正式同行评议状态有限。</li>
+<li>具体实验任务是否覆盖计算催化需进一步核对。</li>
+<li>适合作为设计启发和边界论证，不适合承担核心性能证据。</li>
+</ul>
+<h2 id="section-6">Relevance to user projects</h2>
+<ul>
+<li><strong>CatMaster</strong>：高度相关。可支持 task schema、tool registry、clarifying questions、validation gates 的设计必要性。</li>
+<li><strong>Nanobot/科研管理</strong>：也解释了为什么多项目任务应压缩为明确入口和可交付物。</li>
+<li><strong>AI4X PPT</strong>：可用作“scientific agents need structured task interfaces”的背景。</li>
+</ul>
+<h2 id="section-7">Possible actions</h2>
+<ol>
+<li>CatMaster Methods 可加入：we reduce underspecification via structured task schemas, explicit tool catalogues and incremental validation.</li>
+<li>不建议作为主引用；可作为补充或内部设计参考。</li>
+</ol>
+<h2 id="section-8">Citation notes</h2>
+<ul>
+<li>引用需注明 Master’s thesis, University of Pennsylvania, 2026；若有 DOI/URL需后续核对。</li>
+</ul>
+</div><div class="credit">本文为辅助理解研究方法的中文解读。论文原图、图注及摘要内容归原作者和相应权利人；来源见文首论文链接。</div></article></main><script>window.MathJax={tex:{inlineMath:[['$','$'],['\\(','\\)']],displayMath:[['$$','$$'],['\\[','\\]']]},options:{skipHtmlTags:['script','noscript','style','textarea','pre','code']}};</script><script defer src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-mml-chtml.js"></script><footer><span>AI for Materials 文献精读</span><span>中文研究笔记 · 图与摘要注明论文来源 · 不提供论文 PDF</span></footer></body></html>

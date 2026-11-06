@@ -1,0 +1,65 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Trace-State Validation for Agentic Computational Chemistry Workflows · AI for Materials 文献精读</title><meta name="description" content="AI for Materials、原子模拟与科研智能体的中文文献解读"><link rel="stylesheet" href="../style.css"><link rel="icon" href="../icon.svg" type="image/svg+xml"></head><body><header><a class="brand" href="../index.html"><span class="mark">M</span><span>AI for Materials<small>文献精读 / RESEARCH NOTES</small></span></a><a class="header-link" href="../index.html#library">浏览文献 <span>↗</span></a></header><main class="article-layout"><aside><a href="../index.html#library">← 返回文献库</a><nav aria-label="文章目录"><a href="#section-1">Bibliographic status</a><a href="#section-2">One-line takeaway</a><a href="#section-3">What the paper asks</a><a href="#section-4">Methods</a><a href="#section-5">Main findings</a><a href="#section-6">Competitive overlap and implications</a><a href="#section-7">Limitations and caveats</a><a href="#section-8">Possible actions</a></nav></aside><article><div class="eyebrow">RESEARCH NOTE / T8</div><h1>Trace-State Validation for Agentic Computational Chemistry Workflows</h1><div class="article-meta"><span>智能体技术与科研系统</span><span>收录 2026-07-28</span><span>5 分钟阅读</span></div><a class="original" href="https://doi.org/10.21203/rs.3.rs-9448070/v1" target="_blank" rel="noopener noreferrer">论文原文 ↗</a><div class="prose"><h2 id="section-1">Bibliographic status</h2>
+<ul>
+<li>作者：Umit V. Catalyurek, Jacob B. Gorny</li>
+<li>状态：preprint，ResearchGate DOI <code>10.21203/rs.3.rs-9448070/v1</code>，2026-07-13</li>
+<li>High 类型：<strong>Both</strong>（Direct competitor + Incremental insight）</li>
+<li>对应项目：CatMaster</li>
+<li>全文状态：发现 ResearchGate 元数据页，但未找到可合法直接下载的 PDF。本卡依据 Scholar 摘要和可得元数据，是<strong>摘要级竞争卡</strong>，不冒充全文精读。</li>
+</ul>
+<h2 id="section-2">One-line takeaway</h2>
+<p>该文直接把 agentic computational chemistry workflow 表示为可重放状态机，并验证 transition、intermediate record、artifact identity、repair 与 fault injection；这是 CatMaster audit/validation 主张的正面竞品，同时为 interrupt/resume 和远程任务正确性提供立即可执行的测试范式。</p>
+<h2 id="section-3">What the paper asks</h2>
+<ol>
+<li>对多步 agent 化计算化学流程，什么样的 trace 才能证明过程状态一致、可恢复并可审计？</li>
+<li>如何检查中间记录和 artifact 身份，而不是只验证最终输出存在？</li>
+<li>workflow repair 后如何证明未跳过必要步骤、未混用旧 artifact？</li>
+<li>如何用 replay 与 fault injection 发现静默的状态漂移、错序、重复或错误恢复？</li>
+</ol>
+<h2 id="section-4">Methods</h2>
+<blockquote>
+<p>以下依据摘要与元数据，正文尚未取得。</p>
+</blockquote>
+<ul>
+<li>将 agentic computational chemistry workflow 建模为显式 state machine。</li>
+<li>对 trace 中的 state transition 和中间 record 执行验证。</li>
+<li>检查 artifact identity，确保输入、输出与执行状态对应。</li>
+<li>对 repair/recovery 过程施加规则，避免修复导致非法状态跳转。</li>
+<li>用 replay 重放工作流，并用 fault injection 构造错误或中断。</li>
+<li>论文报告面向计算化学流程，但正文未得，无法核验具体软件、任务、错误注入种类、样本规模和定量检测率。</li>
+</ul>
+<h2 id="section-5">Main findings</h2>
+<ol>
+<li><strong>最终结果正确不代表 trace 正确。</strong> 多步流程可能通过重复使用旧结果、跳过步骤或静默覆盖 artifact 得到看似合理终态。</li>
+<li><strong>artifact identity 是状态验证核心。</strong> 文件名或路径不足以证明身份，应绑定内容、来源、生成步骤和参数。</li>
+<li><strong>repair 本身需要审计。</strong> 自动修复必须记录触发原因、修改内容、回退点和后续合法转移，否则会破坏 provenance。</li>
+<li><strong>replayable state machine 提供可检验语义。</strong> trace 不只是日志，而是可被验证器解释的执行记录。</li>
+<li><strong>fault injection 是增量价值。</strong> 它能将“系统支持恢复”转成可复现 benchmark，而非成功案例叙述。</li>
+<li><strong>对 CatMaster 的直接映射</strong>：thread/message/event 模型、safe-boundary steering、interrupt/resume、stop 保留状态、artifact inspector 和 remote receipt 都可作为 trace-state validation 的被测对象。</li>
+<li><strong>但科学有效性仍需独立 gate。</strong> 状态合法并不能证明 VASP 收敛、结构合理或机理证据充分；CatMaster 可在此形成领域差异。</li>
+</ol>
+<h2 id="section-6">Competitive overlap and implications</h2>
+<ul>
+<li><strong>竞争项目</strong>：CatMaster。</li>
+<li><strong>核心重叠</strong>：agentic computational chemistry、workflow state、trace validation、artifact identity、repair、replay、fault injection、恢复与审计。</li>
+<li><strong>对 novelty 的威胁</strong>：相比一般 agent harness，该文已把方法限定到 computational chemistry；CatMaster 不能将“计算化学 agent 的状态验证/可重放”作为未经比较的独立新卖点。</li>
+<li><strong>对 claim boundary 的影响</strong>：应把 CatMaster 的差异定位为计算催化 domain tools、HPC/DFT/MLIP 统一执行、scientific validation gates、证据升级和真实 case，而不是通用状态机本身。</li>
+<li><strong>正面比较要求</strong>：比较 state schema、artifact identity、repair policy、fault types、determinism、远程 scheduler、HITL 和科学检查；正文中应正面引用。</li>
+<li><strong>立即动作</strong>：基于现有 architecture 制定 replay/fault-injection matrix，验证 interrupt/resume 与 remote receipt，不必启动新科学计算。</li>
+</ul>
+<h2 id="section-7">Limitations and caveats</h2>
+<ul>
+<li>未取得正文，不能引用任何未核验的定量检测率、系统规模或案例结果。</li>
+<li>预印本尚未同行评议，方法成熟度和代码可用性未知。</li>
+<li>state validation 可能依赖预定义 transition，未必覆盖 agent 动态改计划或新工具注入。</li>
+<li>计算化学中的随机性、队列状态和外部软件版本可能限制严格 replay。</li>
+<li>process correctness 与 scientific correctness 仍是两层不同问题。</li>
+</ul>
+<h2 id="section-8">Possible actions</h2>
+<ol>
+<li>把该文加入 CatMaster 竞品表和 related-work/claim audit，标记 DOI <code>10.21203/rs.3.rs-9448070/v1</code>。</li>
+<li>对 thread/message/event 明确合法 transition 和 terminal/interrupted/recoverable 状态。</li>
+<li>artifact 使用内容 hash、producer、parent、tool/version、parameter snapshot 和 remote receipt 绑定身份。</li>
+<li>最小 fault injection：重复 event、缺失 receipt、artifact 替换、超时后重复提交、resume 错位、repair 后参数漂移。</li>
+<li>后续取得全文后补核具体 benchmark，再决定是否需要实现兼容或引用其 validation rules。</li>
+</ol>
+</div><div class="credit">本文为辅助理解研究方法的中文解读。论文原图、图注及摘要内容归原作者和相应权利人；来源见文首论文链接。</div></article></main><script>window.MathJax={tex:{inlineMath:[['$','$'],['\\(','\\)']],displayMath:[['$$','$$'],['\\[','\\]']]},options:{skipHtmlTags:['script','noscript','style','textarea','pre','code']}};</script><script defer src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-mml-chtml.js"></script><footer><span>AI for Materials 文献精读</span><span>中文研究笔记 · 图与摘要注明论文来源 · 不提供论文 PDF</span></footer></body></html>

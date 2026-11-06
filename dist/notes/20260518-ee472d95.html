@@ -1,0 +1,45 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Can Coding Agents Produce Meaningful Research Artifacts? · AI for Materials 文献精读</title><meta name="description" content="AI for Materials、原子模拟与科研智能体的中文文献解读"><link rel="stylesheet" href="../style.css"><link rel="icon" href="../icon.svg" type="image/svg+xml"></head><body><header><a class="brand" href="../index.html"><span class="mark">M</span><span>AI for Materials<small>文献精读 / RESEARCH NOTES</small></span></a><a class="header-link" href="../index.html#library">浏览文献 <span>↗</span></a></header><main class="article-layout"><aside><a href="../index.html#library">← 返回文献库</a><nav aria-label="文章目录"><a href="#section-1">What the paper asks</a><a href="#section-2">Methods and data</a><a href="#section-3">Main findings</a><a href="#section-4">Key evidence</a><a href="#section-5">Limitations and caveats</a><a href="#section-6">Relevance to user projects</a><a href="#section-7">Possible actions</a><a href="#section-8">Citation notes</a></nav></aside><article><div class="eyebrow">RESEARCH NOTE / T8</div><h1>Can Coding Agents Produce Meaningful Research Artifacts?</h1><div class="article-meta"><span>智能体技术与科研系统</span><span>收录 2026-05-18</span><span>3 分钟阅读</span></div><a class="original" href="https://arxiv.org/abs/2605.00803" target="_blank" rel="noopener noreferrer">论文原文 ↗</a><div class="prose"><ul>
+<li><strong>Bibliographic status</strong>: Zhuang et al., 2026, arXiv:2605.00803, AutoMat benchmark; source code and HF dataset are provided in the paper.</li>
+<li><strong>One-line takeaway</strong>: 这是一个面向“科研代码智能体能否产出论文相关 artifact”的基准，结论偏谨慎：模型能写很多脚本，但真正可用于科学论证的 artifact 成功率仍有限，适合作为 CatMaster evaluation/validation gate 的参考。</li>
+</ul>
+<h2 id="section-1">What the paper asks</h2>
+<p>论文关注的问题不是普通软件工程 benchmark，而是：给定科学论文文本，coding agent 是否能自动生成与论文结果相符的研究产物（figures、tables、analysis scripts 等）。这类任务需要同时理解论文叙事、定位数据/方法、写代码并解释产物是否支持原始科学 claim。</p>
+<h2 id="section-2">Methods and data</h2>
+<ul>
+<li>构建 AutoMat：从论文文本和相关材料出发，定义生成 scientific artifacts 的任务。</li>
+<li>评估多种 LLM/coding agent 在真实科研 workflow 里的表现。</li>
+<li>评价重点包括 artifact 是否生成、是否与论文 claim 匹配、代码是否可运行、是否存在科学解释错误。</li>
+<li>论文提供 homepage、source code 和 HF dataset，说明其目标是可复用 benchmark，而不是单个 demo。</li>
+</ul>
+<h2 id="section-3">Main findings</h2>
+<ul>
+<li>LLM coding agents 在软件工程 benchmark 上的成功不等价于在科学 workflow 中可靠。</li>
+<li>失败往往不是单纯语法错误，而是 scientific grounding 错误：误读实验目标、错配数据列、生成看似合理但无法支撑 claim 的图表。</li>
+<li>论文强调需要把 artifact generation 拆成可审计步骤，而非只看最终代码是否跑通。</li>
+</ul>
+<h2 id="section-4">Key evidence</h2>
+<ul>
+<li>摘要明确指出科学任务要求“navigate complex, domain-specific procedures and interpret results in the context of scientific claims”。</li>
+<li>benchmark 设计把论文文本、代码生成、结果解释连接起来，覆盖了 CatMaster 类系统最容易被质疑的“自动做出研究结果是否可信”的环节。</li>
+</ul>
+<h2 id="section-5">Limitations and caveats</h2>
+<ul>
+<li>该文重点是 benchmark，不直接解决科研 agent 在真实实验/计算平台的长期闭环问题。</li>
+<li>如果任务只来自论文文本，仍可能低估真实科研中环境配置、HPC、数据缺失和人工决策的难度。</li>
+<li>具体数值结果需要进一步核对原表格，不建议只凭摘要引用排名。</li>
+</ul>
+<h2 id="section-6">Relevance to user projects</h2>
+<ul>
+<li><strong>CatMaster</strong>：可作为“不是自动写 paper，而是生成可审计 artifact”的反面/正面参照。适合在 Discussion 中引用来说明 scientific artifact 需要 validation gates。</li>
+<li><strong>AI4X/CatMaster PPT</strong>：可用一句话说明：coding agent 的代码能力不能直接外推为科学可靠性，因此 CatMaster 的 audit trail / human supervision 是必要设计。</li>
+</ul>
+<h2 id="section-7">Possible actions</h2>
+<ol>
+<li>如果写 CatMaster benchmarking 部分，可补一句：recent AutoMat-like benchmarks show scientific artifact generation requires claim-level validation beyond code execution.</li>
+<li>不建议现在深挖复现实验；先作为相关工作和论证材料即可。</li>
+</ol>
+<h2 id="section-8">Citation notes</h2>
+<ul>
+<li>引用时核对 arXiv ID、作者列表和 benchmark 名称 AutoMat。</li>
+</ul>
+</div><div class="credit">本文为辅助理解研究方法的中文解读。论文原图、图注及摘要内容归原作者和相应权利人；来源见文首论文链接。</div></article></main><script>window.MathJax={tex:{inlineMath:[['$','$'],['\\(','\\)']],displayMath:[['$$','$$'],['\\[','\\]']]},options:{skipHtmlTags:['script','noscript','style','textarea','pre','code']}};</script><script defer src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-mml-chtml.js"></script><footer><span>AI for Materials 文献精读</span><span>中文研究笔记 · 图与摘要注明论文来源 · 不提供论文 PDF</span></footer></body></html>

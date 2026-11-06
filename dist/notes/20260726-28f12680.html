@@ -1,0 +1,59 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Symbolic Predicate-Guided Language Agents for Inverse Design of Perovskite Oxides · AI for Materials 文献精读</title><meta name="description" content="AI for Materials、原子模拟与科研智能体的中文文献解读"><link rel="stylesheet" href="../style.css"><link rel="icon" href="../icon.svg" type="image/svg+xml"></head><body><header><a class="brand" href="../index.html"><span class="mark">M</span><span>AI for Materials<small>文献精读 / RESEARCH NOTES</small></span></a><a class="header-link" href="../index.html#library">浏览文献 <span>↗</span></a></header><main class="article-layout"><aside><a href="../index.html#library">← 返回文献库</a><nav aria-label="文章目录"><a href="#section-1">Bibliographic status</a><a href="#section-2">One-line takeaway</a><a href="#section-3">What the paper asks</a><a href="#section-4">Methods</a><a href="#section-5">Main findings</a><a href="#section-6">Limitations and caveats</a><a href="#section-7">Possible actions</a></nav></aside><article><div class="eyebrow">RESEARCH NOTE / T8</div><h1>Symbolic Predicate-Guided Language Agents for Inverse Design of Perovskite Oxides</h1><div class="article-meta"><span>智能体技术与科研系统</span><span>收录 2026-07-26</span><span>6 分钟阅读</span></div><a class="original" href="https://arxiv.org/abs/2607.15535" target="_blank" rel="noopener noreferrer">论文原文 ↗</a><div class="prose"><h2 id="section-1">Bibliographic status</h2>
+<ul>
+<li>作者：Dong Hyeon Mok, Seoin Back, Victor Fung, Guoxiang Hu</li>
+<li>状态：arXiv preprint <code>2607.15535v1</code>（2026-07-20）</li>
+<li>框架：ORCHESTRA（Operational Rule-grounded CHEmical Search Through Reasoning Agents）</li>
+<li>全文状态：arXiv PDF 已取得，MinerU 解析成功（46 页）。</li>
+<li>High 类型：<strong>Incremental insight</strong></li>
+<li>对应项目：CatMaster</li>
+</ul>
+<h2 id="section-2">One-line takeaway</h2>
+<p>ORCHESTRA 将 LLM 生成的自然语言材料规则翻译成可执行 chemistry DSL predicate，以 precision/lift 在累积数据上验证、修订或删除规则；它为 CatMaster 的 hypothesis generation 提供了“假设→形式化谓词→数据验证→规则库更新”的可审计实现范式，但也暴露了 DSL 表达不足、规则过拟合和 surrogate oracle 偏差。</p>
+<h2 id="section-3">What the paper asks</h2>
+<ol>
+<li>仅靠 self-reflection、多 agent 互评和自然语言 rule store，能否阻止错误规则在迭代设计中积累？</li>
+<li>能否把化学假设转成可执行谓词，用材料数据统计检验其支持度？</li>
+<li>符号 grounding 是否提高双钙钛矿多目标逆向设计，尤其是多中间体共同决定的 OER overpotential？</li>
+<li>规则 precision、coverage、DSL 表达能力与候选命中率之间有何权衡？</li>
+</ol>
+<h2 id="section-4">Methods</h2>
+<ul>
+<li><strong>多 agent loop</strong>：design node 生成候选；calculation node 用 surrogate 结构优化/算性质；interpretation node 产出自然语言规则与 symbolic predicate；curate node 基于统计证据增删改 rule store。</li>
+<li><strong>DSL</strong>：Boolean 表达式使用预定义化学符号与操作符；在累积材料数据上计算 matched count、precision 与 lift，判断规则是否支持目标方向。</li>
+<li><strong>四基线</strong>：Random；仅 design agent 的 Background；只有自然语言规则的 Rule-only；完整 DSL-guided。</li>
+<li><strong>任务</strong>：立方 double perovskite <code>AA′BB′O6</code>；联合 band gap ≥2.0 eV / formation energy ≤−2.0 eV atom⁻¹，以及 OER overpotential ≤0.3 V。</li>
+<li><strong>oracle</strong>：UMA-s-1p2；bulk 用 OMat task，surface 用 OC22 task。随机选 14 个 DP 做 DFT 对照。</li>
+<li><strong>循环</strong>：每种策略 10 independent runs，每次 50 iterations；区分 exploration 与 exploitation 候选；以非重复候选 hit rate、generation rate 和成功候选总数评价。</li>
+<li><strong>LLM</strong>：GPT-5-mini；规则库存储有限数量规则，并持续更新。</li>
+</ul>
+<h2 id="section-5">Main findings</h2>
+<ol>
+<li><strong>Figure 1：规则不只被“评论”，而是被执行。</strong> interpretation agent 同时输出自然语言规则和 predicate；curate agent用统计证据删除弱规则、修订规则并限制 rule store 大小。</li>
+<li><strong>UMA 仅被定位为 trend oracle。</strong> 全部 14 DP 上 surface energy MAE 562.442 meV/atom、force MAE 58.118 meV/Å；去除含 La 后 surface energy MAE 降至 13.557 meV/atom，binding Gibbs MAE 0.141 eV。全体 binding Gibbs rank correlation 为 0.911，但绝对 binding error 0.381 eV、overpotential error 0.370 V。</li>
+<li><strong>Figure 3：DSL 对复杂目标更有帮助。</strong> band-gap/formation-energy 任务中 DSL-guided hit rate 约 0.681，rule-only 约 0.642，Random &lt;0.05；OER 目标中 DSL-guided 约 0.213，为四种策略最高。</li>
+<li><strong>统计 rule store 会改善。</strong> 10 runs/50 iterations 中，predicate precision 与 lift 通常早期上升后稳定，支持删除弱规则并保留证据较强规则。</li>
+<li><strong>Figure 4 展示两类关键行为。</strong> 零 precision/负 lift 的 Bi/Pb 规则经过数轮修订后被删除；另一个起初无匹配样本的外推规则，在新候选产生后获得 3 个匹配、precision=1.00、positive lift，从而得到初步支持。</li>
+<li><strong>候选层面恢复已知 OER motif。</strong> 198 个 surrogate-predicted OP≤0.3 V 的唯一候选全部以 Co 为 binding B site，80%以上邻近 B′ 为 Ru/Ir，并富集 Nd/Pr/Sm A-site；与已有实验趋势一致，但作者明确不把候选当作高保真确认。</li>
+<li><strong>precision 不等于设计有效性。</strong> 高 precision predicate 若只覆盖很窄 motif，可能过拟合；覆盖太宽又会 precision 低。需要同时优化准确性与 chemical-space coverage。</li>
+<li><strong>DSL 可能压缩化学表达。</strong> <code>ΔG*OH</code> 单目标中 DSL-guided 略逊 rule-only；rule-only 规则平均长度 1218 字符，DSL-guided 530，表面 motif 和复杂条件常无法翻译进当前 DSL。</li>
+<li><strong>元素身份 predicate 提高 hit rate但可能损害可迁移设计原则。</strong> 若目标是泛化规则而非短期命中，需限制 element-specific predicates，增加物性和局域结构描述符。</li>
+<li><strong>对 CatMaster 的直接启示是 hypothesis contract。</strong> 假设必须含可执行形式、适用域、matched count、支持/反驳证据、coverage 与版本；不能只把自然语言推理写进日志。</li>
+</ol>
+<h2 id="section-6">Limitations and caveats</h2>
+<ul>
+<li>所有候选由 UMA surrogate 定义，未对最终 198 个候选做逐个 DFT 或实验验证。</li>
+<li>UMA 在含 La 表面和绝对吸附自由能上误差明显；共享 oracle 保证策略比较相对公平，但不能保证发现真实活性材料。</li>
+<li>当前 DSL 以组成/元素特征为主，对表面构型、吸附位点、动力学和复杂条件表达不足。</li>
+<li>precision/lift 建立在 agent 自己采样的累积数据上，存在分布偏移、反馈回路和多重检验风险。</li>
+<li>GPT-5-mini、prompt、rule-store size 与 50-iteration 配置可能影响结果；不同模型泛化未知。</li>
+<li>double perovskite OER 不是 CatMaster 当前主要真实 case，本工作更适合作为架构方法参考。</li>
+</ul>
+<h2 id="section-7">Possible actions</h2>
+<ol>
+<li>为 CatMaster hypothesis schema 增加：自然语言 claim、typed predicate、scope、required descriptors、support/refute evidence、precision、coverage/lift、version 与 status。</li>
+<li>将 physicochemical hard constraints 与统计 predicate 分开：前者用于拒绝不合法候选，后者用于更新经验规则。</li>
+<li>规则库更新必须保留失败/被删除规则及原因，避免重新发现相同错误。</li>
+<li>若做最小 prototype，只选已有表格数据的窄 case 验证 predicate workflow，不重新开启大规模计算。</li>
+<li>Related work 可将 ORCHESTRA 作为 hypothesis formalization/verification 方法引用，但 CatMaster 的差异应落在计算催化工具执行、HPC、provenance 与 human-supervised evidence upgrading。</li>
+</ol>
+</div><div class="credit">本文为辅助理解研究方法的中文解读。论文原图、图注及摘要内容归原作者和相应权利人；来源见文首论文链接。</div></article></main><script>window.MathJax={tex:{inlineMath:[['$','$'],['\\(','\\)']],displayMath:[['$$','$$'],['\\[','\\]']]},options:{skipHtmlTags:['script','noscript','style','textarea','pre','code']}};</script><script defer src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-mml-chtml.js"></script><footer><span>AI for Materials 文献精读</span><span>中文研究笔记 · 图与摘要注明论文来源 · 不提供论文 PDF</span></footer></body></html>

@@ -1,0 +1,106 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Full-data accuracy with fewer labels for training and fine-tuning machine-learning force fields · AI for Materials 文献精读</title><meta name="description" content="AI for Materials、原子模拟与科研智能体的中文文献解读"><link rel="stylesheet" href="../style.css"><link rel="icon" href="../icon.svg" type="image/svg+xml"></head><body><header><a class="brand" href="../index.html"><span class="mark">M</span><span>AI for Materials<small>文献精读 / RESEARCH NOTES</small></span></a><a class="header-link" href="../index.html#library">浏览文献 <span>↗</span></a></header><main class="article-layout"><aside><a href="../index.html#library">← 返回文献库</a><nav aria-label="文章目录"><a href="#section-1">Bibliographic status</a><a href="#section-2">One-line takeaway</a><a href="#section-3">What the paper asks</a><a href="#section-4">Methods</a><a href="#section-5">Main findings</a><a href="#section-6">Limitations and caveats</a><a href="#section-7">Possible actions</a></nav></aside><article><div class="eyebrow">RESEARCH NOTE / T6</div><h1>Full-data accuracy with fewer labels for training and fine-tuning machine-learning force fields</h1><div class="article-meta"><span>机器学习势训练与泛化</span><span>收录 2026-07-22</span><span>5 分钟阅读</span></div><a class="original" href="https://arxiv.org/abs/2607.14486" target="_blank" rel="noopener noreferrer">论文原文 ↗</a><div class="prose"><h2 id="section-1">Bibliographic status</h2>
+<ul>
+<li><strong>Authors:</strong> Sheng Bi, Yi-Ze Wang, Jun Cheng</li>
+<li><strong>Type:</strong> arXiv preprint, 2026; <strong>not peer reviewed</strong>.</li>
+<li><strong>Full text:</strong> arXiv:2607.14486. 本卡片基于本地 PDF 及 MinerU 全文解析，不是摘要扩写。</li>
+<li><strong>Source files:</strong>
+<ul>
+<li>Parsed Markdown: <code>...\mineru_md_shortnames_no_formula_table\p02.pdf\auto\p02.pdf.md</code></li>
+</ul>
+</li>
+</ul>
+<h2 id="section-2">One-line takeaway</h2>
+<p>用单个 foundation MLFF 的 last-layer features 做低成本 Bayesian linear regression，得到 per-configuration uncertainty，再以该不确定性驱动主动学习；在作者测试的分子、凝聚态和电解液体系中，通常只标注约 <strong>5%–10%</strong> 候选构型即可接近全数据训练/微调精度，并避免传统 committee 为每个成员重复微调的成本。</p>
+<h2 id="section-3">What the paper asks</h2>
+<p>论文针对一个很具体的瓶颈：MLFF 只在训练分布附近可靠，但从零训练或 foundation model 微调时，如何从昂贵候选池中挑出少量最有信息的 DFT 标注点？标准 query-by-committee 可以做 epistemic uncertainty，但对 foundation MLFF 意味着重复微调多个大模型，成本过高。作者因此问：能否只训练一次基础模型，利用其最后一层特征，在几乎不增加模型训练成本的情况下获得足以驱动主动学习的构型级不确定性？</p>
+<h2 id="section-4">Methods</h2>
+<ol>
+<li>
+<p><strong>基础模型与输出分解</strong></p>
+<ul>
+<li>将 MLFF 的总能量写成原子能之和；最后一层把每个原子的特征向量线性映射为原子能。</li>
+<li>论文使用 MACE 作为主测试架构，并在补充实验中检查 PET 和 Allegro，目标是验证方法并非只适用于一种 equivariant GNN。</li>
+</ul>
+</li>
+<li>
+<p><strong>LLPR 不确定性模型</strong></p>
+<ul>
+<li>固定已训练模型的表示层，只对最后一层进行 Bayesian linear regression。</li>
+<li>以构型聚合后的 last-layer feature 作为设计矩阵，利用训练残差估计噪声尺度，得到构型能量预测的 posterior variance。</li>
+<li>关键优势是只需一次模型前向传播与小型矩阵运算，不需要维护多个独立微调模型。</li>
+</ul>
+</li>
+<li>
+<p><strong>主动学习循环</strong></p>
+<ul>
+<li>从很小的随机 seed set 开始训练/微调。</li>
+<li>对未标注 pool 计算 LLPR uncertainty，选择最高不确定性构型加入训练集。</li>
+<li>重复训练—打分—查询，直到预算或性能停止条件满足。</li>
+<li>与随机采样、farthest-point sampling（FPS）及 ensemble variance 等策略比较；同时检查 uncertainty 与真实误差的相关性和排序能力。</li>
+</ul>
+</li>
+<li>
+<p><strong>任务覆盖</strong></p>
+<ul>
+<li>分子势能面：MD17 / rMD17 一类小分子体系。</li>
+<li>凝聚相与多相数据：从较同质体系到结构分布更宽的混合数据。</li>
+<li>电解液/溶剂化体系：包含稀有配位环境和明显类别不均衡，用于检验能否主动捕获少数但关键的局部结构。</li>
+<li>同时覆盖 <strong>from-scratch training</strong> 与 <strong>foundation MLFF fine-tuning</strong> 两种使用模式。</li>
+</ul>
+</li>
+</ol>
+<h2 id="section-5">Main findings</h2>
+<ol>
+<li>
+<p><strong>小比例标注可以接近全数据精度。</strong></p>
+<ul>
+<li>作者在多类任务上报告，约 5%–10% 的 LLPR 选择数据即可达到或接近全数据模型的能量/力精度；具体比例随体系异质性变化，不能把“5%”当成普适常数。</li>
+<li>相比随机采样，LLPR 在低预算区间的优势最明显；当标注比例变大时，各策略差距逐渐缩小。</li>
+</ul>
+</li>
+<li>
+<p><strong>不确定性对高误差构型具有实用排序能力。</strong></p>
+<ul>
+<li>LLPR variance 与构型真实误差总体正相关，足以优先暴露训练集之外的结构。</li>
+<li>论文强调的是主动学习排序价值，而不是声称给出了严格校准的概率置信区间；不同体系和模型仍需单独检查 calibration。</li>
+</ul>
+</li>
+<li>
+<p><strong>对稀有局部环境的捕获优于纯几何多样性策略。</strong></p>
+<ul>
+<li>在电解液等类别不均衡体系里，LLPR 会主动选中较少见但模型误差高的配位结构。</li>
+<li>FPS 更关注 feature-space 距离，未必等价于监督目标上的高误差；因此“结构多样”与“对势能面最有信息”不能混为一谈。</li>
+</ul>
+</li>
+<li>
+<p><strong>适合 foundation model 微调。</strong></p>
+<ul>
+<li>committee fine-tuning 的主要痛点是每轮需要多个独立模型；LLPR 只读取单模型最后一层表示，因此更适合大型 foundation MLFF 的定制数据选择。</li>
+<li>在作者的微调实验中，LLPR 选择集以少量标签接近全数据微调结果，表明预训练表示可以为 uncertainty ranking 提供有效基础。</li>
+</ul>
+</li>
+<li>
+<p><strong>跨架构结果支持一定可迁移性，但证据仍有限。</strong></p>
+<ul>
+<li>MACE 是最完整的验证对象；PET、Allegro 的补充结果说明思路可迁移到其他 last-layer-linear 的 MLFF。</li>
+<li>这不等于对所有 foundation potential、所有输出头或强分布外化学空间都已证明有效。</li>
+</ul>
+</li>
+</ol>
+<h2 id="section-6">Limitations and caveats</h2>
+<ul>
+<li>预印本尚未同行评审。</li>
+<li>验证仍以离线 pool-based active learning 为主；真实在线 MD 中的相关构型、trajectory autocorrelation、任务中途分布漂移和 DFT 失败会使问题更复杂。</li>
+<li>末层线性化只能刻画给定表示下的 epistemic signal；若 representation 本身对新化学环境失真，LLPR 可能低估风险。</li>
+<li>“约 5% 数据”是作者测试集上的结果，不应转写成所有 MLFF 项目的固定节省比例。</li>
+<li>uncertainty calibration、矩阵条件数、超参数和 query batch size 仍会影响排序；需要在目标体系上保留 independent test / challenge set。</li>
+<li>工作重点是数据选择效率，不直接解决能量守恒、长时间 MD 稳定性、反应势垒精度和 rare-event kinetics 的可信度。</li>
+</ul>
+<h2 id="section-7">Possible actions</h2>
+<ul>
+<li><strong>对应缺口：Pd-TWC / CatMaster 的 MLFF demo 缺少便宜、单模型的增量数据选择器。</strong> 当前如果扩展 TiO₂/Pd 动态抗烧结数据，committee 会重复微调且成本高。可把 LLPR 作为候选 selector，但先限定为离线 pool 实验。</li>
+<li><strong>最小迁移动作：</strong> 对已有 trajectory pool 做一次固定预算对照：<code>random vs FPS vs LLPR</code>，使用相同 MACE/UMA backbone、相同 DFT 标注数，独立比较能量/力误差、最坏 5% 构型误差及短 MD 稳定性。</li>
+<li><strong>停止规则：</strong> 若 LLPR 选集在独立 OOD challenge set 上没有稳定优于 random/FPS，或 uncertainty 与误差排序相关性很弱，则不接入 CatMaster 自动闭环。</li>
+<li><strong>为何不是相邻重复：</strong> 用户已有 MACE fine-tuning、主动学习和 foundation model 泛化认识，但本文给出的是一个可以直接降低“每轮多模型微调”成本的具体 uncertainty head 与 selection protocol，而不是再次泛谈主动学习重要性。</li>
+</ul>
+</div><div class="credit">本文为辅助理解研究方法的中文解读。论文原图、图注及摘要内容归原作者和相应权利人；来源见文首论文链接。</div></article></main><script>window.MathJax={tex:{inlineMath:[['$','$'],['\\(','\\)']],displayMath:[['$$','$$'],['\\[','\\]']]},options:{skipHtmlTags:['script','noscript','style','textarea','pre','code']}};</script><script defer src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-mml-chtml.js"></script><footer><span>AI for Materials 文献精读</span><span>中文研究笔记 · 图与摘要注明论文来源 · 不提供论文 PDF</span></footer></body></html>

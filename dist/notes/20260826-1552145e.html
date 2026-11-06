@@ -1,0 +1,30 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Accelerating Catalyst Discovery Using Quantum Chemistry and Machine Learning · AI for Materials 文献精读</title><meta name="description" content="AI for Materials、原子模拟与科研智能体的中文文献解读"><link rel="stylesheet" href="../style.css"><link rel="icon" href="../icon.svg" type="image/svg+xml"></head><body><header><a class="brand" href="../index.html"><span class="mark">M</span><span>AI for Materials<small>文献精读 / RESEARCH NOTES</small></span></a><a class="header-link" href="../index.html#library">浏览文献 <span>↗</span></a></header><main class="article-layout"><aside><a href="../index.html#library">← 返回文献库</a><nav aria-label="文章目录"><a href="#section-1">这篇工作解决什么问题</a><a href="#section-2">为什么难</a><a href="#section-3">方法</a><a href="#section-4">主要发现</a><a href="#section-5">证据定位</a><a href="#section-6">局限</a><a href="#section-7">对当前项目的用处</a><a href="#section-8">一句话判断</a></nav></aside><article><div class="eyebrow">RESEARCH NOTE / T4</div><h1>Accelerating Catalyst Discovery Using Quantum Chemistry and Machine Learning</h1><div class="article-meta"><span>性质、表征与材料表示</span><span>收录 2026-08-26</span><span>2 分钟阅读</span></div><a class="original" href="https://scholar.google.com/scholar_url?url=https://utoronto.scholaris.ca/bitstreams/4338865b-93a1-4571-96f3-96608d25035f/download&amp;hl=zh-CN&amp;sa=X&amp;d=2016757796388182808&amp;ei=tUiMavK-KqHWieoPsbnhsA8&amp;scisig=AIVdB-wD68VgL7yOc7X05ywRraM2&amp;oi=scholaralrt&amp;hist=Qqxzy1UAAAAJ:17161998875107665524:AIVdB-xexEgwVzzumiKe0iGaPd9Z&amp;html=&amp;pos=4&amp;folt=cit" target="_blank" rel="noopener noreferrer">论文原文 ↗</a><div class="prose"><ul>
+<li><strong>原始序号</strong>：5</li>
+<li><strong>作者</strong>：Yuxin Chang</li>
+<li><strong>来源</strong>：University of Toronto, PhD thesis（2026）</li>
+<li><strong>标识符</strong>：无</li>
+<li><strong>原始链接</strong>：https://scholar.google.com/scholar_url?url=https://utoronto.scholaris.ca/bitstreams/4338865b-93a1-4571-96f3-96608d25035f/download&amp;hl=zh-CN&amp;sa=X&amp;d=2016757796388182808&amp;ei=tUiMavK-KqHWieoPsbnhsA8&amp;scisig=AIVdB-wD68VgL7yOc7X05ywRraM2&amp;oi=scholaralrt&amp;hist=Qqxzy1UAAAAJ:17161998875107665524:AIVdB-xexEgwVzzumiKe0iGaPd9Z&amp;html=&amp;pos=4&amp;folt=cit</li>
+<li><strong>本地 PDF</strong>：</li>
+</ul>
+<h2 id="section-1">这篇工作解决什么问题</h2>
+<p>单靠 DFT 很难遍历高熵合金的巨大化学空间，单靠机器学习又容易失去可靠的物理依据。论文把两者分工：DFT 负责建立机制与可解释特征，机器学习负责扩大筛选范围。</p>
+<h2 id="section-2">为什么难</h2>
+<p>OER/ORR 同时受吸附能、表面相、双位点几何、电荷转移和稳定性约束。高熵合金还带来组合爆炸；如果训练数据少，普通图网络很容易把相似化学环境当成完全无关样本。</p>
+<h2 id="section-3">方法</h2>
+<p>全文先用 DFT 分析 Ba-Co3O4 与 Mn0.75Ru0.25O2。随后构建带量子启发相似度特征的 CGCNN，用于预测高熵合金吸附能并筛选 ORR 候选。</p>
+<h2 id="section-4">主要发现</h2>
+<ul>
+<li>Ba 掺杂稳定活性 CoOOH 表面并改变 OER 路径。</li>
+<li>Mn–O–Ru 不对称双位点降低反应势垒；Mn→Ru 电荷转移同时帮助稳定 Ru。</li>
+<li>相似度增强的 CGCNN 提高了小数据效率；论文摘要称数据效率约提高一倍。</li>
+<li>筛得 FeCoNiIrRu 高熵合金，并获得实验确认。</li>
+</ul>
+<h2 id="section-5">证据定位</h2>
+<p>论文 PDF 第 ii–iii 页 Abstract；正文分别对应两项 DFT 机理研究和高熵合金 ML 筛选章节。</p>
+<h2 id="section-6">局限</h2>
+<p>这是学位论文，多个子工作被汇总在同一叙事下。模型跨数据集、跨表面覆盖度和真实工作条件下的外推能力仍需逐章核对。</p>
+<h2 id="section-7">对当前项目的用处</h2>
+<p>对 Spin-SAC/HESAC，最可借鉴的是“先用物理相似度改善小样本筛选，再用实验验证候选”的闭环；不能只复用随机切分分数。</p>
+<h2 id="section-8">一句话判断</h2>
+<p>DFT机理与机器学习筛选形成完整闭环；博士论文还含经实验确认的 FeCoNiIrRu 高熵合金 ORR 候选。</p>
+</div><div class="credit">本文为辅助理解研究方法的中文解读。论文原图、图注及摘要内容归原作者和相应权利人；来源见文首论文链接。</div></article></main><script>window.MathJax={tex:{inlineMath:[['$','$'],['\\(','\\)']],displayMath:[['$$','$$'],['\\[','\\]']]},options:{skipHtmlTags:['script','noscript','style','textarea','pre','code']}};</script><script defer src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-mml-chtml.js"></script><footer><span>AI for Materials 文献精读</span><span>中文研究笔记 · 图与摘要注明论文来源 · 不提供论文 PDF</span></footer></body></html>

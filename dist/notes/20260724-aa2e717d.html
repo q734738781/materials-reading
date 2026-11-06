@@ -1,0 +1,60 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>A Survey of Self-Evolving Agents: What, When, How, and Where to Evolve on the Path to Artificial Super Intelligence · AI for Materials 文献精读</title><meta name="description" content="AI for Materials、原子模拟与科研智能体的中文文献解读"><link rel="stylesheet" href="../style.css"><link rel="icon" href="../icon.svg" type="image/svg+xml"></head><body><header><a class="brand" href="../index.html"><span class="mark">M</span><span>AI for Materials<small>文献精读 / RESEARCH NOTES</small></span></a><a class="header-link" href="../index.html#library">浏览文献 <span>↗</span></a></header><main class="article-layout"><aside><a href="../index.html#library">← 返回文献库</a><nav aria-label="文章目录"><a href="#section-1">Bibliographic status</a><a href="#section-2">One-line takeaway</a><a href="#section-3">What the paper asks</a><a href="#section-4">Methods</a><a href="#section-5">Main findings</a><a href="#section-6">Limitations and caveats</a><a href="#section-7">Possible actions</a></nav></aside><article><div class="eyebrow">RESEARCH NOTE / T8</div><h1>A Survey of Self-Evolving Agents: What, When, How, and Where to Evolve on the Path to Artificial Super Intelligence</h1><div class="article-meta"><span>智能体技术与科研系统</span><span>收录 2026-07-24</span><span>6 分钟阅读</span></div><a class="original" href="https://arxiv.org/abs/2507.21046" target="_blank" rel="noopener noreferrer">论文原文 ↗</a><div class="prose"><h2 id="section-1">Bibliographic status</h2>
+<ul>
+<li>题名：<em>A Survey of Self-Evolving Agents: What, When, How, and Where to Evolve on the Path to Artificial Super Intelligence</em></li>
+<li>作者：Huan-ang Gao, Jiayi Geng, Wenyue Hua, Mengkang Hu 等</li>
+<li>状态：TMLR 2026 survey；OpenReview 可核查版本；arXiv：<code>2507.21046v4</code></li>
+<li>全文状态：已取得并以 MinerU 成功解析（77 页）。</li>
+<li>身份核对说明：Scholar 记录题名写作 <em>Self-Evolving Agents: A Unified Survey of What, How, and With Whom Agentic Systems Improve Themselves</em>；可取得全文的正式题名如上。两者主题相同但不是同一字面题名，本卡严格按实际全文身份命名，不把抓取标题冒充 PDF 标题。</li>
+<li>归档说明：该全文是 Scholar High 记录的同主题补充文献，不是该记录的同题全文；exact-record ResearchGate PDF 获取返回 403。由于本文本身对 CatMaster 具有独立 High 价值，作为相关补充精读归档，不计作 exact-record 全文。</li>
+<li>High 类型：<strong>Incremental insight</strong>（相关补充；不是 Direct competitor）</li>
+<li>对应项目：CatMaster</li>
+</ul>
+<h2 id="section-2">One-line takeaway</h2>
+<p>自进化不应理解为“agent 随意重写自己”，而应拆成可审计的四个演化对象（模型、上下文/记忆、工具、架构）、两个时序（任务内/任务间）和三类更新机制（奖励、示范、群体/进化）；对 CatMaster 最可执行的启示是先做<strong>可回滚、带验证门和审计轨迹的工具/记忆演化</strong>，而不是把开放式自修改直接升级为当前论文主故事。</p>
+<h2 id="section-3">What the paper asks</h2>
+<ol>
+<li>agent 系统中究竟哪些部分可以演化：模型参数、上下文/记忆、工具，还是工作流/多智能体架构？</li>
+<li>演化应在任务执行中发生，还是在任务完成后基于历史轨迹发生？</li>
+<li>更新信号和算法如何组织：文本反馈、标量奖励、示范学习、RL、种群搜索或多智能体协同？</li>
+<li>如何评价持续适应，而不只测一次性静态任务成功率？</li>
+<li>自修改会带来哪些长程漂移、reward hacking、工具安全、遗忘和治理风险？</li>
+</ol>
+<h2 id="section-4">Methods</h2>
+<ul>
+<li><strong>综述范围</strong>：系统归纳 self-evolving agents 文献，并提供 GitHub 资源列表；论文把“自进化”限定为由自身轨迹/反馈驱动、产生持续策略改变且具备一定自主探索或学习能力的更新，而不是一次性的普通提示跟随。</li>
+<li><strong>形式化框架</strong>：将环境表示为 POMDP，将 agent system 表示为由拓扑、模型、上下文与工具组成的系统；自进化策略是依据轨迹和反馈把当前 agent 映射到新状态的变换。</li>
+<li><strong>What to evolve</strong>：分成模型、上下文（prompt/长期记忆）、工具、agent architecture 四个 locus。每类进一步梳理数据生成、记忆 ADD/UPDATE/DELETE、技能创建/精炼/管理、工作流搜索与代码自修改等机制。</li>
+<li><strong>When to evolve</strong>：区分 intra-test-time 与 inter-test-time。前者在当前任务中针对即时障碍适应；后者在任务之间用累积轨迹改进未来任务。</li>
+<li><strong>How to evolve</strong>：按 reward-based、imitation/demonstration-based、population/evolution-based 组织，并比较文本反馈、内部置信度、外部奖励、隐式奖励及单/多智能体更新。</li>
+<li><strong>Where/evaluation</strong>：覆盖 coding、GUI、教育、医疗等场景；强调静态、短期与长程评价的差异，以及适应增益、泛化、效率、安全与遗忘之间的权衡。</li>
+<li><strong>风险分析</strong>：将风险定位到模型漂移、记忆 reward hacking、恶意或有漏洞的自建工具，并提出 sandbox、静态/动态验证、审计轨迹、rollback、持续 red-team 和人类批准门。</li>
+</ul>
+<h2 id="section-5">Main findings</h2>
+<ol>
+<li><strong>Figure 2–3：自进化的核心是系统级分解。</strong> 论文最重要的不是罗列方法，而是把演化对象拆成模型、context、tools 和 architecture，再与时序、反馈方式及部署场景交叉。对 CatMaster 而言，这能避免把“skill 共进化”“prompt 优化”“memory 更新”“workflow 搜索”混为一个不可验证的大功能。</li>
+<li><strong>形式化定义强调“持续改变”与“经验依赖”。</strong> 只有更新由执行轨迹、失败或环境反馈触发，并改变未来策略，才称得上演化。临时把一条建议放进当前上下文不等于完整自进化；纯人工定时的数据管线也不等于主动演化。</li>
+<li><strong>Figure 5：任务内与任务间更新应分开治理。</strong> 任务内演化适合即时反思、局部重规划、临时检索或轻量调整；任务间演化适合从多次运行中归纳规则、整理记忆、更新技能和做更重的优化。CatMaster 当前更稳妥的入口是任务间、离线、可回滚的技能改进，而不是运行时直接改核心代码。</li>
+<li><strong>记忆演化需要显式操作和遗忘机制。</strong> 综述列出 ADD、UPDATE、DELETE、合并、衰减、结构化索引与从成功/失败轨迹蒸馏规则等做法。关键不只是“记更多”，而是防重复、防矛盾、选择性删除和验证检索是否改善未来任务。</li>
+<li><strong>工具演化包含 discovery → refinement → management。</strong> agent 可以发现能力缺口并创建技能，但新脚本通常脆弱；必须经过错误定位、文档/参数精炼、测试和管理。技能库增大后，选择和组合工具本身成为新瓶颈。该链条与 CatMaster 的 skills/tool registry、validation gate 和 provenance 设计高度吻合。</li>
+<li><strong>架构演化既可优化固定拓扑，也可搜索工作流。</strong> TextGrad、AFlow、ADAS、AgentSquare 等被用于节点 prompt、模型选择、通信拓扑或代码结构优化。但每次候选工作流都真实执行会非常昂贵，因此需要代理评价器；这也引入评价器偏差和 reward hacking 风险。</li>
+<li><strong>Figure 6 及方法综述：反馈信号决定演化边界。</strong> 文本反馈信息丰富但难标定，标量奖励易优化却可能被钻空子，示范稳定但可能压缩探索，种群方法保持多样性但成本高。对科研 agent，不能只用“任务成功”作奖励，应加入科学正确性、证据完整性、成本和可追溯性。</li>
+<li><strong>长期评价不能由静态 benchmark 替代。</strong> 文中强调 adaptivity、generalization、efficiency、safety 和 long-horizon behavior；一次性成功率不能证明更新后的 agent 更稳健。应比较演化前后、跨任务迁移、回归测试、遗忘、成本和失败恢复。</li>
+<li><strong>Section 8.3：自进化独有风险是“misevolution”。</strong> 模型可能漂移；记忆会把偶然高奖励固化成错误策略；自建/外部工具可能携带漏洞或敏感信息泄露。论文提出严格 sandbox、自动验证、完整 audit trail、rollback/failsafe、持续监测和高风险批准门，这些都比“完全自治”叙事更适合 CatMaster。</li>
+<li><strong>Figure 1 的 ASI 叙事应谨慎使用。</strong> 论文将 self-evolving agents 放在通往 ASI 的概念轨迹上，但这属于前瞻性定位，不是经验证明。CatMaster 当前不应据此放大“自主科学发现”主张。</li>
+</ol>
+<h2 id="section-6">Limitations and caveats</h2>
+<ul>
+<li>综述覆盖面很广，部分分类边界仍处在快速变化中；作者也承认这是 guiding synthesis，而非成熟范式的最终定义。</li>
+<li>方法证据横跨 coding、GUI、医疗等不同环境，不能假定在计算催化/HPC/DFT 中同样有效。</li>
+<li>很多“self-evolving”方法只在短期 benchmark 上验证，长期科学可靠性、成本、污染/遗忘和真实用户监督尚不充分。</li>
+<li>论文强调 ASI 的远景，但对 CatMaster 当前工程路线，最可信的是受限演化与治理，不是开放式递归自修改。</li>
+<li>Scholar 题名与实际全文题名不一致；本卡不能被当作前者那篇记录的严格同题全文。交付映射必须保留这一身份边界。</li>
+</ul>
+<h2 id="section-7">Possible actions</h2>
+<ol>
+<li>为 CatMaster 做一个窄版 evolution matrix：行是 <code>memory / prompt / skill / tool / workflow</code>，列是触发信号、候选更新、验证集、科学硬约束、成本上限、人工批准、rollback 与审计记录。</li>
+<li>第一阶段只允许<strong>任务间</strong>演化：从失败轨迹提出 patch，在隔离环境运行回归测试，通过 validation gate 后由人批准进入技能库。</li>
+<li>建立“演化前后”评价：任务成功率之外，至少记录科学错误率、工具调用失败率、成本、回归退化、跨任务迁移和可回滚性。</li>
+<li>保持当前论文边界：将 self-evolution 放入工程 backlog/未来工作，不把它升级为 CatMaster 已实现的核心学术 claim。</li>
+</ol>
+</div><div class="credit">本文为辅助理解研究方法的中文解读。论文原图、图注及摘要内容归原作者和相应权利人；来源见文首论文链接。</div></article></main><script>window.MathJax={tex:{inlineMath:[['$','$'],['\\(','\\)']],displayMath:[['$$','$$'],['\\[','\\]']]},options:{skipHtmlTags:['script','noscript','style','textarea','pre','code']}};</script><script defer src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-mml-chtml.js"></script><footer><span>AI for Materials 文献精读</span><span>中文研究笔记 · 图与摘要注明论文来源 · 不提供论文 PDF</span></footer></body></html>

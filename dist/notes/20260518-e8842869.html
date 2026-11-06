@@ -1,0 +1,58 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Adaptive and scalable catalyst discovery with composable intelligence · AI for Materials 文献精读</title><meta name="description" content="AI for Materials、原子模拟与科研智能体的中文文献解读"><link rel="stylesheet" href="../style.css"><link rel="icon" href="../icon.svg" type="image/svg+xml"></head><body><header><a class="brand" href="../index.html"><span class="mark">M</span><span>AI for Materials<small>文献精读 / RESEARCH NOTES</small></span></a><a class="header-link" href="../index.html#library">浏览文献 <span>↗</span></a></header><main class="article-layout"><aside><a href="../index.html#library">← 返回文献库</a><nav aria-label="文章目录"><a href="#section-1">What the paper asks</a><a href="#section-2">Methods and data</a><a href="#section-3">Main findings</a><a href="#section-4">Key evidence</a><a href="#section-5">Limitations and caveats</a><a href="#section-6">Relevance to user projects</a><a href="#section-7">Possible actions</a><a href="#section-8">Citation notes</a></nav></aside><article><div class="eyebrow">RESEARCH NOTE / T2</div><h1>Adaptive and scalable catalyst discovery with composable intelligence</h1><div class="article-meta"><span>合成与工艺</span><span>收录 2026-05-18</span><span>5 分钟阅读</span></div><a class="original" href="https://doi.org/10.21203/rs.3.rs-9556645/v1" target="_blank" rel="noopener noreferrer">论文原文 ↗</a><div class="prose"><ul>
+<li><strong>Bibliographic status</strong>: Wentao Li, Qilong Cai, Qi Lei, Jinxing Chen, Ruixuan Chen, Jiangjie Qiu, Botian Wang, Kai Zhao, Zemeng Wang, Yijun Li, Jun Yin, Fangfang Li, Hongxuan Liu, Yingdong Lu, Yawen Ouyang, Manu Suvarna, Wei-Ying Ma, Ya-Qin Zhang, Kostya S. Novoselov, Hao Zhou, Jiong Lu, Xiaonan Wang, Research Square preprint, posted May 4 2026, DOI: 10.21203/rs.3.rs-9556645/v1.</li>
+<li><strong>One-line takeaway</strong>: 这是导师团队 CatAI/composable intelligence 方向的催化发现框架，30 个 encoders、1.8M structure-property datapoints、六个 benchmark 和两个实验发现案例；与用户 CatMaster/CSR Review 关系很强，但因作者/组内背景，引用和定位要谨慎。</li>
+</ul>
+<h2 id="section-1">What the paper asks</h2>
+<p>催化发现越来越跨越 homogeneous、heterogeneous、enzymatic、thermal/electro/photo 等子领域，但现有预测模型常被各自领域的知识表示锁住，跨体系迁移和少样本外推困难。论文提出：能否把预训练 physicochemical knowledge modules 组合成 task-specific predictive models，使催化模型能在不同任务间自适应迁移。</p>
+<h2 id="section-2">Methods and data</h2>
+<ul>
+<li>提出 <strong>Composable Catalytic Intelligence (CatAI)</strong>。</li>
+<li>使用 30 个 encoders，训练于 1.8M structure-property datapoints。</li>
+<li>模块化组合预训练 physicochemical knowledge modules，形成任务特定模型。</li>
+<li>在六个 benchmark tasks 上评估。</li>
+<li>进一步做两个 discovery campaigns：
+<ol>
+<li>homogeneous catalysis：筛选 polyolefin elastomer synthesis 的 zirconocene catalyst；</li>
+<li>heterogeneous catalysis：结合 autonomous platform 发现 Cu-based geminal-atom photocatalyst for C–O coupling。</li>
+</ol>
+</li>
+</ul>
+<h2 id="section-3">Main findings</h2>
+<ul>
+<li>CatAI 相对 baseline models 将 prediction error 降低 7.8%。</li>
+<li>在 few-shot accuracies 和 active learning scenarios 中提升超过 15%。</li>
+<li>homogeneous case 中找到 zirconocene catalyst，活性 <code>194.4 × 10^4 kg/(mol·h)</code>，相对 commercial benchmark 约 9 倍提升。</li>
+<li>heterogeneous case 中发现 Cu-based geminal-atom photocatalyst，突破 Ni-dominated paradigm。</li>
+<li>模块化架构允许新 structure-property modules 加入并与已有模块选择性组合，也提供一定 interpretability。</li>
+</ul>
+<h2 id="section-4">Key evidence</h2>
+<ul>
+<li>摘要明确给出 30 encoders / 1.8M datapoints / six benchmark tasks / 7.8% error reduction / &gt;15% few-shot and active-learning improvement。</li>
+<li>两个实验发现案例把计算预测连接到实际催化结果，是该文区别于纯 benchmark 的核心证据。</li>
+<li>作者阵容和单位显示其与清华/新加坡/产业合作相关，和用户研究生态高度接近。</li>
+</ul>
+<h2 id="section-5">Limitations and caveats</h2>
+<ul>
+<li>Research Square preprint，需注意版本和正式发表状态。</li>
+<li>摘要层面的 benchmark 提升幅度不算极大，真正价值更多在模块化跨任务迁移和实验闭环。</li>
+<li>与 CatMaster 不应简单比较“谁更自动”；CatAI 是 predictive modeling/composable intelligence，CatMaster 是 agentic computational catalysis ecosystem。</li>
+<li>因为导师王笑楠老师为通讯作者之一，该文在用户项目中既是重要背景，也需要避免不当占用或误解组内贡献边界。</li>
+</ul>
+<h2 id="section-6">Relevance to user projects</h2>
+<ul>
+<li><strong>CSR Review</strong>：高度相关，可作为 catalyst discovery with composable/foundation-like intelligence 的关键案例。</li>
+<li><strong>CatMaster</strong>：应作为上游/相邻催化 AI 生态背景。CatMaster 可定位为 workflow/agent/validation ecosystem，而不是与 CatAI 抢 predictive model 主线。</li>
+<li><strong>AI4X PPT</strong>：如果需要讲组内 AI catalysis landscape，可作为重要背景，但需根据导师授权决定展示深度。</li>
+<li><strong>PX-New</strong>：概念上支持跨任务催化预测，但不直接解决 MOF/PX 吸附机制。</li>
+</ul>
+<h2 id="section-7">Possible actions</h2>
+<ol>
+<li>标为 <strong>High but sensitive</strong>：建议你亲自看全文，尤其图 1 架构、benchmark 和两个 case。</li>
+<li>CatMaster 写作中可强调与 predictive model 平台互补：CatAI supplies composable predictive intelligence; CatMaster orchestrates computational workflows and validation.</li>
+<li>CSR Review 中可单独开一段 composable intelligence / modular catalyst foundation models。</li>
+</ol>
+<h2 id="section-8">Citation notes</h2>
+<ul>
+<li>DOI: 10.21203/rs.3.rs-9556645/v1；Research Square posted May 4 2026；正式引用前核对版本、作者顺序和是否已有期刊版本。</li>
+</ul>
+</div><div class="credit">本文为辅助理解研究方法的中文解读。论文原图、图注及摘要内容归原作者和相应权利人；来源见文首论文链接。</div></article></main><script>window.MathJax={tex:{inlineMath:[['$','$'],['\\(','\\)']],displayMath:[['$$','$$'],['\\[','\\]']]},options:{skipHtmlTags:['script','noscript','style','textarea','pre','code']}};</script><script defer src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-mml-chtml.js"></script><footer><span>AI for Materials 文献精读</span><span>中文研究笔记 · 图与摘要注明论文来源 · 不提供论文 PDF</span></footer></body></html>

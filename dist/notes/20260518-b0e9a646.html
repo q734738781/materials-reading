@@ -1,0 +1,47 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Agentic AI Scientists Are Not Built For Autonomous Scientific Discovery · AI for Materials 文献精读</title><meta name="description" content="AI for Materials、原子模拟与科研智能体的中文文献解读"><link rel="stylesheet" href="../style.css"><link rel="icon" href="../icon.svg" type="image/svg+xml"></head><body><header><a class="brand" href="../index.html"><span class="mark">M</span><span>AI for Materials<small>文献精读 / RESEARCH NOTES</small></span></a><a class="header-link" href="../index.html#library">浏览文献 <span>↗</span></a></header><main class="article-layout"><aside><a href="../index.html#library">← 返回文献库</a><nav aria-label="文章目录"><a href="#section-1">What the paper asks</a><a href="#section-2">Methods and data</a><a href="#section-3">Main findings</a><a href="#section-4">Key evidence</a><a href="#section-5">Limitations and caveats</a><a href="#section-6">Relevance to user projects</a><a href="#section-7">Possible actions</a><a href="#section-8">Citation notes</a></nav></aside><article><div class="eyebrow">RESEARCH NOTE / T8</div><h1>Agentic AI Scientists Are Not Built For Autonomous Scientific Discovery</h1><div class="article-meta"><span>智能体技术与科研系统</span><span>收录 2026-05-18</span><span>3 分钟阅读</span></div><a class="original" href="https://arxiv.org/abs/2605.08956" target="_blank" rel="noopener noreferrer">论文原文 ↗</a><div class="prose"><ul>
+<li><strong>Bibliographic status</strong>: Harshit Bisht, Vinay Kumar, Kevin Maik Jablonka, Mausam, N. M. Anoop Krishnan, 2026, arXiv:2605.08956, position paper.</li>
+<li><strong>One-line takeaway</strong>: 这是一篇对“全自动 AI scientist”叙事的批判性 position paper，主张当前 agent 更适合作为 co-scientist；非常适合支撑 CatMaster 新叙事中的 human supervision、validation gates 和避免 fully autonomous science 的表述。</li>
+</ul>
+<h2 id="section-1">What the paper asks</h2>
+<p>论文讨论：为什么即使 agentic AI 在若干任务上表现强，也不能简单推出其已经能做端到端 autonomous scientific discovery。作者把问题定位为科学发现的制度、知识和反馈闭环问题，而不是单纯模型规模或 scaffold 问题。</p>
+<h2 id="section-2">Methods and data</h2>
+<ul>
+<li>这不是实证 benchmark，而是立场/概念分析。</li>
+<li>作者从问题选择、知识来源、模型后训练、benchmark 设计和实验反馈等方面论证 autonomous AI scientist 的局限。</li>
+<li>提出将 agent 作为 co-scientist，而非替代完整科学发现系统。</li>
+</ul>
+<h2 id="section-3">Main findings</h2>
+<p>作者提出四类核心挑战：</p>
+<ol>
+<li><strong>McNamara fallacy</strong>：agent/benchmark 容易选择可量化、可自动评估的问题，而忽视真正重要但难测的科学问题。</li>
+<li><strong>Tacit procedural/failure knowledge 缺失</strong>：LLM 训练语料缺少实验室实践中的隐性流程知识和失败知识。</li>
+<li><strong>Preference optimisation 压缩多样性</strong>：后训练可能把输出推向共识，降低假说多样性。</li>
+<li><strong>Benchmark 缺少物理实验反馈</strong>：多数 benchmark 测单轮预测，不包含从 physical experiment 回到 computational model 的闭环。</li>
+</ol>
+<h2 id="section-4">Key evidence</h2>
+<ul>
+<li>摘要明确列出上述四项挑战，并指出这些问题不是简单扩大模型或增加 scaffolding 就能解决。</li>
+<li>论文主张 AI scientists already function as co-scientists，但不是 autonomous discovery 的完整替代。</li>
+</ul>
+<h2 id="section-5">Limitations and caveats</h2>
+<ul>
+<li>该文是 position paper，不提供新的实验数据或系统 benchmark。</li>
+<li>论证偏宏观，引用时最好只用来支撑 narrative boundary，不用作性能证据。</li>
+<li>对纯计算催化系统，实验反馈问题可部分替换为 DFT/MLFF validation feedback，但不能完全等同 wet-lab 闭环。</li>
+</ul>
+<h2 id="section-6">Relevance to user projects</h2>
+<ul>
+<li><strong>CatMaster</strong>：高度相关。可直接支持把叙事从“fully autonomous scientist / automatically writing paper”改为“virtual ecosystem / co-scientist / human-supervised computational catalysis”。</li>
+<li><strong>AI4X PPT</strong>：可作为一页里“why not claim full autonomy”的理论依据。</li>
+<li><strong>CSR Review</strong>：可放入 LLM agent for science 的 limitations 小节。</li>
+</ul>
+<h2 id="section-7">Possible actions</h2>
+<ol>
+<li>CatMaster Discussion 中加入一句：recent critiques argue agentic AI scientists should be framed as co-scientists because autonomous discovery requires tacit failure knowledge and physical feedback loops.</li>
+<li>避免把这篇和 CatGo/CatMaster竞品混为“系统性能比较”；它是叙事边界文献。</li>
+</ol>
+<h2 id="section-8">Citation notes</h2>
+<ul>
+<li>arXiv:2605.08956；正式引用前核对作者顺序。</li>
+</ul>
+</div><div class="credit">本文为辅助理解研究方法的中文解读。论文原图、图注及摘要内容归原作者和相应权利人；来源见文首论文链接。</div></article></main><script>window.MathJax={tex:{inlineMath:[['$','$'],['\\(','\\)']],displayMath:[['$$','$$'],['\\[','\\]']]},options:{skipHtmlTags:['script','noscript','style','textarea','pre','code']}};</script><script defer src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-mml-chtml.js"></script><footer><span>AI for Materials 文献精读</span><span>中文研究笔记 · 图与摘要注明论文来源 · 不提供论文 PDF</span></footer></body></html>

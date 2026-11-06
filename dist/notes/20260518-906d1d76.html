@@ -1,0 +1,57 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Dataset Merging Strategy for Efficient Construction of a Machine-Learning Force Field: A case of CeO2 Surfaces with an Oxygen Vacancy · AI for Materials 文献精读</title><meta name="description" content="AI for Materials、原子模拟与科研智能体的中文文献解读"><link rel="stylesheet" href="../style.css"><link rel="icon" href="../icon.svg" type="image/svg+xml"></head><body><header><a class="brand" href="../index.html"><span class="mark">M</span><span>AI for Materials<small>文献精读 / RESEARCH NOTES</small></span></a><a class="header-link" href="../index.html#library">浏览文献 <span>↗</span></a></header><main class="article-layout"><aside><a href="../index.html#library">← 返回文献库</a><nav aria-label="文章目录"><a href="#section-1">What the paper asks</a><a href="#section-2">Methods and data</a><a href="#section-3">Main findings</a><a href="#section-4">Key evidence</a><a href="#section-5">Limitations and caveats</a><a href="#section-6">Relevance to user projects</a><a href="#section-7">Possible actions</a><a href="#section-8">Citation notes</a></nav></aside><article><div class="eyebrow">RESEARCH NOTE / T8</div><h1>Dataset Merging Strategy for Efficient Construction of a Machine-Learning Force Field: A case of CeO2 Surfaces with an Oxygen Vacancy</h1><div class="article-meta"><span>智能体技术与科研系统</span><span>收录 2026-05-18</span><span>3 分钟阅读</span></div><a class="original" href="https://doi.org/10.26434/chemrxiv.15003015/v1" target="_blank" rel="noopener noreferrer">论文原文 ↗</a><div class="prose"><ul>
+<li><strong>Bibliographic status</strong>: Kai Oshiro, Min Gao, Jun-ya Hasegawa, ChemRxiv preprint, posted 12 May 2026, DOI: 10.26434/chemrxiv.15003015/v1.</li>
+<li><strong>One-line takeaway</strong>: 该文提出 CeO2 表面 MLFF 的 dataset merging 策略：从小而不稳定 slab 启动 on-the-fly 训练、逐步升温采样局部结构、合并不同厚度/缺陷数据集，以提升对大模型和氧空位扩散路径的可迁移性。</li>
+</ul>
+<h2 id="section-1">What the paper asks</h2>
+<p>CeO2 的氧空位对催化、储氧和红氧性质非常关键，但 DFT 难以覆盖大表面和动态扩散路径。论文问的是：如何高效构建一个对 pristine/oxygen-defective CeO2 surfaces 都可迁移的 system-specific MLFF，并让它能用于更大 slab 和氧空位扩散路径。</p>
+<h2 id="section-2">Methods and data</h2>
+<ul>
+<li>使用 system-specific MLFF，而非完全依赖通用势。</li>
+<li>策略包括三部分：
+<ol>
+<li>从 small, less stable slab models 启动 on-the-fly training，以便早期采样多样 high-energy configurations；</li>
+<li>逐步提高 MD temperature，采样多样 local structures，同时避免过快原子运动和非物理短接触；</li>
+<li>合并不同 slab thickness 和 defect conditions 的独立数据集，提高 transferability。</li>
+</ol>
+</li>
+<li>在 144 原子以上 slab 上验证 pristine / defective surface 优化和 lattice oxygen diffusion pathways。</li>
+<li>进一步测试 CeO2(111) 扩展模型，最高到 5183 atoms。</li>
+</ul>
+<h2 id="section-3">Main findings</h2>
+<ul>
+<li>Dataset merging across model sizes and defect configurations 可以实际提升 MLFF 对复杂氧化物表面的迁移性。</li>
+<li>MLFF 预测的结构优化、氧空位扩散路径和能垒与 DFT 结果吻合较好，特别是涉及较大结构/能量变化的路径。</li>
+<li>模型在 5183 原子的扩展 CeO2(111) surface 上仍保持一致表现，接近实验相关尺度。</li>
+<li>论文强调构建训练数据比单纯换模型更关键。</li>
+</ul>
+<h2 id="section-4">Key evidence</h2>
+<ul>
+<li>摘要明确给出三步 dataset merging strategy。</li>
+<li>验证对象包括 larger slab models with 144 atoms、oxygen-defective surfaces、lattice oxygen diffusion pathways。</li>
+<li>摘要称 predicted pathways and energy barriers are in good agreement with DFT，且扩展到 5183 atoms。</li>
+</ul>
+<h2 id="section-5">Limitations and caveats</h2>
+<ul>
+<li>该文是 ChemRxiv preprint，数据可能仍需同行评议。</li>
+<li>体系限定在 CeO2 surfaces 与 oxygen vacancy，不能直接泛化到所有氧化物/催化体系。</li>
+<li>system-specific MLFF 的数据构建成本仍然存在；对每个新材料体系都需要重新设计采样策略。</li>
+<li>引用前需要核对具体 MLFF 框架、训练集规模、能垒误差和 DFT 设置。</li>
+</ul>
+<h2 id="section-6">Relevance to user projects</h2>
+<ul>
+<li><strong>NFPP MLFF</strong>：高度相关于数据集构建策略。可类比 replay/representative structures：不是只追求随机 RMSE，而是覆盖高能、缺陷、不同尺寸和动力学路径。</li>
+<li><strong>CSR Review</strong>：可作为 complex oxide surface MLFF dataset design 案例。</li>
+<li><strong>CatMaster</strong>：适合作为“agent 生成 MLFF workflow 时必须考虑数据合并和适用域验证”的例子。</li>
+<li><strong>PX-New</strong>：方法上有启发，但材料体系不同；不直接进入 PX 机制叙事。</li>
+</ul>
+<h2 id="section-7">Possible actions</h2>
+<ol>
+<li>标为 <strong>Medium-High</strong>：后续可抽取其 dataset merging protocol，和 NFPP MLFF 数据策略对照。</li>
+<li>若写 CSR Review，可放在 MLFF data curation / active learning / transferability 小节。</li>
+<li>不建议现在重跑；先作为方法参考。</li>
+</ol>
+<h2 id="section-8">Citation notes</h2>
+<ul>
+<li>ChemRxiv DOI: 10.26434/chemrxiv.15003015/v1；posted 12 May 2026。</li>
+</ul>
+</div><div class="credit">本文为辅助理解研究方法的中文解读。论文原图、图注及摘要内容归原作者和相应权利人；来源见文首论文链接。</div></article></main><script>window.MathJax={tex:{inlineMath:[['$','$'],['\\(','\\)']],displayMath:[['$$','$$'],['\\[','\\]']]},options:{skipHtmlTags:['script','noscript','style','textarea','pre','code']}};</script><script defer src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-mml-chtml.js"></script><footer><span>AI for Materials 文献精读</span><span>中文研究笔记 · 图与摘要注明论文来源 · 不提供论文 PDF</span></footer></body></html>

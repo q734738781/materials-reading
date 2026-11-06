@@ -1,0 +1,30 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Harnessing X-ray Absorption Spectroscopy Data through Multimodal Mining of Battery Literature · AI for Materials 文献精读</title><meta name="description" content="AI for Materials、原子模拟与科研智能体的中文文献解读"><link rel="stylesheet" href="../style.css"><link rel="icon" href="../icon.svg" type="image/svg+xml"></head><body><header><a class="brand" href="../index.html"><span class="mark">M</span><span>AI for Materials<small>文献精读 / RESEARCH NOTES</small></span></a><a class="header-link" href="../index.html#library">浏览文献 <span>↗</span></a></header><main class="article-layout"><aside><a href="../index.html#library">← 返回文献库</a><nav aria-label="文章目录"><a href="#section-1">Bibliographic status</a><a href="#section-2">One-line takeaway</a><a href="#section-3">What the paper asks</a><a href="#section-4">Methods</a><a href="#section-5">Main findings</a><a href="#section-6">Limitations and caveats</a><a href="#section-7">Possible actions</a></nav></aside><article><div class="eyebrow">RESEARCH NOTE / T1</div><h1>Harnessing X-ray Absorption Spectroscopy Data through Multimodal Mining of Battery Literature</h1><div class="article-meta"><span>材料生成与逆向设计</span><span>收录 2026-08-04</span><span>2 分钟阅读</span></div><a class="original" href="https://arxiv.org/abs/2607.23886" target="_blank" rel="noopener noreferrer">论文原文 ↗</a><div class="prose"><ul>
+<li><strong>High 类型</strong>：High—Incremental insight</li>
+</ul>
+<h2 id="section-1">Bibliographic status</h2>
+<p>He et al., <em>Harnessing X-ray Absorption Spectroscopy Data through Multimodal Mining of Battery Literature</em>, arXiv:2607.23886 (2026)，Scientific Data Data Descriptor 预印本；25 页。</p>
+<h2 id="section-2">One-line takeaway</h2>
+<p>论文把 46 万余篇全文中的 XAS 图转成 13,740 条带来源和样品元数据的数值谱，并用专用曲线分割弥补通用 VLM 的像素级精度不足。</p>
+<h2 id="section-3">What the paper asks</h2>
+<p>如何规模化恢复文献图中的精确 XAS 曲线，并把曲线、图例、吸收边、材料和原文来源绑定成 AI-ready 数据？</p>
+<h2 id="section-4">Methods</h2>
+<p>EXSCLAIM/出版商 API 获取全文；Mixtral 与 GPT-5.2 分层筛图；OCR 读坐标，颜色分解+连通图分离重叠曲线，VLM 做图例和上下文元数据匹配；专家抽查 100 条。</p>
+<h2 id="section-5">Main findings</h2>
+<ul>
+<li>从 485,628 篇文献和 4,112,327 个图注筛到 6,055 张 XAS 图，最终从 3,510 篇论文生成 13,740 条谱，覆盖 66 个吸收元素。</li>
+<li>轴标签/刻度准确率 100%，图例 97%，曲线分离 91%，材料 97%，元素 98%；全部字段同时正确为 89%。</li>
+<li>专用曲线算法可把目视正确曲线控制在平均 &lt;1% 强度范围偏差、99% 点低于 3%，但虚线/点线尚不能恢复。</li>
+<li>跨文献聚合 146 条 CoO Co K-edge 谱后，边能 IQR 1.8 eV、相邻后边峰间距 IQR 0.5 eV，显示跨实验室校准差异。</li>
+</ul>
+<h2 id="section-6">Limitations and caveats</h2>
+<ul>
+<li>当前限定电池文献与特定出版商/TDM 权限；数据和代码声明为发表时公开。</li>
+<li>无法处理虚线/点线，重叠曲线仍是主要误差源；任一局部错误即判整条曲线失败。</li>
+<li>任意单位、非标准归一化及上下文歧义会限制跨谱定量比较。</li>
+</ul>
+<h2 id="section-7">Possible actions</h2>
+<ul>
+<li>为 CatMaster evidence registry 增加曲线坐标、图例、单位、figure label、DOI、提取置信度和人工校验状态。</li>
+<li>在 Pd-TWC 中选少量 XAS/粒径分布图建立人工真值，测试专用 CV+VLM 管线而不是让 VLM 直接读数。</li>
+</ul>
+</div><div class="credit">本文为辅助理解研究方法的中文解读。论文原图、图注及摘要内容归原作者和相应权利人；来源见文首论文链接。</div></article></main><script>window.MathJax={tex:{inlineMath:[['$','$'],['\\(','\\)']],displayMath:[['$$','$$'],['\\[','\\]']]},options:{skipHtmlTags:['script','noscript','style','textarea','pre','code']}};</script><script defer src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-mml-chtml.js"></script><footer><span>AI for Materials 文献精读</span><span>中文研究笔记 · 图与摘要注明论文来源 · 不提供论文 PDF</span></footer></body></html>

@@ -1,0 +1,87 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>High-throughput design of catalytic materials for NOx reduction from aircraft emissions · AI for Materials 文献精读</title><meta name="description" content="AI for Materials、原子模拟与科研智能体的中文文献解读"><link rel="stylesheet" href="../style.css"><link rel="icon" href="../icon.svg" type="image/svg+xml"></head><body><header><a class="brand" href="../index.html"><span class="mark">M</span><span>AI for Materials<small>文献精读 / RESEARCH NOTES</small></span></a><a class="header-link" href="../index.html#library">浏览文献 <span>↗</span></a></header><main class="article-layout"><aside><a href="../index.html#library">← 返回文献库</a><nav aria-label="文章目录"><a href="#section-1">Bibliographic status</a><a href="#section-2">One-line takeaway</a><a href="#section-3">What the paper asks</a><a href="#section-4">Methods</a><a href="#section-9">Main findings</a><a href="#section-16">Limitations and caveats</a><a href="#section-17">Possible actions</a></nav></aside><article><div class="eyebrow">RESEARCH NOTE / T4</div><h1>High-throughput design of catalytic materials for NOx reduction from aircraft emissions</h1><div class="article-meta"><span>性质、表征与材料表示</span><span>收录 2026-07-15</span><span>9 分钟阅读</span></div><a class="original" href="https://doi.org/10.1016/j.eng.2025.07.024" target="_blank" rel="noopener noreferrer">论文原文 ↗</a><div class="prose"><h2 id="section-1">Bibliographic status</h2>
+<ul>
+<li><strong>作者</strong>：Mrigank Goswami, Reinhard J. Maurer, Sebastian A. Maurer</li>
+<li><strong>期刊状态</strong>：Engineering，2026 年 5 月在线，Article in Press</li>
+<li><strong>DOI</strong>：10.1016/j.eng.2025.07.024</li>
+<li><strong>原文页面</strong>：https://www.sciencedirect.com/science/article/pii/S209580992600006X</li>
+<li><strong>关联项目</strong>：实习 Pd-TWC/尾气催化计算；也涉及高熵/多组元表面 ensemble 与描述符筛选方法</li>
+</ul>
+<h2 id="section-2">One-line takeaway</h2>
+<p>论文用单金属 DFT、吸附/过渡态 scaling、CatMap 微观动力学与多组元表面 ensemble 统计筛选高温航空尾气 NO–CO 反应，得到 Pt/Pd/Rh 接近火山顶、NiCrPt 为综合稳定性—活性首选；对 Pd-TWC 的价值主要是可复用的“表面 ensemble 概率 × 位点速率”筛选框架，而不是把航空发动机 1100 K 结果直接移植到汽车 TWC。</p>
+<h2 id="section-3">What the paper asks</h2>
+<p>航空发动机尾气温度高、流速大、停留时间短，传统汽车尾气催化剂的材料选择逻辑未必可以直接套用。论文尝试回答：</p>
+<ol>
+<li>在含 NO、CO、O₂、CO₂ 等组分的高温尾气条件下，哪些单金属表面的 N/O 吸附强度落入 NO 还原—CO 氧化的高活性窗口？</li>
+<li>如何用少量吸附描述符和过渡态 scaling 构建可遍历大材料空间的微观动力学近似？</li>
+<li>Ni 基多组元合金中，稳定元素与 Pt/Pd/Rh 活性元素如何共同决定 bulk/surface stability、局部 ensemble 分布、NO 消耗速率与积碳倾向？</li>
+<li>能否从 broad screening 中提出值得更高精度计算和实验验证的候选合金，而不是给出过度精确的绝对排名？</li>
+</ol>
+<h2 id="section-4">Methods</h2>
+<h3 id="section-5">1. 单金属 DFT 数据与描述符降维</h3>
+<p>作者考虑 Ag、Au、Co、Cu、Ir、Ni、Os、Pd、Pt、Re、Rh、Ru 等过渡金属，并统一按 fcc 结构构建 (111)、(100)、(211) 三类表面。VASP/ASE 计算采用 RPBE、PAW：bulk 使用 520 eV 与 8×8×8 k 网格；p(3×3) slab 几何优化使用 500 eV、6×6×1 k 网格、约 15 Å 真空层，力收敛阈值为 0.01 eV/Å。计算 C、N、O、CO、NO 的不同位点吸附能。</p>
+<p>以 <strong>E_ads(N)</strong> 和 <strong>E_ads(O)</strong> 为两个主描述符。作者拟合 C–N、CO–N、NO–N 的线性吸附 scaling：C–N 斜率约 1、RMSE 可达 0.5 eV；CO–N 和 NO–N 斜率约 0.5–0.6、RMSE 约 0.2–0.3 eV。这样可由两个描述符近似恢复其余物种的热力学输入。</p>
+<h3 id="section-6">2. 过渡态 scaling 与 ML-NEB</h3>
+<p>机制包含 NO/CO 吸附、NO 解离、CO 解离、CO* + O* → CO₂、O 重组、N 重组七类步骤。O₂、N₂、NO、CO、CO₂ 解离的过渡态通过 ML-enhanced NEB 迭代求取：模型预测路径、不确定性低于 0.05 eV 后，用 VASP improved dimer 将鞍点力收敛到 0.05 eV/Å，并用单虚频确认。</p>
+<p>作者用过渡态能与反应能建立 TSS/BEP 关系。拟合 RMSE 多为 0.1–0.3 eV，不同晶面之间存在系统平移；除 O₂ 外，多数解离 TSS 斜率大于 0.5，过渡态较偏向终态。低配位 (211) 步位整体给出更低势垒和更高反应性。</p>
+<h3 id="section-7">3. mean-field 微观动力学</h3>
+<p>目标总反应为 NO + CO → 1/2 N₂ + CO₂。CatMap 建立稳态 mean-field 方程，气相熵来自 Shomate/NIST-JANAF，吸附态熵和 ZPE 采用 Pt 表面的谐振近似参数。代表性航空尾气条件为约 1100 K、P_N2=0.7 bar、P_O2=0.1 bar、P_CO=2×10⁻⁴ bar、P_NO=2×10⁻³ bar、P_CO2=0.04 bar。</p>
+<p>模型做了重要简化：统一指定晶面位点；忽略表面氧化物；忽略吸附物相互作用与不同位点间 spillover；不纳入烃氧化；以平均场和 scaling 外推合金位点速率。</p>
+<h3 id="section-8">4. Ni 基多组元合金与表面 ensemble 统计</h3>
+<p>作者从 NiCo、NiFe、NiCr 等稳定基体出发，引入 Pt、Pd 或 Rh，考察 12 组多元合金。bulk 和 surface 以近等组分 chemically disordered solid solutions 表示，不显式考虑长程有序、聚集和相分离。</p>
+<p>对于 alloy surface，作者：</p>
+<ul>
+<li>比较 bulk formation energy 与 surface formation energy；</li>
+<li>用 Boltzmann 权重估算不同表面构型和局部 site ensemble 的出现概率；</li>
+<li>对每种表面平均约 20 个局部构型的 C/N/O 吸附能；</li>
+<li>将局部位点的 E_ads(N)、E_ads(O) 映射到单金属火山图；</li>
+<li>用“site probability × local microkinetic rate”得到合金总体 NO 消耗率；</li>
+<li>用 site-averaged C binding energy 作为碳滞留/积碳倾向的一阶热力学 proxy。</li>
+</ul>
+<p>bulk 计算使用自旋极化；高温表面 screening 主要采用非自旋极化，另用 NUPDOWN=0 的代表性 spin-polarized 对照测试敏感性。</p>
+<h2 id="section-9">Main findings</h2>
+<h3 id="section-10">1. 单金属火山图重现 Pt/Pd/Rh 高活性区域</h3>
+<p>Figure 3 给出的 NO 分解/CO 消耗 descriptor maps 均表现为火山形。与 (111)/(100) 相比，(211) 火山高活性区更宽，说明低配位 corrugated surfaces 允许更多金属进入可用描述符窗口。Pt、Pd、Rh 在三个晶面上都靠近火山顶，与汽车尾气催化经验一致。</p>
+<p>这说明 N/O 双描述符可以用于第一轮空间压缩，但不能把拟合误差忽略：吸附 scaling 最大约 0.5 eV，TSS 最大约 0.4 eV；按作者的保守传播估计，势垒不确定性可达约 1.3 eV，速率最坏可跨 <strong>6 个数量级</strong>。因此，火山图适合识别 promising region，不适合精确排列相邻候选。</p>
+<h3 id="section-11">2. Cr 对 Ni 基多元体系稳定性贡献最明显，Pt 常进一步稳定</h3>
+<p>Figure 4a–b 显示：在不含贵金属的 NiCo/NiFe/NiCr 组合中，Cr 的 bulk stabilization 最明显；加入 Pt 通常比 Rh、Pd 给出更有利的形成能。NiCrPt 的 bulk formation energy 最负，surface formation energy 也在多种晶面上最稳定。</p>
+<p>表面组成并不简单等于 bulk 等摩尔组成。Ni 与 Pt 更倾向稳定表面；Cr 更偏向 bulk。作者承认当前枚举与 Boltzmann weighting 只是统一 baseline，并未进行完整 segregation thermodynamics 和大规模 configurational sampling。</p>
+<h3 id="section-12">3. 多组元表面需要用位点分布而不是单一“平均表面”描述</h3>
+<p>Figure 4c 展示 NiCrPt(111) 的局部 ensemble 概率。Cr–Cr 富集团簇出现概率低，NiCrPt 混合 ensemble 与含 Pt cluster 更常见。不同合金/晶面具有不同局部位点分布；加入 Pt/Pd/Rh 后，稳定元素 cluster 往往受到抑制。</p>
+<p>Figure 4d 将局部 ensemble 吸附能分布叠加到火山图。相同 ensemble 的不同邻域仍有约 0.2 eV 标准差，但 ensemble composition 仍能作为第一阶分类变量。作者据此用局部位点概率加权，而不是只用整个合金的单一平均吸附能。</p>
+<p>这一点与多组元/高熵催化的统计视角一致：性能来自一组局部 motif 的分布，活性应理解为“好位点概率 × 位点活性”，而不只是一个全局成分标签。</p>
+<h3 id="section-13">4. Pt 基最活跃，Pd 基紧随其后；步位贡献最高</h3>
+<p>Figure 5 显示，引入 Pt/Pd/Rh 后，预测 NO 消耗速率相对无活性元素合金最高可改善约 <strong>6 个数量级</strong>；Pt 基合金整体最高，Pd 基紧随其后。不同晶面排序为 (211) &gt; (100) &gt; (111)，强调低配位位点的重要性。</p>
+<p>作者用平均 C binding energy 评估碳滞留倾向。框架内，NiCrPt 和 NiCoPt 同时表现出高 NO 活性和较弱碳结合，没有出现明显 activity–coking trade-off。但该结论只是热力学 proxy，未模拟积碳生成/清除微观动力学，不能直接等价于真实抗积碳稳定性。</p>
+<h3 id="section-14">5. 综合候选与 Pd-TWC 相关结果</h3>
+<p>作者综合 bulk/surface stability、位点概率、NO–CO 活性与 C retention，提出 <strong>NiCrPt</strong> 为首选，随后是 <strong>NiCoPd、NiCoPt、NiFePt</strong>。NiCrPt 同时被认为是含活性金属候选中成本最低者之一。</p>
+<p>对 Pd-TWC 更直接的可用信息是：</p>
+<ul>
+<li>Pd 在 N/O 描述符空间内稳定靠近高活性区；</li>
+<li>NiCoPd 被列为综合候选之一；</li>
+<li>Pd-rich/含 Pd 局部 ensemble 的概率、表面偏析与晶面低配位效应需要联合考虑；</li>
+<li>局部 ensemble 概率加权可作为复杂 Pd 合金/多组元表面的简化建模入口。</li>
+</ul>
+<h3 id="section-15">6. 磁性近似对 broad trend 影响有限，但不支持忽略局部自旋</h3>
+<p>代表性 spin-polarized 对照显示，CoCoCo、FeFeFe、CrCrCr 等磁性 ensemble 偏差较大，而含 Pd/Pt/Rh 的非磁性位点更接近 parity；整体 RMSE 约 0.1–0.2 eV，火山顶附近位点变化相对小。作者因此认为非自旋极化足以做高温 broad screening，但定量研究磁性合金仍需要显式自旋或 DLM 等更严谨处理。</p>
+<h2 id="section-16">Limitations and caveats</h2>
+<ol>
+<li><strong>工况不是汽车 TWC 工况</strong>：目标为航空发动机约 1100 K、高流速尾气，不可直接外推到汽车冷启动、rich/lean oscillation 和不同空速窗口。</li>
+<li><strong>反应网络不完整</strong>：只纳入 NO–CO 核心反应，明确省略 HC oxidation，而真实 TWC 同时涉及 CO/HC 氧化和 NOx 还原以及水、蒸汽重整等副反应。</li>
+<li><strong>忽略氧化物与动态重构</strong>：Pt/Pd/Rh 在含氧尾气下可能形成 oxide/metal 共存或动态相，尤其 Pd/PdO 状态对真实 TWC 至关重要；模型将其排除。</li>
+<li><strong>mean-field 和无横向相互作用近似</strong>：高覆盖、中间体竞争、多位点 spillover 与空间相关性均未充分体现。</li>
+<li><strong>scaling 误差会指数放大</strong>：作者自己给出最坏约 6 个数量级速率不确定性，因此候选的细排序不稳健。</li>
+<li><strong>合金结构是理想化无序固溶体</strong>：未完整处理 segregation、ordering、clustering、phase separation、烧结和高温微结构演化。</li>
+<li><strong>C binding 不是完整积碳模型</strong>：它只代表碳滞留倾向，无法描述积碳生成路径、CO disproportionation、HC cracking 和氧化清除。</li>
+<li><strong>载体效应缺失</strong>：真实 Pd-TWC 常依赖 CeO₂/ZrO₂、氧储存能力、金属–载体界面和水热老化；论文是 free-standing alloy surface screening。</li>
+<li><strong>部分元素统一按 fcc 模型</strong>：对自然不稳定于 fcc 的元素，模型更多是比较性的表面化学空间映射，不应视为实际稳定相预测。</li>
+</ol>
+<h2 id="section-17">Possible actions</h2>
+<ul>
+<li><strong>实习 Pd-TWC 方法入口</strong>：可把“局部 site ensemble 概率 × 位点微动力学速率”作为 Pd 多组元催化剂设计分析的一个框架候选，但应先适配汽车真实温度、lean/rich 波动、CO/NO/HC/H₂O 组分和载体界面。</li>
+<li><strong>最小复用而非照搬候选</strong>：优先复用 N/O/CO/C 相关描述符、低配位位点比较和 ensemble weighting；不要直接把 NiCrPt 或 NiCoPd 当作实习项目候选结论。</li>
+<li><strong>Pd/CeO₂ 下一层证据</strong>：若研究支持体体系，应加入 Pd⁰/PdOₓ 状态、氧空位/氧迁移、界面 NO/CO 反应与氧储放循环，而不是只做金属合金面。</li>
+<li><strong>不确定性处理</strong>：把 scaling/BEP 只用于 broad triage；火山顶附近候选必须回到显式 DFT 势垒、局部环境采样和更完整 microkinetics。</li>
+<li><strong>Spin_SAC/HESAC 可借鉴点</strong>：局部 motif 分布与 good-site probability 的统计表达可作为方法类参照；但本文体系与 Fe–N₄ ORR 不同，不能直接迁移描述符或活性结论。</li>
+<li><strong>阅读优先级</strong>：High，精读重点应放在 alloy ensemble probability、微动力学假设和 Pd/Pt/Rh 局部位点结果；实习中真正采用前需再检查 SI、CatHub 结构和工况适配性。</li>
+</ul>
+</div><div class="credit">本文为辅助理解研究方法的中文解读。论文原图、图注及摘要内容归原作者和相应权利人；来源见文首论文链接。</div></article></main><script>window.MathJax={tex:{inlineMath:[['$','$'],['\\(','\\)']],displayMath:[['$$','$$'],['\\[','\\]']]},options:{skipHtmlTags:['script','noscript','style','textarea','pre','code']}};</script><script defer src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-mml-chtml.js"></script><footer><span>AI for Materials 文献精读</span><span>中文研究笔记 · 图与摘要注明论文来源 · 不提供论文 PDF</span></footer></body></html>

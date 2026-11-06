@@ -1,0 +1,118 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Self-single-atomization of active sites in electrochemical ammonia synthesis unveiled by machine learning potential · AI for Materials 文献精读</title><meta name="description" content="AI for Materials、原子模拟与科研智能体的中文文献解读"><link rel="stylesheet" href="../style.css"><link rel="icon" href="../icon.svg" type="image/svg+xml"></head><body><header><a class="brand" href="../index.html"><span class="mark">M</span><span>AI for Materials<small>文献精读 / RESEARCH NOTES</small></span></a><a class="header-link" href="../index.html#library">浏览文献 <span>↗</span></a></header><main class="article-layout"><aside><a href="../index.html#library">← 返回文献库</a><nav aria-label="文章目录"><a href="#section-1">Source PDF</a><a href="#section-2">Bibliographic status</a><a href="#section-3">One-line takeaway</a><a href="#section-4">What the paper asks</a><a href="#section-5">Methods</a><a href="#section-11">Main findings</a><a href="#section-18">Limitations and caveats</a><a href="#section-19">Possible actions</a></nav></aside><article><div class="eyebrow">RESEARCH NOTE / T6</div><h1>Self-single-atomization of active sites in electrochemical ammonia synthesis unveiled by machine learning potential</h1><div class="article-meta"><span>机器学习势训练与泛化</span><span>收录 2026-07-15</span><span>11 分钟阅读</span></div><a class="original" href="https://doi.org/10.1093/nsr/nwag417" target="_blank" rel="noopener noreferrer">论文原文 ↗</a><div class="prose"><h2 id="section-1">Source PDF</h2>
+<ul>
+<li><strong>读取范围</strong>：正文、Figure 1–6 对应讨论、结论及可抽取的补充方法信息</li>
+</ul>
+<h2 id="section-2">Bibliographic status</h2>
+<ul>
+<li><strong>作者</strong>：Jun Long, Chenyu Yang, Huan Li, Hao Li, Jianping Xiao</li>
+<li><strong>文献类型</strong>：Research Article，不是综述</li>
+<li><strong>期刊</strong>：National Science Review，2026，advance article / original unedited manuscript</li>
+<li><strong>DOI</strong>：https://doi.org/10.1093/nsr/nwag417</li>
+<li><strong>开放状态</strong>：CC BY 4.0</li>
+<li><strong>研究对象的准确口径</strong>：起始催化剂是 <strong>bulk Fe 电极/Fe(110) 表面模型</strong>，不是预制或负载型单原子催化剂。作者研究的是电化学 NO 还原制氨条件下，N* 在 Fe 表面累积并迁入次表层/体相，引发以氮化为主的表面重构，形成多样的表面 FeNₓ 局部结构。论文把其中部分顶位 FeNₓ motif 称为“self-single-atomized”或“SAC-like”，但明确承认重构表面仍可能保留 Fe–Fe 相互作用，因此不应简化成“Fe 单原子催化剂研究”。</li>
+</ul>
+<h2 id="section-3">One-line takeaway</h2>
+<p>这篇工作的核心不是预制 Fe 单原子，而是 <strong>bulk Fe 电极在 eNORR 工况下发生动态氮化和表面/次表层重构</strong>：NO 还原产生的 N* 高覆盖并向 Fe 内部迁移，形成一组 FeNₓ 局部 motif；其中顶位 Fe 的中间体吸附减弱，作者据此解释实验上 Fe 的高制氨活性及 N₂O→N₂→NH₃→H₂ 的电位依赖选择性。</p>
+<h2 id="section-4">What the paper asks</h2>
+<p>论文针对一个表观矛盾展开：实验上，Fe 在低浓度 NO 电化学还原制氨中可达到很高的 NH₃ 产率与 Faradaic efficiency；但以洁净 Fe(110) 为模型的静态 DFT 却预测其对含氮中间体吸附过强、制氨本征活性较差。</p>
+<p>作者试图回答四个问题：</p>
+<ol>
+<li>洁净 Fe 表面为什么不能解释已有实验活性和选择性？</li>
+<li>eNORR 工况下持续生成并累积的 N* 会如何改变 bulk Fe 电极的表面与次表层结构？</li>
+<li>氮化重构后哪些局部 FeNₓ 位点真正有利于 NH₃ 生成？</li>
+<li>同一 Fe 电极上，产物为什么会随电位依次由 N₂O、N₂、NH₃ 转向 H₂？</li>
+</ol>
+<p>其基本假设是：反应物和中间体不仅占据静态表面，还会参与构建实际活性相；因此活性位识别必须从 operando-like 动态结构集合出发，而不能只计算 pristine Fe。</p>
+<h2 id="section-5">Methods</h2>
+<h3 id="section-6">1. 洁净 Fe(110) 的静态 DFT 与机制基线</h3>
+<p>作者首先以 Fe(110) 代表 pristine bulk Fe 表面，计算 NO 向 NH₃ 转化涉及的 NOH*、N*、NH*、NH₂* 等中间体。借助 CatRPD，以吸附自由能 scaling relation 构建 eNORR 准活性图和机制图，并筛选候选反应路径。</p>
+<p>对电化学步骤，作者使用 electric-field-controlled constant-potential（EFC–CP）方法显式考虑溶剂、电场与电位影响；再以计算的反应自由能和势垒建立微观动力学模型。该部分的作用不是证明 Fe(110) 活跃，而是建立一个与实验冲突的静态基准。</p>
+<h3 id="section-7">2. N* 高覆盖与向次表层迁移</h3>
+<p>洁净 Fe 微观动力学预测，不同电位下 N* 覆盖度均可超过 90%：NO 生成 N* 较容易，而 N* 继续质子化为 NH* 较困难，导致 N* 积累。随后，作者进行 298 K AIMD，在一层 N* 覆盖的 Fe 表面观察到 N 向 subsurface 扩散。</p>
+<p>这一步表明真实工况下的 Fe 不能继续视为无氮吸附的洁净金属表面，后续应研究动态氮化后的结构集合。</p>
+<h3 id="section-8">3. REANN 机器学习势与 MLP–GCMC 结构采样</h3>
+<p>作者主要基于 AIMD 数据训练 recursively embedded atom neural network（REANN）势，用于加速 Fe–N 结构优化和大规模采样。随后在 Fe(110) 上执行与电位相关的 Grand Canonical Monte Carlo：N 化学势参考 NO、H⁺+e⁻ 和 H₂O。</p>
+<ul>
+<li>电位：−0.8、−0.5、−0.2、0.1、0.4 V vs. RHE；</li>
+<li>每个电位：100 次独立 GCMC；</li>
+<li>每次：5000 步；</li>
+<li>合计：500 次独立模拟、约 250 万个结构。</li>
+</ul>
+<p>作者明确说明，这些模拟主要用于探索可达的稳定和亚稳构型，而不是建立严格平衡的 grand-canonical ensemble。</p>
+<p>此外，作者用 DFT 驱动的竞争 GCMC 比较 N* 与 OH* 累积，因为所用 MLP 未包含 H。该比较用于判断水溶液中 Fe 是优先氮化还是羟基化。</p>
+<h3 id="section-9">4. 从动态结构集合统计局部 FeNₓ 位点</h3>
+<p>从氮化重构结构中，作者按反应物吸附几何把位点分为 top、bridge 和 hollow，并继续按局部 Fe 的 N 配位环境区分 motif。三类位点各随机选择 100 个局部结构，计算 NOH*、N*、NH*、NH₂* 的吸附自由能，以 kernel density estimation 比较吸附分布。</p>
+<p>再以 G_ad(NOH*) 和 G_ad(NH₂*) 为描述符，比较各位点的 eNORR 活性；用潜在决定步自由能 ΔG_PDS、Fe d-band center、PDOS 和 Bader charge 分析活性来源。</p>
+<h3 id="section-10">5. 产物选择性与微观动力学</h3>
+<p>作者选择代表性的 FeNₓ 顶位，计算 NH₃、N₂O、N₂ 和 H₂ 相关基元步骤：</p>
+<ul>
+<li>电化学步骤：EFC–CP；</li>
+<li>热化学 N–N 偶联：CI-NEB 初筛，并对关键步骤进一步用 EFC–CP 检查；</li>
+<li>HER：Volmer–Heyrovsky 路径，主要在 bridge 位评估；</li>
+<li>最终基于反应自由能和势垒求不同电位下各产物 TOF 与估算 FE，并与已有 Fe 电极实验趋势比较。</li>
+</ul>
+<h2 id="section-11">Main findings</h2>
+<h3 id="section-12">Figure 1：pristine Fe 的静态模型无法解释实验</h3>
+<p>CatRPD 与路径计算显示，洁净 Fe(110) 的制氨活性低于 Cu、Pt 和 Ru，与低浓度 NO 实验中 Fe 的优异表现不符。0.4 V vs. RHE 时，N* 继续质子化为 NH* 的势垒/热力学负担最高，文中给出约 0.9 eV；只有电位负至约 −0.5 V 后，连续质子化在热力学上才整体有利。但实验在 −0.2 V 已能观察到 NH₃。</p>
+<p>同样，pristine Fe 上关键 N–N 偶联势垒超过 2 eV，也难以解释低过电位区域的 N₂O 和 N₂。微观动力学则预测 N* 覆盖度超过 90%；AIMD 显示一层 N* 可进入次表层。因此 Figure 1 的真正结论是：<strong>洁净 Fe 并非工作态，N 富集会推动 Fe 表面/次表层改性。</strong></p>
+<h3 id="section-13">Figure 2：bulk Fe 电极发生以氮化为主的动态重构</h3>
+<p>在 −0.5 V 的代表性 5000 步 GCMC 中，早期 N* 不断吸附，表面覆盖度达到约 58%；之后 N 开始向 subsurface 和 bulk 迁移。到后期，五配位 N（作者用作次表层/体相 N 的标志）约占全部 N 的一半。</p>
+<p>不同电位下 500 次独立模拟共探索约 250 万个结构，显示 Fe–N 体系形成广泛的稳定/亚稳重构构型，而不是单一理想晶面。N*/OH* 竞争结果显示：</p>
+<ul>
+<li>−0.2 V 时 N* 与 OH* 都可能累积，但 OH*/N* 约为 1/4，仍以氮化为主；</li>
+<li>−0.5 和 −0.8 V 时模拟中基本只观察到氮化；</li>
+<li>−0.5 V 也是实验制氨的主要高性能电位区。</li>
+</ul>
+<p>因此，这里更准确的材料图景是：<strong>原始 bulk Fe 电极在反应条件下形成 N 富集、含次表层 N 的动态 FeNₓ/氮化重构表面</strong>。论文并未证明整个 Fe 块体完全转化为某个单一晶相的铁氮化物。</p>
+<h3 id="section-14">Figure 3：不同 FeNₓ 局部位点具有宽分布，顶位整体吸附较弱</h3>
+<p>氮化过程中，表面 Fe 可具有 1–4 个局部 N 配位，并形成 top、bridge、hollow 等不同吸附位。对三类各 100 个样本的统计显示：</p>
+<ul>
+<li>top 位对 NOH*、N*、NH*、NH₂* 的吸附整体比 pristine Fe 弱；</li>
+<li>bridge 与 hollow 的吸附分布更负、更接近 pristine Fe；</li>
+<li>pristine Fe 的主要问题是含氮中间体结合过强，阻碍 N* 逐步质子化；</li>
+<li>因此，氮化重构并非所有位点都同样变好，而是产生了活性差异很大的局部位点分布。</li>
+</ul>
+<h3 id="section-15">Figure 4：FeNₓ 顶位是作者识别出的高活性 motif</h3>
+<p>以 G_ad(NOH*) 和 G_ad(NH₂*) 为描述符时，多数 top 位落在比 pristine Fe 更有利的活性区域；bridge/hollow 中只有部分改善。ΔG_PDS 的 KDE 峰值在 top 位约为 −0.25 eV，而 pristine Fe 为 0.48 eV；bridge 和 hollow 的分布峰接近 pristine Fe。</p>
+<p>代表性 top 位在 0 V vs. RHE 下的各步均可为放热，而 pristine Fe 上 NH*、NH₂* 的继续质子化仍不利。电子结构分析给出的解释是：</p>
+<ul>
+<li>FeNₓ top 位的 Fe d-band center 分布峰约 −0.95 eV，低于 pristine Fe 的约 0.01 eV；</li>
+<li>氮化后 Fe 向配位 N 转移电子，Fe 4s–中间体 N 2p 相互作用减弱；</li>
+<li>最终使含氮中间体的吸附不再过强。</li>
+</ul>
+<p>这是一种 <strong>局部氮配位调节 bulk Fe 表面位点电子结构</strong> 的解释，不应转写成“孤立 Fe 原子脱离金属基体后成为唯一活性中心”。</p>
+<h3 id="section-16">Figure 5：作者把部分 FeNₓ motif 定义为“SAC-like”，但不等于预制 SAC</h3>
+<p>代表性 FeNₓ top 位与吡啶型 FeN₄、吡咯型 FeN₄ 和 FePc 的中间体吸附自由能差别小于约 0.35 eV；其 ΔG_PDS（约 −0.25 eV）也接近 pyrrolic-FeN₄（−0.31 eV）和 FePc（−0.36 eV）。因此作者提出“in situ self-single-atomization”。</p>
+<p>但正文同时明确限定：生成的 FeNₓ 中心虽具有类似 Fe–N–C SAC 的局部结构和催化特征，<strong>重构表面仍可能保留较弱的 Fe–Fe 相互作用</strong>。所以本图更合理的理解是：氮化后的 bulk Fe 表面产生了 <strong>局部 SAC-like FeNₓ motif</strong>，而不是证明 Fe 电极转化为传统意义上彼此完全隔离、由惰性载体锚定的 Fe 单原子催化剂。</p>
+<h3 id="section-17">Figure 6：FeNₓ 工作态可定性重现实验的电位依赖选择性</h3>
+<p>在代表性 FeNₓ top 位上，NH₃ 路径的速率决定步骤从 pristine Fe 的 N* 质子化转为 NOH* 质子化，且势垒降低。N*+NO_g→N₂O* 接近无势垒，N*–NOH* 偶联势垒约 0.10–0.12 eV，可解释低过电位下的 N₂O/N₂。</p>
+<p>微观动力学定性重现了实验趋势：</p>
+<ul>
+<li>较正电位：N₂O 占优；</li>
+<li>电位负移至约 0 V：NOH* 覆盖增加，N*–NOH* 偶联促进 N₂；</li>
+<li>进一步负移：电化学 N* 质子化势垒下降，NH₃ 超过 N₂，在约 −0.5 V 达到约 92% 的模拟 FE 峰值；</li>
+<li>低于约 −0.5/−0.6 V：Volmer 步对电位更敏感，HER 逐渐占优。</li>
+</ul>
+<p>模型与实验在 −0.2 至 0.1 V 左右的 N₂ FE 有定量偏差。作者进一步加入 OH* 影响：邻近 OH* 将 N*–NOH* 偶联势垒由约 0.1 eV 提高到 0.35 eV，可部分解释实验 N₂ 选择性更低。</p>
+<h2 id="section-18">Limitations and caveats</h2>
+<ol>
+<li><strong>“self-single-atomization”是作者的概念化命名，不是直接结构证据。</strong> 工作主要依靠 DFT、MLP–GCMC、AIMD 与微观动力学；正文没有给出 operando XAS、Mössbauer、XRD 或显微证据直接确认工作态 FeNₓ 局部结构。</li>
+<li><strong>起点是 bulk Fe，工作态是氮化重构表面。</strong> 不能把论文归类成常规 Fe–N–C 单原子催化剂设计；更不能写成“预制 Fe 单原子负责制氨”。</li>
+<li><strong>不宜把结果过度外推为单一 bulk iron nitride 晶相。</strong> GCMC 显示 N 进入表面、次表层及部分 bulk，并形成多样 FeNₓ motif；论文没有证明整个电极形成某种均一、长程有序的 FeₓN 晶相。</li>
+<li><strong>GCMC 不是严格平衡采样。</strong> 作者明确把 5000 步运行用于探索稳定/亚稳构型，而非收敛的 grand-canonical ensemble；位点概率不能直接等价为真实 operando 丰度。</li>
+<li><strong>MLP 体系不含 H。</strong> N*/OH* 竞争需要转用规模更有限的 DFT–GCMC；水、质子、电解质和界面电场对动态相稳定性的耦合没有被统一纳入同一势模型。</li>
+<li><strong>位点活性统计存在抽样与描述符近似。</strong> 每类 100 个位点可显示分布趋势，但未证明覆盖所有相关表面、缺陷、晶粒边界和动态构型；CatRPD/scaling 也会带来模型误差。</li>
+<li><strong>选择性验证以趋势一致为主。</strong> 模型可定性重现实验 FE 随电位变化，但并非所有电位和产物都定量吻合；OH* 的事后修正说明真实界面比核心模型更复杂。</li>
+<li><strong>实验数据主要来自既有文献。</strong> 本文不是同一批次 operando 结构表征、催化测试和理论闭环的新实验研究，因果链仍需专门实验验证。</li>
+<li><strong>FeNₓ 位点可能随电位和时间继续演化。</strong> 论文用代表性位点计算后续动力学，但实际反应中位点分布、N 化学势和表面组成可能与选择性同步改变。</li>
+</ol>
+<h2 id="section-19">Possible actions</h2>
+<ul>
+<li><strong>对动态催化演变的可用启发</strong>：把工作态活性相识别从“单个静态 slab”升级为 <code>反应中间体覆盖 → 表面/次表层迁移 → 动态相集合 → 位点分布 → 微观动力学</code> 的串联流程。</li>
+<li><strong>与 Spin_SAC/HESAC 严格区分</strong>：本文是 bulk Fe 电极的反应诱导氮化和局部 FeNₓ motif，不是 Fe–N₄ 碳载体 SAC 数据库；只可借鉴“局部 N 配位与位点分布”的方法思想，不能混用材料定义或活性结论。</li>
+<li><strong>CatMaster/计算基础设施启发</strong>：MLP–GCMC 适合做工作态结构候选生成，但结果必须附带 DFT 回标、动力学验证、采样收敛说明与 operando evidence gap，不能把“程序探索到”直接当成“实验中存在”。</li>
+<li><strong>后续若引用这篇论文，建议使用的安全表述</strong>：<code>bulk Fe electrode undergoes reaction-induced nitridation and surface/subsurface reconstruction, generating diverse FeNₓ motifs; SAC-like top-site motifs were computationally proposed as active configurations.</code></li>
+<li><strong>不建议使用的表述</strong>：<code>Fe single atoms are the catalyst</code>、<code>bulk Fe fully transforms into a single iron nitride phase</code>、<code>operando experiments directly observed isolated Fe atoms</code>。</li>
+<li><strong>最值得补的验证</strong>：电位分辨 operando XAS/Mössbauer 或同位素/准原位结构表征；不同电位下 Fe–N 与 Fe–Fe 配位数变化；铁氮化物相/局部 motif 与 FE 的时间相关；显式水和电解质条件下的动态相稳定性。</li>
+</ul>
+</div><div class="credit">本文为辅助理解研究方法的中文解读。论文原图、图注及摘要内容归原作者和相应权利人；来源见文首论文链接。</div></article></main><script>window.MathJax={tex:{inlineMath:[['$','$'],['\\(','\\)']],displayMath:[['$$','$$'],['\\[','\\]']]},options:{skipHtmlTags:['script','noscript','style','textarea','pre','code']}};</script><script defer src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-mml-chtml.js"></script><footer><span>AI for Materials 文献精读</span><span>中文研究笔记 · 图与摘要注明论文来源 · 不提供论文 PDF</span></footer></body></html>

@@ -1,0 +1,47 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Benchmarking Compositional Generalisation for Machine Learning Interatomic Potentials · AI for Materials 文献精读</title><meta name="description" content="AI for Materials、原子模拟与科研智能体的中文文献解读"><link rel="stylesheet" href="../style.css"><link rel="icon" href="../icon.svg" type="image/svg+xml"></head><body><header><a class="brand" href="../index.html"><span class="mark">M</span><span>AI for Materials<small>文献精读 / RESEARCH NOTES</small></span></a><a class="header-link" href="../index.html#library">浏览文献 <span>↗</span></a></header><main class="article-layout"><aside><a href="../index.html#library">← 返回文献库</a><nav aria-label="文章目录"><a href="#section-1">What the paper asks</a><a href="#section-2">Methods and data</a><a href="#section-3">Main findings</a><a href="#section-4">Key evidence</a><a href="#section-5">Limitations and caveats</a><a href="#section-6">Relevance to user projects</a><a href="#section-7">Possible actions</a><a href="#section-8">Citation notes</a></nav></aside><article><div class="eyebrow">RESEARCH NOTE / T8</div><h1>Benchmarking Compositional Generalisation for Machine Learning Interatomic Potentials</h1><div class="article-meta"><span>智能体技术与科研系统</span><span>收录 2026-05-18</span><span>3 分钟阅读</span></div><a class="original" href="https://arxiv.org/abs/2605.08988" target="_blank" rel="noopener noreferrer">论文原文 ↗</a><div class="prose"><ul>
+<li><strong>Bibliographic status</strong>: Amir Masoud Nourollah, Irtaza Khalid, Stefano Leoni, Steven Schockaert, 2026, arXiv:2605.08988, 待核对正式发表状态。</li>
+<li><strong>One-line takeaway</strong>: 该文系统评估 MLIP 在“组合成分泛化”上的能力，强调 foundation model/finetuned model 在 OOD composition 上仍有明显短板；适合 CSR Review 和 NFPP/MLFF 方法讨论。</li>
+</ul>
+<h2 id="section-1">What the paper asks</h2>
+<p>机器学习势能可以加速材料模拟，但真正材料发现常要求模型外推到未见过的元素组合或组分空间。论文关注 compositional generalisation：模型能否从已见组合泛化到新组合，而不仅是同分布测试集高精度。</p>
+<h2 id="section-2">Methods and data</h2>
+<ul>
+<li>构建/使用 compositional generalisation benchmark。</li>
+<li>比较多类 MLIP 架构或模型，包括文中提到的 SchNet、TorchMD、PaiNN、NequIP、Allegro、MACE 等。</li>
+<li>设计不同 fragment/composition 相关任务，例如 fragment fusion、fragment duplication、fragment combination/chain extension 等，用来区分 ID 与 OOD 泛化。</li>
+</ul>
+<h2 id="section-3">Main findings</h2>
+<ul>
+<li>常规 ID 测试性能不能代表 composition OOD 性能。</li>
+<li>不同 MLIP 架构在组合泛化任务上的表现差异明显。</li>
+<li>foundation model 或大数据预训练不是自动解决 compositional extrapolation 的万能方案；OOD 仍需专门评估。</li>
+<li>该文把“组合泛化”作为独立 benchmark 问题提出，有助于避免只报告随机 split RMSE。</li>
+</ul>
+<h2 id="section-4">Key evidence</h2>
+<ul>
+<li>题名和摘要明确指出 benchmarking compositional generalisation。</li>
+<li>文中列出多个任务类型，用于测试 fragment-level 或 composition-level 的泛化。</li>
+<li>该问题与当前 MLFF 在新掺杂元素/新材料空间使用时的主要风险一致。</li>
+</ul>
+<h2 id="section-5">Limitations and caveats</h2>
+<ul>
+<li>具体最优模型、数值排名和数据集范围需进一步核对表格。</li>
+<li>benchmark 任务是否贴近催化表面、离子扩散或 MOF 吸附，需要单独判断。</li>
+<li>对 NFPP 这类结构相近但元素替换的任务，composition OOD 风险存在，但不一定等同于该文 benchmark 的 hardest split。</li>
+</ul>
+<h2 id="section-6">Relevance to user projects</h2>
+<ul>
+<li><strong>NFPP MLFF</strong>：提醒不能只看测试集 RMSE；要考虑元素/掺杂组合外推，尤其 round2 新元素组合。</li>
+<li><strong>CSR Review</strong>：可作为 MLIP generalization/OOD evaluation 关键文献。</li>
+<li><strong>CatMaster</strong>：可支持 validation gates：agent 使用 MLFF 时需要知道模型适用域。</li>
+</ul>
+<h2 id="section-7">Possible actions</h2>
+<ol>
+<li>CSR Review 中加入 “compositional generalisation benchmark for MLIPs” 小节或例句。</li>
+<li>NFPP 若写方法说明，可强调当前 MLFF 使用 replay strategy 和 representative structures 来缓解 OOD，但仍需 smoke test/DFT backing。</li>
+</ol>
+<h2 id="section-8">Citation notes</h2>
+<ul>
+<li>arXiv:2605.08988；正式引用前核对 benchmark 名称和各模型结果。</li>
+</ul>
+</div><div class="credit">本文为辅助理解研究方法的中文解读。论文原图、图注及摘要内容归原作者和相应权利人；来源见文首论文链接。</div></article></main><script>window.MathJax={tex:{inlineMath:[['$','$'],['\\(','\\)']],displayMath:[['$$','$$'],['\\[','\\]']]},options:{skipHtmlTags:['script','noscript','style','textarea','pre','code']}};</script><script defer src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-mml-chtml.js"></script><footer><span>AI for Materials 文献精读</span><span>中文研究笔记 · 图与摘要注明论文来源 · 不提供论文 PDF</span></footer></body></html>

@@ -1,0 +1,67 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>How reliable are Large Language Models in grading student work? · AI for Materials 文献精读</title><meta name="description" content="AI for Materials、原子模拟与科研智能体的中文文献解读"><link rel="stylesheet" href="../style.css"><link rel="icon" href="../icon.svg" type="image/svg+xml"></head><body><header><a class="brand" href="../index.html"><span class="mark">M</span><span>AI for Materials<small>文献精读 / RESEARCH NOTES</small></span></a><a class="header-link" href="../index.html#library">浏览文献 <span>↗</span></a></header><main class="article-layout"><aside><a href="../index.html#library">← 返回文献库</a><nav aria-label="文章目录"><a href="#section-1">Source PDF</a><a href="#section-2">Bibliographic status</a><a href="#section-3">One-line takeaway</a><a href="#section-4">What the paper asks</a><a href="#section-5">Methods and data</a><a href="#section-6">Main findings</a><a href="#section-7">Key evidence</a><a href="#section-8">Limitations and caveats</a><a href="#section-9">Relevance to user projects</a><a href="#section-10">Possible actions</a><a href="#section-11">Citation notes</a></nav></aside><article><div class="eyebrow">RESEARCH NOTE / T8</div><h1>How reliable are Large Language Models in grading student work?</h1><div class="article-meta"><span>智能体技术与科研系统</span><span>收录 2026-05-11</span><span>4 分钟阅读</span></div><div class="prose"><h2 id="section-1">Source PDF</h2>
+<h2 id="section-2">Bibliographic status</h2>
+<ul>
+<li>标题：<em>How reliable are Large Language Models in grading student work?</em></li>
+<li>作者：Ahmed Muharram</li>
+<li>年份：2026</li>
+<li>类型/venue：Master’s thesis, Uppsala University, Department of Information Technology（PDF 封面信息）</li>
+<li>DOI：待核对（学位论文 PDF 文本未见 DOI）</li>
+<li>其他标识：待核对（可能有 university repository record）</li>
+</ul>
+<h2 id="section-3">One-line takeaway</h2>
+<p>这篇硕士论文系统评估 LLM 自动批改学生作业的可靠性，发现模型能在部分场景接近人工评分，但对 prompt、rubric、样本分布和输入扰动高度敏感，因此更适合作为辅助批改/反馈工具而不是独立高风险评分者。</p>
+<h2 id="section-4">What the paper asks</h2>
+<ul>
+<li>教育场景中，LLM 被用于生成反馈、评分和批改，但“能否可靠替代人工评分”仍缺少细粒度证据。</li>
+<li>论文关心的问题包括：LLM 分数与人工分数的一致性如何？模型在不同 rubric、任务类型、prompt 条件下是否稳定？对文本微小变化/扰动是否会产生 grading flip？</li>
+<li>还有一个实际问题：如何设计面向教学使用的 LLM grading workflow，既提高效率又控制误判风险？</li>
+</ul>
+<h2 id="section-5">Methods and data</h2>
+<ul>
+<li>研究类型：硕士论文中的实证评估/系统实验。</li>
+<li>数据：学生作业/答案及人工评分或参考评分（具体课程、题目数量、样本规模需按正文表格核对）。</li>
+<li>模型/条件：不同 LLM、prompting strategy、rubric 表述、评分尺度或反馈格式；论文中还讨论模型不确定性、行为翻转和评分一致性。</li>
+<li>指标：与人工评分的一致性、相关性、误差、可能包括 quadratic weighted kappa（QWK）等评分一致性指标；并分析 grading flip / sensitivity。</li>
+<li>输出：不仅看数值分数，也关注解释/反馈文本的质量与潜在偏差。</li>
+</ul>
+<h2 id="section-6">Main findings</h2>
+<ul>
+<li>LLM 可以在结构化 rubric 和明确评分标准下达到可用的一致性，但不稳定性明显：prompt phrasing、上下文长度、rubric 模糊性会改变结果。</li>
+<li>对边界样本、模糊答案、部分正确答案，模型更容易与人工评分分歧。</li>
+<li>LLM 的解释性反馈看似流畅，但可能掩盖评分依据不一致或 hallucinated rationale。</li>
+<li>最稳妥的定位是 human-in-the-loop：先由 LLM 做初筛、反馈草稿或第二意见，再由教师/助教审核高风险或低置信样本。</li>
+</ul>
+<h2 id="section-7">Key evidence</h2>
+<ul>
+<li>论文包含对多个实验条件下评分一致性的表格与对比，核心证据来自 LLM score 与 human score 的量化一致性。</li>
+<li>文中对 “flip rate/behavior flip” 类现象的讨论显示：同一作业在不同提示或扰动下可能得到不同判定。</li>
+<li>结果章节还把失败归因到 rubric 表述、题目开放度、答案长度/风格、模型自信但错误的解释等因素。</li>
+<li>结论/建议部分强调 shared limitations 与 design recommendations，说明作者并未把高分案例解释为可完全自动化。</li>
+</ul>
+<h2 id="section-8">Limitations and caveats</h2>
+<ul>
+<li>由于是硕士论文，样本和课程范围可能有限；不同学科、语言、评分尺度的外推需谨慎。</li>
+<li>PDF 文本抽取中表格数字不够完整；本卡未强行填入无法核实的具体 QWK/相关系数。</li>
+<li>LLM 版本、温度、系统提示和 API 更新都会影响可重复性。</li>
+<li>人工评分本身也有噪声；“与人工一致”不等于“绝对正确”。</li>
+<li>DOI/仓库记录、完整数据可用性需进一步核对。</li>
+</ul>
+<h2 id="section-9">Relevance to user projects</h2>
+<ul>
+<li>对任何“LLM 评价器/LLM-as-judge”项目都有直接借鉴意义：它提醒不能只看平均一致性，还要看 flip、边界样本和 rubric 敏感性。</li>
+<li>如果你在做科研 agent 评测或自动打分，可以把教育评分中的 reliability、inter-rater agreement、human audit 机制迁移过来。</li>
+<li>对构建中文科研助理也相关：输出建议、评分或排序时，应显式标注置信度并保留人工复核入口。</li>
+</ul>
+<h2 id="section-10">Possible actions</h2>
+<ul>
+<li>复核 PDF 中具体实验表格，抽出 QWK/相关系数/flip rate 等数字，补成更精确的实验摘要。</li>
+<li>若用于自己的评测系统，建立 rubric perturbation test：同一答案在不同 rubric phrasing 下是否稳定。</li>
+<li>设计 grading agent 时加入：双模型复核、低置信/高分歧样本人工审核、评分理由引用 rubric 条款、日志留存。</li>
+<li>检查论文是否有公开数据或代码；如无，可只借鉴方法和风险分类。</li>
+</ul>
+<h2 id="section-11">Citation notes</h2>
+<ul>
+<li>建议引用格式（待核对）：Muharram, A. <em>How reliable are Large Language Models in grading student work?</em> Master’s thesis, Uppsala University, Department of Information Technology, 2026.</li>
+<li>元数据待核对：导师/审阅人、repository URL、永久标识符、具体提交日期。</li>
+</ul>
+</div><div class="credit">本文为辅助理解研究方法的中文解读。论文原图、图注及摘要内容归原作者和相应权利人；来源见文首论文链接。</div></article></main><script>window.MathJax={tex:{inlineMath:[['$','$'],['\\(','\\)']],displayMath:[['$$','$$'],['\\[','\\]']]},options:{skipHtmlTags:['script','noscript','style','textarea','pre','code']}};</script><script defer src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-mml-chtml.js"></script><footer><span>AI for Materials 文献精读</span><span>中文研究笔记 · 图与摘要注明论文来源 · 不提供论文 PDF</span></footer></body></html>

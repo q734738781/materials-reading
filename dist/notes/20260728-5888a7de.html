@@ -1,0 +1,56 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>MOF-Sleuth: Tool-Grounded Reward Alignment for Explainable Fine-Grained MOF CIF Auditing · AI for Materials 文献精读</title><meta name="description" content="AI for Materials、原子模拟与科研智能体的中文文献解读"><link rel="stylesheet" href="../style.css"><link rel="icon" href="../icon.svg" type="image/svg+xml"></head><body><header><a class="brand" href="../index.html"><span class="mark">M</span><span>AI for Materials<small>文献精读 / RESEARCH NOTES</small></span></a><a class="header-link" href="../index.html#library">浏览文献 <span>↗</span></a></header><main class="article-layout"><aside><a href="../index.html#library">← 返回文献库</a><nav aria-label="文章目录"><a href="#section-1">Bibliographic status</a><a href="#section-2">One-line takeaway</a><a href="#section-3">What the paper asks</a><a href="#section-4">Methods</a><a href="#section-5">Main findings</a><a href="#section-6">Limitations and caveats</a><a href="#section-7">Possible actions</a></nav></aside><article><div class="eyebrow">RESEARCH NOTE / T8</div><h1>MOF-Sleuth: Tool-Grounded Reward Alignment for Explainable Fine-Grained MOF CIF Auditing</h1><div class="article-meta"><span>智能体技术与科研系统</span><span>收录 2026-07-28</span><span>5 分钟阅读</span></div><a class="original" href="https://arxiv.org/abs/2607.19935" target="_blank" rel="noopener noreferrer">论文原文 ↗</a><div class="prose"><h2 id="section-1">Bibliographic status</h2>
+<ul>
+<li>作者：Yu Liu, Zhiwei Yang, Diandian Guo 等</li>
+<li>状态：arXiv <code>2607.19935v1</code>（2026-07-26）</li>
+<li>全文状态：PDF 已归档，MinerU 解析成功（21 页）。</li>
+<li>High 类型：<strong>Incremental insight</strong></li>
+<li>对应项目：PX-New/MOF；CatMaster</li>
+</ul>
+<h2 id="section-2">One-line takeaway</h2>
+<p>MOF-Sleuth 证明 MOF CIF 审核的瓶颈不是更大的 LLM，而是把几何、连接、占位、配位和电荷等确定性工具结果变成可引用证据，并用 reward 对齐“为什么判错”；这可直接作为 PX-New 结构输入的前置审计层，也为 CatMaster 提供 tool evidence→grounded explanation 的可量化范式。</p>
+<h2 id="section-3">What the paper asks</h2>
+<ol>
+<li>如何从“CIF 是否可用”的二分类，推进到细粒度错误归因和逐条证据解释？</li>
+<li>为什么直接让 LLM 读取长 CIF 会失败，扩大模型或使用通用 agent scaffold 是否能解决？</li>
+<li>如何将确定性化学工具输出变成 explanation-level reward，而不只奖励最终答案？</li>
+<li>如何不用 LLM judge，确定性评价诊断解释是否真实、相关并支持所报错误类型？</li>
+</ol>
+<h2 id="section-4">Methods</h2>
+<ul>
+<li>将任务定义为 closed-evidence CIF audit：只允许使用从 CIF 计算出的证据，不查外部数据库/文献。</li>
+<li>定义 15 类细粒度错误（14 个命名类型 + other），上层归到 charge、hydrogen、disorder、other 四类。</li>
+<li><strong>Forensic Lab</strong>：8 类确定性工具，完成 CIF parsing、composition/cell accounting、occupancy、periodic geometry、cutoff-graph connectivity、functional-group recognition、coordination/bridge 和 charge ledger；输出 facts、hard flags、soft signals、context 与 citation aliases。</li>
+<li><strong>Sleuth</strong>：Qwen3-4B-Instruct，经 full-parameter GRPO 训练，输出 schema-constrained explanation、错误类型集合和 binary verdict。</li>
+<li>六类 deterministic reward 覆盖 answer、type、format、consistency、grounding (<code>Rgrd</code>) 和 evidence-supported diagnosis (<code>Revid</code>)。</li>
+<li>提出 Chem-GD：要求 verdict 正确、引文真实、type/answer 一致、诊断受工具证据支持且 evidence 与 diagnosis 有关联；按类别平衡，避免全报 clean。</li>
+<li>在 CoRE-MOF 2019/2026、ToBaCCo、QMOF 四个套件上评估，每套 1000 CIF；比较 raw-CIF LLM、13 个通用 agent scaffold、前沿 API 模型及 MOFChecker/MOFClassifier/SETC-GAT。</li>
+</ul>
+<h2 id="section-5">Main findings</h2>
+<ol>
+<li><strong>Figure 1–3：原始 CIF 隐含证据过多。</strong> 语法可读不等于化学可计算；缺氢、占位、配位、电荷和 disorder 需要跨表格推导，LLM 很难直接可靠完成。</li>
+<li><strong>模型规模和通用 agent 都不是解法。</strong> raw-CIF Qwen 4B–30B 平均 accuracy 0.414–0.463，13 个通用 agent scaffold 为 0.410–0.487；前沿 API 模型最高平均 accuracy 也只有 0.698。</li>
+<li><strong>MOF-Sleuth 综合领先。</strong> 四套件平均 accuracy 0.781、Type-Hit Acc 0.712、Chem-GD 0.713，并在三套件上领先。</li>
+<li><strong>工具证据是主要增益来源。</strong> 同一个冻结 4B auditor，用 Forensic Lab report 替代 raw CIF 后，平均 accuracy 由 0.441 升至 0.568，Chem-GD 由 0.055 升至 0.229。</li>
+<li><strong>reward 对齐改善“如何使用证据”。</strong> 在 ToBaCCo，SFT 为 Acc/Chem-GD 0.796/0.023，完整 GRPO 为 0.943/0.640；移除 grounding reward 后 Chem-GD 降至 0.041，移除 evidence-support reward 后降至 Acc/Chem-GD 0.856/0.471。</li>
+<li><strong>工具敏感性需要校准。</strong> 冻结 tool-report auditor 只漏 14 个错误，却误报 355 个 clean；RL 后漏报 24、误报降至 33，说明工具 flags 不能直接等同 verdict。</li>
+<li><strong>verdict-preserving refinement 改善归因而不改变判断。</strong> 在相同 accuracy 0.943 下，Chem-GD 从 0.640 提到 0.866；盲审中 Type-Hit Acc 增加 0.240、Jaccard 增加 0.091。</li>
+<li><strong>专家验证支持可用性。</strong> binary verdict agreement 0.930，Cohen’s κ=0.860；错误样本 15-type attribution 的 Type-Hit Acc 0.700；Chem-GD 对 expert-supported diagnoses precision 0.938、agreement 0.720。</li>
+<li><strong>效率优势来自压缩证据。</strong> 本地 4B 模型平均 2.04 s/example、17.50M tokens；API 模型为 4.62–13.82 s/example、49.86–72.83M tokens，4000 次审核估计成本约 42–919 美元。</li>
+<li><strong>对 PX-New 的直接意义</strong>：CoRE-MOF 筛选中任何 CIF 错误都可能传播到清洗、孔径、吸附和 family 归纳；应在新计算前输出结构 audit report，而不是默认数据库条目 computation-ready。</li>
+</ol>
+<h2 id="section-6">Limitations and caveats</h2>
+<ul>
+<li>15 类细分标签并非已有公共统一标准，依赖专家判断和工具信号定义。</li>
+<li>Forensic Lab 的 cutoff、charge/protonation 与 functional-group 规则可能对边界体系产生误报。</li>
+<li>closed-evidence 设置不利用原始实验论文、合成条件或数据库修订历史，因此诊断不等同最终修复。</li>
+<li>QMOF 仅 23/1000 erroneous，普通 accuracy 容易被类别失衡误导，需结合 recall 和 Chem-GD。</li>
+<li>论文评价“可审核性”，没有证明修正后的 CIF 会改善 PX 吸附能或排名。</li>
+</ul>
+<h2 id="section-7">Possible actions</h2>
+<ol>
+<li>对 PX-New 仅在需要新增/复算候选时加一个前置 audit：重点检查 missing H、occupancy/disorder、charge balance、metal coordination 和 free guest；不回溯重做已完成全部计算。</li>
+<li>将 audit 结果存为结构 artifact 的伴随报告，并保留 field-level evidence、hard flag 和最终人工 verdict。</li>
+<li>CatMaster 可借鉴“deterministic tool evidence + constrained explanation + deterministic metric”，不要用更长 CoT 代替证据。</li>
+<li>若代码开放，先用 5–10 个 PX 候选 CIF 做 smoke test，核对与现有清洗记录的一致性，再决定是否纳入工具库。</li>
+</ol>
+</div><div class="credit">本文为辅助理解研究方法的中文解读。论文原图、图注及摘要内容归原作者和相应权利人；来源见文首论文链接。</div></article></main><script>window.MathJax={tex:{inlineMath:[['$','$'],['\\(','\\)']],displayMath:[['$$','$$'],['\\[','\\]']]},options:{skipHtmlTags:['script','noscript','style','textarea','pre','code']}};</script><script defer src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-mml-chtml.js"></script><footer><span>AI for Materials 文献精读</span><span>中文研究笔记 · 图与摘要注明论文来源 · 不提供论文 PDF</span></footer></body></html>

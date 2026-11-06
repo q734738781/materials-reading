@@ -1,0 +1,57 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>CADAQUES: A Cost-Aware Dual Architecture for Query-Efficient Autonomous Discovery · AI for Materials 文献精读</title><meta name="description" content="AI for Materials、原子模拟与科研智能体的中文文献解读"><link rel="stylesheet" href="../style.css"><link rel="icon" href="../icon.svg" type="image/svg+xml"></head><body><header><a class="brand" href="../index.html"><span class="mark">M</span><span>AI for Materials<small>文献精读 / RESEARCH NOTES</small></span></a><a class="header-link" href="../index.html#library">浏览文献 <span>↗</span></a></header><main class="article-layout"><aside><a href="../index.html#library">← 返回文献库</a><nav aria-label="文章目录"><a href="#section-1">Bibliographic status</a><a href="#section-2">One-line takeaway</a><a href="#section-3">What the paper asks</a><a href="#section-4">Methods</a><a href="#section-5">Main findings</a><a href="#section-6">Limitations and caveats</a><a href="#section-7">Possible actions</a></nav></aside><article><div class="eyebrow">RESEARCH NOTE / T8</div><h1>CADAQUES: A Cost-Aware Dual Architecture for Query-Efficient Autonomous Discovery</h1><div class="article-meta"><span>智能体技术与科研系统</span><span>收录 2026-07-26</span><span>5 分钟阅读</span></div><a class="original" href="https://doi.org/10.5281/zenodo.21293589" target="_blank" rel="noopener noreferrer">论文原文 ↗</a><div class="prose"><h2 id="section-1">Bibliographic status</h2>
+<ul>
+<li>作者：Jorge Bravo-Abad</li>
+<li>状态：arXiv preprint <code>2607.16127v1</code>（2026-07-21）</li>
+<li>软件：CADAQUES v0.1.0，MIT License；Zenodo DOI <code>10.5281/zenodo.21293589</code></li>
+<li>全文状态：arXiv PDF 已取得，MinerU 解析成功（46 页）。</li>
+<li>High 类型：<strong>Incremental insight</strong></li>
+<li>对应项目：CatMaster</li>
+</ul>
+<h2 id="section-2">One-line takeaway</h2>
+<p>CADAQUES 把查询成本和 agent 决策成本提升为协议级一等对象：Oracle/Driver 双接口、向量预算、declared/settled cost 与 append-only ledger，为 CatMaster 的 DFT/MLIP/HPC/LLM 远程执行、成本控制和可恢复审计提供了可直接借鉴的小型架构。</p>
+<h2 id="section-3">What the paper asks</h2>
+<ol>
+<li>当 DFT、MLFF、仪器和 LLM planner 的成本相差多个数量级时，为何固定迭代次数不能公平描述 discovery campaign？</li>
+<li>如何让算法在提交查询前知道价格/剩余预算，并在执行后记录真实结算成本？</li>
+<li>如何统一计量 oracle 查询与 driver 决策，避免把 LLM token 或 surrogate fitting 当成免费？</li>
+<li>最小公共协议能否兼容模拟器、仪器、经典优化器和语言 agent，并留下可重建的 provenance？</li>
+</ol>
+<h2 id="section-4">Methods</h2>
+<ul>
+<li><strong>架构</strong>：用 Python <code>typing.Protocol</code> 定义 Oracle (<code>price</code>, <code>evaluate</code>) 与 Driver (<code>propose</code>, <code>observe</code>)；无需继承框架基类。</li>
+<li><strong>数据模型</strong>：冻结 dataclass <code>Cost</code>、<code>Query</code>、<code>Result</code>。Cost 包含 seconds、CPU hours、euros、tokens；Query 把 design params 与 fidelity 分开。</li>
+<li><strong>预算语义</strong>：向量资源逐分量约束；declared cost 用于 admission，settled cost 在完成后无条件计费；允许观测成本估计偏差。</li>
+<li><strong>provenance</strong>：append-only frozen Transaction ledger 记录负责方、declared/settled cost、时间戳、query/fidelity、结果与元数据，可导出 JSONL。</li>
+<li><strong>实验</strong>：二维 Ising 模型临界温度定位；比较随机、budget-adaptive annealed local 与 GP-EI driver；另比较低保真、高保真与低→高保真 schedule。</li>
+<li><strong>公平性</strong>：统一 nominal 10 s 预算，计入 GP proposal 时间；10 个 seed；报告误差、失败数、driver cost share 和 cost overrun。</li>
+<li><strong>工程验证</strong>：761 行非空 Python、1 个运行依赖 NumPy，CPython 3.10–3.12 CI；测试预算、ledger、终止和 oracle 行为。</li>
+</ul>
+<h2 id="section-5">Main findings</h2>
+<ol>
+<li><strong>Figure 1–2：双协议足以表达闭环最小骨架。</strong> Driver 读取历史和只读 BudgetView 后提议 Query；Oracle 先报价再执行；campaign runner 统一计费并记录每笔交易。</li>
+<li><strong>五项要求明确化</strong>：typed vector cost、budget admission/termination、declared vs settled、oracle/driver symmetric charging、transactional provenance。它们正对应 CatMaster 当前成本、队列、远程回执和审计需求。</li>
+<li><strong>fidelity 是类型级字段。</strong> 同一结构的 MLFF、低精度 DFT 和高精度 DFT 可被表示为同一 design point 的不同 fidelity，而不是埋在自由文本参数里。</li>
+<li><strong>declared/settled 分离暴露预测误差。</strong> 实验中故意沿用旧硬件校准，median settled query cost 比 declared 高 652%（约 7.5 倍）。ledger 让误差可见并可用于重标定，而非被隐藏在日志。</li>
+<li><strong>Figure 4：昂贵 planner 不保证更好。</strong> 固定 10 s 下随机搜索 median error 0.069；GP-EI median 0.086，并将 3.2% settled expenditure 用于 deliberation；10 seed 的比较不支持 concentrating strategy 优于随机。</li>
+<li><strong>关键失败模式是 incumbent capture。</strong> 噪声峰会诱导 annealed/GP 方法持续集中错误区域；budget-aware 接口只是可表达能力，不是性能保证。</li>
+<li><strong>低→高保真 schedule 在该任务/预算下更稳。</strong> 先以低成本广泛探索，再在后半预算用高保真局部细化，比全程高保真得到更低且波动更小的观察误差；作者谨慎限定为该实验尺度。</li>
+<li><strong>计量开销很低。</strong> ledger/metering 每次仅几十微秒，约比最便宜 oracle 查询低三个数量级。</li>
+<li><strong>对 CatMaster 的迁移重点不是复用整个包，而是接口语义。</strong> 可将 remote worker/DFT/MLFF 视为 Oracle，将 agent loop 视为 Driver，并把 scheduler receipt、API token、GPU/CPU hour 和 wall time统一进入结构化 Cost/Transaction。</li>
+</ol>
+<h2 id="section-6">Limitations and caveats</h2>
+<ul>
+<li>仅在低维 Ising toy problem、单一 10 s 预算和 10 seeds 上评价，不证明对催化材料发现的性能优势。</li>
+<li>v0.1.0 的 Result 只承载标量 value，难以直接表示结构、轨迹、多目标、失败诊断和证据包。</li>
+<li>settled cost 可能超过预算；框架记录 overrun，但不能预先消除调度/云计费不确定性。</li>
+<li>Driver 可通过可选 <code>last_proposal_cost</code> 报 token 等成本，仍依赖 adapter 正确上报。</li>
+<li>没有原生 HPC scheduler、异步任务、并发、多用户权限、HITL 或科学 validation gate。</li>
+</ul>
+<h2 id="section-7">Possible actions</h2>
+<ol>
+<li>为 CatMaster general remote interface 定义 <code>estimate_cost/submit-or-evaluate/result</code> 与结构化 fidelity；保留 scheduler receipt 和实际资源结算。</li>
+<li>将 wall time、CPU/GPU hours、API tokens、money 做向量预算，不强行提前折算为单一成本。</li>
+<li>把 driver deliberation 也计费；比较昂贵模型是否真正减少 DFT/MLIP 查询总成本。</li>
+<li>append-only transaction 与现有 thread/message/event、remote receipt、artifact registry 对齐；增加 checkpoint/恢复和 validation status 字段。</li>
+<li>暂不把 CADAQUES 当直接竞品；它解决 campaign accounting 的窄层，CatMaster 仍需计算催化工具、科学验证与证据升级。</li>
+</ol>
+</div><div class="credit">本文为辅助理解研究方法的中文解读。论文原图、图注及摘要内容归原作者和相应权利人；来源见文首论文链接。</div></article></main><script>window.MathJax={tex:{inlineMath:[['$','$'],['\\(','\\)']],displayMath:[['$$','$$'],['\\[','\\]']]},options:{skipHtmlTags:['script','noscript','style','textarea','pre','code']}};</script><script defer src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-mml-chtml.js"></script><footer><span>AI for Materials 文献精读</span><span>中文研究笔记 · 图与摘要注明论文来源 · 不提供论文 PDF</span></footer></body></html>

@@ -1,0 +1,137 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>MatUQ：材料图神经网络的结构分布外预测与不确定性基准 · AI for Materials 文献精读</title><meta name="description" content="AI for Materials、原子模拟与科研智能体的中文文献解读"><link rel="stylesheet" href="../style.css"><link rel="icon" href="../icon.svg" type="image/svg+xml"></head><body><header><a class="brand" href="../index.html"><span class="mark">M</span><span>AI for Materials<small>文献精读 / RESEARCH NOTES</small></span></a><a class="header-link" href="../index.html#library">浏览文献 <span>↗</span></a></header><main class="article-layout"><aside><a href="../index.html#library">← 返回文献库</a><nav aria-label="文章目录"><a href="#section-1">随机划分为何会掩盖结构分布外风险</a><a href="#section-2">SOAP-LOCO 怎样构造，又怎样验证分布外</a><a href="#section-3">十二种网络、六类性质和八种不确定性方法</a><a href="#section-4">四个不确定性指标分别回答什么问题</a><a href="#section-9">准确性与不确定性为何不能互相代替</a><a href="#section-10">数据减少时，最佳策略怎样变化</a><a href="#section-11">dropout 与证据回归各自的边界</a><a href="#section-12">这项基准真正建立了什么</a><a href="#section-13">证据边界</a></nav></aside><article><div class="eyebrow">RESEARCH NOTE / T4</div><h1>MatUQ：材料图神经网络的结构分布外预测与不确定性基准</h1><div class="article-meta"><span>性质、表征与材料表示</span><span>收录 2026-08-26</span><span>14 分钟阅读</span></div><a class="original" href="https://doi.org/10.1038/s41524-026-02272-x" target="_blank" rel="noopener noreferrer">论文原文 ↗</a><div class="prose"><ul>
+<li><strong>原始题名</strong>：MatUQ: a benchmark for uncertainty-aware out-of-distribution materials property prediction with graph neural networks</li>
+<li><strong>作者</strong>：Liqin Tan；Xiean Wang；Yuexin Zou；Pin Chen；Qingsong Zou</li>
+<li><strong>来源</strong>：npj Computational Materials，2026；DOI：10.1038/s41524-026-02272-x</li>
+<li><strong>全文</strong>：</li>
+</ul>
+<h2 id="section-1">随机划分为何会掩盖结构分布外风险</h2>
+<p>材料发现中的预测对象通常不是训练集中已有晶体的随机同类样本，而是组成、晶体原型或局域原子环境不同的新候选。问题在于，常用随机划分会把结构近邻同时分到训练集和测试集：模型即使主要依赖已见局域结构的插值，也可能得到较低测试误差和看似合理的置信度。MatUQ 的核心贡献不是发明新的结构描述符或不确定性算法，而是把局域结构导向的分布外划分、统一的不确定性感知训练、十二种晶体图神经网络和八种不确定性估计方式放进同一基准，检验“预测得准”与“知道自己何时可能出错”是否真是同一种能力。</p>
+<p>晶体图神经网络将原子表示为节点、邻近关系表示为边，通过多轮消息传递汇总局域原子环境。若测试结构周围的元素组合、键长和几何排布在训练集中已有近邻，模型面对的主要是插值；随机划分通常无法保证测试集离开这种局域结构流形。</p>
+<p>论文指出，以往基于轨道场矩阵的分布外划分也未完全解决这一问题。轨道场矩阵偏重全局价轨道信息，与图神经网络实际汇聚的局域几何环境并不完全一致；部分稀疏划分还只从每个簇保留一个测试结构，形成约 50 个样本的测试集，均值容易被少数异常点左右（PDF 物理页 3–4，引言）。这并不说明轨道场矩阵划分无效，而是说明“分布外”必须绑定一个与待测外推类型一致、且能独立量化训练—测试距离的结构坐标。</p>
+<h2 id="section-2">SOAP-LOCO 怎样构造，又怎样验证分布外</h2>
+<p>SOAP 描述符把中心原子周围的邻居密度展开到径向基与球谐函数，并构造成旋转不变的局域环境向量。作者使用 DScribe 计算原子级 SOAP，按元素聚合后展平为晶体级向量；随后执行 k-means 聚类，把每个簇依次作为测试集，其余簇作为训练候选，再按 4∶1 划分训练集与验证集（PDF 物理页 26–28，“SOAP-LOCO 结构感知划分”及算法 2）。</p>
+<p>作者没有固定簇数，而是在</p>
+<p>\[
+k\in\{5,10,20,30,40,50\}
+\]</p>
+<p>中选择跨折平均 SOAP 距离最大的 \(k\)。最终 dielectric、mp-gap、perovskites、log-gvrh、jdft2d 和 SuperCon3D 的簇数分别为 5、5、5、5、10、5，合计形成 35 个分布外测试折（PDF 物理页 7–8，图 2；物理页 13）。</p>
+<p>用于选择簇数的结构距离是：</p>
+<p><strong>论文原式，式（1），PDF 物理页 25–26：</strong></p>
+<p>\[
+d(s,t)=1-
+\frac{\mathbf v(s)^\top\mathbf v(t)}
+{\|\mathbf v(s)\|_2\|\mathbf v(t)\|_2}.
+\]</p>
+<p>\(s,t\) 是两个晶体；\(\mathbf v(s)\)、\(\mathbf v(t)\) 是 SOAP 特征向量，正文未说明其分量的单位或归一化约定；余弦比值及 \(d(s,t)\) 均为无量纲量。单个测试晶体到训练集 \(A\) 的距离取最近邻：</p>
+<p>\[
+d(s,A)=\min_{t\in A}d(s,t).
+\]</p>
+<p>第 \(k\) 折的结构难度可按论文式（3）–（4）合并写为：</p>
+<p>\[
+\hat d_k=\frac{1}{|S_k^{\mathrm{Te}}|}
+\sum_{s\in S_k^{\mathrm{Te}}}
+\min_{t\in S_k^{\mathrm{Tr}}}d(s,t).
+\]</p>
+<p>\(S_k^{\mathrm{Te}}\)、\(S_k^{\mathrm{Tr}}\) 分别是测试集和训练集；距离越大，表示测试晶体在 SOAP 空间中离训练流形越远。</p>
+<p><strong>观察到的结果。</strong> 用同一 SOAP 距离重新评价随机划分、五种轨道场矩阵划分和 SOAP-LOCO 后，SOAP-LOCO 在六个数据集上都给出最大的训练—测试几何分离，平均距离为相应随机划分的 1.8–2.5 倍（PDF 物理页 7–9，图 3）。六个数据集在所选簇数下的平均 SOAP 距离依次为 0.465、0.407、0.260、0.569、0.775、0.835；折间标准差分别为 0.106、0.138、0.018、0.136、0.181、0.286（PDF 物理页 9，表 1）。</p>
+<p>为了检查 SOAP 距离增加是否仅是描述符空间中的人为拉远，作者还定义晶体原型新颖率：晶体原型键由空间群编号和排序后的 Wyckoff 字母序列组成，测试集中未出现在训练集的原型比例记为 \(r\)（PDF 物理页 26，式 7–10）。SOAP-LOCO 在多数数据集上同时得到最高原型新颖率，趋势与 SOAP 距离一致（PDF 物理页 8–10，图 4）。但 perovskites 只有 8 种独立原型，所有划分的 \(r\) 均约为 0，而 SOAP 距离仍能区分划分；这说明离散原型标签在原型种类很少时会失去分辨率。</p>
+<p><strong>作者的解释。</strong> SOAP 直接描述局域原子邻域，因此比偏全局的轨道场矩阵更贴近消息传递图神经网络使用的结构信息；留出 SOAP 簇会阻断模型依赖已见局域环境的结构记忆（PDF 物理页 7、21）。</p>
+<p><strong>卡片推断。</strong> 图 3 直接证明的是结构距离差异，而不是随机划分和 SOAP-LOCO 之间全部不确定性性能的差异。SOAP 距离独立于被评测模型的预测，却并非“表示独立”；它仍由 SOAP 的径向基、球谐阶数、元素聚合和 k-means 几何决定。主 PDF 没有给出最终 <code>nradial</code>、<code>lmax</code> 和描述符维数，这些被指向未附的补充材料。</p>
+<h2 id="section-3">十二种网络、六类性质和八种不确定性方法</h2>
+<p>六个数据集覆盖不同规模和目标性质（PDF 物理页 24–25，表 6）：</p>
+<ul>
+<li>dielectric：4,764 个结构，目标为折射率；</li>
+<li>mp-gap：106,113 个结构，目标为带隙；</li>
+<li>perovskites：18,928 个结构，目标为形成能；</li>
+<li>log-gvrh：10,987 个结构，目标为 Voigt–Reuss–Hill 平均剪切模量的十进对数；</li>
+<li>jdft2d：636 个结构，目标为二维材料剥离能；</li>
+<li>SuperCon3D：1,016 个结构，目标为超导转变温度。</li>
+</ul>
+<p>十二种网络包括 CGCNN、SchNet、MEGNet、DimeNet++、ALIGNN、PotNet、DeeperGATGNN、Matformer、iComFormer、eComFormer、SODNet 和 CrystalFramer（PDF 物理页 27–29）。所有模型统一采用 8.0 Å 邻域截断，在最终输出层之前加入率为 0.1 的空间 dropout；训练使用深度证据回归损失，正则系数 \(\lambda=0.01\)，验证损失连续 50 个周期不改善时早停（PDF 物理页 29、33–34）。</p>
+<p>每个网络不再只输出标量性质，而是输出正态—逆伽马分布的四个参数 \((\gamma,\nu,\alpha,\beta)\)。\(\gamma\) 与目标 \(y\) 同量纲，是预测中心；\(\nu\)、\(\alpha\) 无量纲；\(\beta\) 具有 \(y^2\) 的量纲。</p>
+<p><strong>论文原式，式（11）与式（13），PDF 物理页 29：</strong></p>
+<p>\[
+\mathcal L_{\mathrm{DER}}
+=\frac1N\sum_{i=1}^{N}
+\left(\mathcal L_{\mathrm{NLL},i}+\lambda\mathcal L_{\mathrm R,i}\right),
+\]</p>
+<p>\[
+\mathcal L_{\mathrm R,i}=|y_i-\gamma_i|(2\nu_i+\alpha_i).
+\]</p>
+<p>\(\mathcal L_{\mathrm{NLL}}\) 是正态—逆伽马边缘似然的负对数；正则项在误差大但模型给出高证据时施加惩罚，试图阻止模型在结构外推点上轻易给出过高置信度。论文同时提醒，深度证据回归是启发式不确定性估计，并非严格贝叶斯后验（PDF 物理页 4–5）。</p>
+<p>论文组合三类基本不确定性来源：</p>
+<ol>
+<li><strong>证据不确定性</strong>：用单个模型的正态—逆伽马参数计算；</li>
+<li><strong>测试时 dropout 不确定性</strong>：保持 dropout 开启，对单模型执行 50 次随机前向传播，以预测均值方差估计不确定性；</li>
+<li><strong>集成不确定性</strong>：训练 5 个独立随机种子模型，以成员预测分散估计不确定性。</li>
+</ol>
+<p>证据总不确定性为：</p>
+<p><strong>论文算法 3 第 1–3 行，PDF 物理页 30：</strong></p>
+<p>\[
+U_{\mathrm{Evi}}
+=\frac{\beta}{\nu(\alpha-1)}+\frac{\beta}{\alpha-1},
+\qquad \alpha&gt;1.
+\]</p>
+<p>前项被解释为认知不确定性，后项为偶然不确定性，两项量纲均为 \(y^2\)。三类基本来源又组成五种混合方法，总计 8 种策略。</p>
+<p>实验规模应准确理解为：35 个折 × 12 种架构 × 5 个随机种子 = 2,100 个训练模型；八种不确定性策略从这些模型的确定性、dropout 和集成输出中重新组合，并非再训练八倍模型（PDF 物理页 5–6、13，图 1）。SchNet 和 DimeNet++ 在 SuperCon3D 上发散且 MAE 大于 \(10^6\)，因此未进入表 2–5 的有效比较（PDF 物理页 14）。</p>
+<h2 id="section-4">四个不确定性指标分别回答什么问题</h2>
+<p>预测准确性使用 MAE。不确定性质量则至少分为四种问题。</p>
+<h3 id="section-5">能否把真正高误差样本排到高风险位置</h3>
+<p><strong>论文原式，式（16），PDF 物理页 31–32：</strong></p>
+<p>\[
+\rho=1-\frac{6\sum_i d_i^2}{n(n^2-1)}.
+\]</p>
+<p>\(d_i\) 是第 \(i\) 个样本在不确定性排序和绝对误差排序中的秩差；\(n\) 是样本数；\(\rho\) 无量纲，越接近 1，风险排序越好。式（16）的这一闭式写法在不存在并列秩时成立，正文未说明出现并列秩时采用何种修正。它不要求不确定性的绝对尺度正确，也不保证预测均值准确。</p>
+<h3 id="section-6">预测区间的绝对覆盖是否校准</h3>
+<p>标准化残差为 \(z_i=(y_i-\hat y_i)/\sigma_i\)。论文比较其经验累积分布与标准正态分布：</p>
+<p>\[
+\mathrm{Area}=\int_{-\infty}^{\infty}|F_{\mathrm{obs}}(z)-\Phi(z)|\,dz.
+\]</p>
+<p>这是论文式（17），PDF 物理页 32。Area 无量纲，越接近 0 越好。</p>
+<h3 id="section-7">预测中心和方差尺度的联合概率质量</h3>
+<p><strong>论文原式，式（18），PDF 物理页 32：</strong></p>
+<p>\[
+\mathrm{NLL}
+=\frac1{2n}\sum_i
+\left[\ln(2\pi)+\ln\sigma_i^2+
+\frac{(y_i-\hat y_i)^2}{\sigma_i^2}\right].
+\]</p>
+<p>方差太小会使大残差项爆炸；方差太大又受 \(\ln\sigma_i^2\) 惩罚。因此 NLL 既不是纯准确性指标，也不是纯排序指标。</p>
+<h3 id="section-8">原始尺度错误能否被简单重校准修复</h3>
+<p>cNLL 先在验证集上拟合 \(\hat\sigma^2=aU(x)+b\)，使验证集 NLL 最小，再在测试集计算 NLL（PDF 物理页 32–33，式 19）。它衡量的是不确定性经过线性尺度修正后的可恢复性，不等同于原始校准质量。原始 NLL 很差而 cNLL 较好，通常表示风险信息尚在，但绝对尺度错位。</p>
+<h2 id="section-9">准确性与不确定性为何不能互相代替</h2>
+<p><strong>观察到的结果一。</strong> dielectric 上，MAE 最低的是 ALIGNN，但四个不确定性指标均由其他架构领先：MEGNet 的 \(\rho=0.785\)，SODNet 的 Area 为 0.218，Matformer 的 NLL 最低，MEGNet 的 cNLL 为 2.0；ALIGNN 没有领先任何一项（PDF 物理页 16，表 2–5及正文）。主 PDF 没有列出全部架构的具体 MAE，只在未附图 S1 中展示，因此不能在本卡补造数值。</p>
+<p><strong>观察到的结果二。</strong> 在结构距离最大的 SuperCon3D 上，DeeperGATGNN 和 CGCNN 分别得到最高的 \(\rho=0.884\) 与 0.858，却属于预测误差最大的架构；最准确的 CrystalFramer 只有 \(\rho=0.171\)（PDF 物理页 16，表 2及图 8 相关正文）。jdft2d 上也只有 eComFormer 和 PotNet 超过 0.5，分别为 0.645 和 0.615，但它们属于低准确性组；最准确的一组架构均不超过 0.349（PDF 物理页 16）。</p>
+<p><strong>观察到的结果三。</strong> CrystalFramer 在 mp-gap 上同时取得最强误差排序 \(\rho=0.731\) 和并列最优 cNLL=1.0，却有约 \(2.84\times10^5\) 的灾难性原始 NLL（PDF 物理页 15–16，表 2、4、5）。这说明它保留了可用于排序和线性重标定的信息，但原始方差尺度严重错误。</p>
+<p><strong>作者的解释。</strong> 准确性依赖模型对目标函数及结构规律的拟合能力；不确定性质量则依赖置信分数是否随训练流形距离和真实认知状态变化。两者受到不同架构归纳偏置和训练目标控制（PDF 物理页 21–22）。</p>
+<p><strong>卡片推断。</strong> 高 \(\rho\) 只能说明“不确定性排序追随误差排序”，不能把一个高误差模型变成可靠预测器；低 MAE 也不能证明模型能识别自身失败。可靠性至少包含预测中心质量、风险排序、绝对校准和概率尺度四个轴。</p>
+<p>图 8 给出一个表示空间例子：在 SuperCon3D 上，两种网络的留出 SOAP 簇都在 UMAP 潜空间形成独立区域；DeeperGATGNN 的高 dropout 不确定性区域与留出簇及大误差区域重合，对应 \(\rho=0.884\)，而 CrystalFramer 对同类高误差留出点给出的不确定性偏低，对应 \(\rho=0.171\)（PDF 物理页 20–21，图 8）。这是一个数据集、两种架构的可视化佐证，不能证明 dropout 普遍感知结构距离。</p>
+<h2 id="section-10">数据减少时，最佳策略怎样变化</h2>
+<p>四个较大数据集的样本量为 4,764–106,113，jdft2d 和 SuperCon3D 分别只有 636 和 1,016 个样本。作者观察到，Area 与 NLL 的最佳方法在两类规模之间发生明显转换。</p>
+<p>在四个较大数据集上，包含证据参数的混合方法几乎占据各架构的 Area 与 NLL 最优位置：log-gvrh 的 Area、mp-gap 的 NLL 和 perovskites 的 NLL 均由所有十二种架构选择含证据方法，三重混合出现最频繁（PDF 物理页 18，正文对图 S2–S4 的汇总）。数据集级 Area 冠军分别包括 mp-gap 的 MEGNet 0.049、perovskites 的 MEGNet 0.352、dielectric 的 SODNet 0.218、log-gvrh 的 SODNet 0.060（PDF 物理页 14、17–18，表 3）。</p>
+<p>到 jdft2d，十二种架构的 Area、NLL 和 cNLL 最优值全部由集成方差方法取得；数据集级 Area 冠军为 eComFormer 0.094，NLL 冠军为 iComFormer 5.9（PDF 物理页 18，表 3–5）。SuperCon3D 上，EnsU 给出两个最低 Area，并在十个有效架构中的八个上取得最优 NLL；数据集级 Area 冠军是 Matformer 0.038，NLL 冠军是 eComFormer 6.4。</p>
+<p><strong>作者的解释。</strong> 深度证据回归必须为每个样本拟合 \(\gamma,\nu,\alpha,\beta\) 四个参数，数据稀缺时这些高阶分布参数约束不足；集成方差直接利用独立模型之间的预测分散，因而更稳健（PDF 物理页 22）。</p>
+<p><strong>卡片推断。</strong> 本文支持“样本稀少时纯集成方差相对更稳”的经验规律，但不能给出通用样本量阈值。作者没有在同一数据集、同一性质和同一结构分布上受控下采样；样本数下降同时伴随性质类型、目标噪声、结构多样性和架构适配变化。因此，这是跨任务相关性，不是已隔离的数据量因果效应。</p>
+<p>摘要中“数据稀缺时所有评测架构均转向纯集成方差”的表述也需按正文收窄。jdft2d 的确在十二种架构的三个分布指标上全部转向集成方差；但 SuperCon3D 仍有 eComFormer、iComFormer 和 PotNet 的最佳 Area 由单独证据不确定性取得，数值为 0.092、0.170 和 0.341（PDF 物理页 19）。更准确的结论是：稀缺数据下，<strong>数据集级冠军和多数分布指标最优位置明显转向集成方差</strong>，而不是每个架构、每项指标均无例外。</p>
+<h2 id="section-11">dropout 与证据回归各自的边界</h2>
+<p>单独测试时 dropout 几乎不出现在 Area、NLL 和 cNLL 的架构内最优方法中，其显著优势主要集中在误差排序。SuperCon3D 的两个最高 \(\rho\) 均由单独 dropout 得到（PDF 物理页 17–18）。作者把局限归因于 dropout 只加在消息传递完成后的输出层之前，因此随机掩蔽扰动的是已压缩图级表示，而不是局域结构编码（PDF 物理页 22–23）。这是工作假说，因为本文固定 dropout 率为 0.1，未比较消息传递层内部的位置或其他率。</p>
+<p>单独证据不确定性也很少成为架构内最优方法；较大数据集上的价值主要通过与集成或 dropout 的混合出现。训练协议只在 dielectric 和 jdft2d、六种架构上与 MSE 和均值—方差估计比较。dielectric 的平均 MAE 从 MSE 的 0.434、均值—方差估计的 0.352 降至 MatUQ 的 0.284；相对降低约 34.6% 和 19.3%。jdft2d 从 70.217、61.324 降至 36.510，相对降低约 48.0% 和 40.5%（PDF 物理页 11–13，图 6–7；百分比为卡片推导）。jdft2d 图中没有标明剥离能单位，因此只能保留原数据集数值，不能凭常识补写单位。</p>
+<h2 id="section-12">这项基准真正建立了什么</h2>
+<p>第一，结构分布外难度必须显式验证。SOAP-LOCO 同时利用连续局域环境距离和离散原型新颖率，使测试集是否真正离开训练结构流形成为可检查量，而不是由“未见元素”或“未见空间群”等标签直接宣布。</p>
+<p>第二，预测准确性和不确定性质量可以独立失效。MAE、误差排序、绝对校准、原始概率似然和重校准后似然分别暴露不同失败模式；只报告其中一项会漏掉模型在其他维度的过度自信或尺度错位。</p>
+<p>第三，不确定性方法的优劣依赖数据集、性质、架构和数据规模。原始 NLL 的六个数据集冠军由六种不同架构获得：Matformer、MEGNet、SODNet、DimeNet++、iComFormer 和 eComFormer 分别领先 dielectric、mp-gap、perovskites、log-gvrh、jdft2d 和 SuperCon3D（PDF 物理页 15–17，表 4）。不存在一个可以不经本地验证直接迁移到所有任务的概率似然冠军。</p>
+<h2 id="section-13">证据边界</h2>
+<ol>
+<li>SOAP-LOCO 针对局域结构分布外，不能自动覆盖组成外推、标签机制变化、实验条件变化或性质定义变化。</li>
+<li>SOAP 距离不依赖被评测模型的预测，却依赖 SOAP 参数和聚类方式；不能把“模型独立”扩大成“表示独立”。</li>
+<li>数据稀缺规律来自不同任务横向比较，没有同任务受控下采样。</li>
+<li>八种方法是三个基础范式的组合，并非逐组件消融；混合方法最优不能确定增益究竟来自哪一项。</li>
+<li>所有网络统一使用 8.0 Å 截断，有利于横向一致，但可能偏离某些架构的原始最优感受野。</li>
+<li>每个架构按测试指标从八种方法中报告最优者，属于事后知道测试表现的上限比较，不等于新任务中能事先选择到该方法。</li>
+<li>Area 与 NLL 假定高斯标准化残差；重尾、多峰或无法由单高斯描述的误差会改变解释。</li>
+<li>主 PDF 不含补充材料，无法核验图 S1–S6 的全部架构—策略明细、SOAP 具体参数和历史时间线分析。</li>
+<li>表 1 的 SuperCon3D 平均 SOAP 距离为 0.835，图 8 前正文写作 0.81；可能是取整或另一口径，正文没有解释。</li>
+<li>摘要对稀缺数据下“全部转向集成”的措辞强于正文，最终应采用正文限定。</li>
+<li>本文是未编辑预发表版本，正式版可能修改数字、图注和论断强度。</li>
+</ol>
+</div><div class="credit">本文为辅助理解研究方法的中文解读。论文原图、图注及摘要内容归原作者和相应权利人；来源见文首论文链接。</div></article></main><script>window.MathJax={tex:{inlineMath:[['$','$'],['\\(','\\)']],displayMath:[['$$','$$'],['\\[','\\]']]},options:{skipHtmlTags:['script','noscript','style','textarea','pre','code']}};</script><script defer src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-mml-chtml.js"></script><footer><span>AI for Materials 文献精读</span><span>中文研究笔记 · 图与摘要注明论文来源 · 不提供论文 PDF</span></footer></body></html>

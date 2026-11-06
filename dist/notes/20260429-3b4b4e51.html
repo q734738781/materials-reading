@@ -1,0 +1,53 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>OptiMat: A living database for materials optimization and discovery · AI for Materials 文献精读</title><meta name="description" content="AI for Materials、原子模拟与科研智能体的中文文献解读"><link rel="stylesheet" href="../style.css"><link rel="icon" href="../icon.svg" type="image/svg+xml"></head><body><header><a class="brand" href="../index.html"><span class="mark">M</span><span>AI for Materials<small>文献精读 / RESEARCH NOTES</small></span></a><a class="header-link" href="../index.html#library">浏览文献 <span>↗</span></a></header><main class="article-layout"><aside><a href="../index.html#library">← 返回文献库</a><nav aria-label="文章目录"><a href="#section-1">1. 文献信息</a><a href="#section-2">2. 一句话总结</a><a href="#section-3">3. 研究动机</a><a href="#section-4">4. 数据库与方法</a><a href="#section-8">5. 主要案例</a><a href="#section-9">6. 主要贡献</a><a href="#section-10">7. 局限与注意点</a><a href="#section-11">8. 对我当前工作的可能启发（不强行关联）</a></nav></aside><article><div class="eyebrow">RESEARCH NOTE / T6</div><h1>OptiMat: A living database for materials optimization and discovery</h1><div class="article-meta"><span>机器学习势训练与泛化</span><span>收录 2026-04-29</span><span>3 分钟阅读</span></div><a class="original" href="https://arxiv.org/abs/2604.21850" target="_blank" rel="noopener noreferrer">论文原文 ↗</a><div class="prose"><h2 id="section-1">1. 文献信息</h2>
+<ul>
+<li>类型：arXiv preprint, 2026-04-29</li>
+<li>作者：Jonas F. Pieler, Mattia Ruggeri, Moritz H. Hoffmann, Jialin Song, Marco A. Celis Gil, Matthias Riebesell, Nils E. R. Zimmermann, Felix Musil, Michael Herbst, Bingqing Cheng, Boris Kozinsky</li>
+</ul>
+<h2 id="section-2">2. 一句话总结</h2>
+<p>OptiMat 是一个“living database”，面向材料发现中的稳定结构优化问题，把多种机器学习势的结构优化结果、交叉势能评估、不确定性/分歧度量和在线扩展机制组织成可查询数据库，用于在大规模候选空间中更可靠地筛选材料。</p>
+<h2 id="section-3">3. 研究动机</h2>
+<p>材料筛选通常需要从数据库或生成模型给出的候选结构出发，判断其是否稳定、是否能在更高精度计算下保留结构和性质。直接 DFT 优化成本高，而 MLIP/基础势虽然便宜，但不同势之间可能给出不同局部极小值和能量排序。作者希望构建一个持续更新的数据库，系统记录：</p>
+<ul>
+<li>不同机器学习势优化后的结构；</li>
+<li>同一结构在不同势上的单点能量；</li>
+<li>势之间的分歧，作为不确定性代理；</li>
+<li>新材料体系按需加入后的再优化和再评估。</li>
+</ul>
+<h2 id="section-4">4. 数据库与方法</h2>
+<h3 id="section-5">4.1 多势优化与交叉评估</h3>
+<p>OptiMat 的核心不是单个 MLIP，而是把多个势作为一个 ensemble 使用：</p>
+<ul>
+<li>对候选结构分别用不同势优化；</li>
+<li>对优化后的结构用多种势重新打分；</li>
+<li>用 cross-potential agreement/disagreement 衡量候选结构是否稳定、是否对模型选择敏感。</li>
+</ul>
+<p>这种设计将“哪个势更准”的问题部分转化为“多个势是否在同一候选上形成一致判断”。</p>
+<h3 id="section-6">4.2 Living database</h3>
+<p>数据库不是静态 benchmark，而是可以持续扩展：</p>
+<ul>
+<li>初始包含大量已知和候选材料；</li>
+<li>用户可以按需提交新组分或新结构；</li>
+<li>系统进行结构优化、去重、能量评估和可视化；</li>
+<li>新结果可反过来丰富数据库。</li>
+</ul>
+<h3 id="section-7">4.3 不确定性与筛选逻辑</h3>
+<p>OptiMat 使用不同势之间的能量/结构差异作为不确定性信号。若多个势都将某一结构优化到相似低能状态，说明该候选更可靠；若势之间分歧很大，则该候选可能需要 DFT 复核或被标记为高风险。</p>
+<h2 id="section-8">5. 主要案例</h2>
+<p>文章展示了对复杂合金/多主元体系的筛选与优化示例，包括高维组分空间中的 on-demand 结构优化。文中也讨论了 web interface 和 database demo，用于浏览优化结果、稳定性排序与模型分歧。</p>
+<h2 id="section-9">6. 主要贡献</h2>
+<ul>
+<li>把“结构优化结果”而非仅“初始数据库结构”作为材料发现中的一等数据对象。</li>
+<li>用多 MLIP 交叉评估提供实用的不确定性估计。</li>
+<li>提出 living database 形态，让材料数据库从静态存档变成持续计算与持续更新的平台。</li>
+<li>对生成式材料发现尤其重要：生成模型给出的结构往往需要快速 relax、去重和稳定性复核。</li>
+</ul>
+<h2 id="section-10">7. 局限与注意点</h2>
+<ul>
+<li>MLIP ensemble 的一致性并不等于 DFT 或实验正确，只能作为优先级和不确定性代理。</li>
+<li>若多个势共享相似训练数据偏差，它们可能一致地犯错。</li>
+<li>数据库维护需要计算资源和版本管理；living database 的可复现性依赖于记录势版本、优化参数和结构去重规则。</li>
+<li>高熵/多主元体系的真实热力学还涉及构型熵、温度和动力学因素，仅靠 0 K 优化能量不足以最终定论。</li>
+</ul>
+<h2 id="section-11">8. 对我当前工作的可能启发（不强行关联）</h2>
+<p>这篇文章可作为“MLIP 辅助材料筛选时如何处理不确定性”的参考：不要只用单一 MACE/CHGNet 能量排序，而可以增加跨模型一致性、结构变化幅度、relax 后保真度等指标，作为 DFT 复核优先级。</p>
+</div><div class="credit">本文为辅助理解研究方法的中文解读。论文原图、图注及摘要内容归原作者和相应权利人；来源见文首论文链接。</div></article></main><script>window.MathJax={tex:{inlineMath:[['$','$'],['\\(','\\)']],displayMath:[['$$','$$'],['\\[','\\]']]},options:{skipHtmlTags:['script','noscript','style','textarea','pre','code']}};</script><script defer src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-mml-chtml.js"></script><footer><span>AI for Materials 文献精读</span><span>中文研究笔记 · 图与摘要注明论文来源 · 不提供论文 PDF</span></footer></body></html>

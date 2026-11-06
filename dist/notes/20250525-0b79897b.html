@@ -1,0 +1,120 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Probability and symmetry in materials discovery · AI for Materials 文献精读</title><meta name="description" content="AI for Materials、原子模拟与科研智能体的中文文献解读"><link rel="stylesheet" href="../style.css"><link rel="icon" href="../icon.svg" type="image/svg+xml"></head><body><header><a class="brand" href="../index.html"><span class="mark">M</span><span>AI for Materials<small>文献精读 / RESEARCH NOTES</small></span></a><a class="header-link" href="../index.html#library">浏览文献 <span>↗</span></a></header><main class="article-layout"><aside><a href="../index.html#library">← 返回文献库</a><nav aria-label="文章目录"><a href="#section-1">Bibliographic status</a><a href="#section-2">One-line takeaway</a><a href="#section-3">What the paper asks</a><a href="#section-4">Methods</a><a href="#section-5">Main findings</a><a href="#section-6">Limitations and caveats</a><a href="#section-7">Possible actions</a></nav></aside><article><div class="eyebrow">RESEARCH NOTE / T6</div><h1>Probability and symmetry in materials discovery</h1><div class="article-meta"><span>机器学习势训练与泛化</span><span>收录 2025-05-25</span><span>7 分钟阅读</span></div><a class="original" href="https://arxiv.org/abs/2605.19939" target="_blank" rel="noopener noreferrer">论文原文 ↗</a><div class="prose"><h2 id="section-1">Bibliographic status</h2>
+<ul>
+<li><strong>Type / status</strong>: arXiv preprint, 2026-05；领域为材料性质预测中的概率预测、校准不确定性与 SE(3) 对称性。</li>
+<li><strong>Authors</strong>: Franco P. Heredia, Valentin S. Schäfer, Noa Marom, Risi Kondor.</li>
+<li><strong>Main object</strong>: 在材料图神经网络中同时处理三维旋转/平移对称性与预测不确定性，提出 probabilistic SE(3)-equivariant neural network 思路，并以二氧化硅 polymorph 能量预测为示例。</li>
+</ul>
+<h2 id="section-2">One-line takeaway</h2>
+<p>这篇文章主张材料发现中的模型不应只给点估计，而应给出经过校准的概率分布；作者把概率输出接入 SE(3)-equivariant GNN，显示其在小数据硅氧多晶型能量预测中既保留对称性约束，又能给出有用的不确定性，适合作为 MLIP/材料模型 reliability 讨论的概念性参考。</p>
+<h2 id="section-3">What the paper asks</h2>
+<ul>
+<li>材料发现中 GNN/等变网络通常输出一个确定性性质值，例如能量、带隙或形成能；但高通量筛选真正需要知道的是：预测值有多可信、候选排序的不确定性有多大、哪些区域需要更多数据。</li>
+<li>传统 uncertainty quantification 方法在材料领域有两个挑战：
+<ul>
+<li>如果模型不尊重空间对称性（平移、旋转、排列等），预测均值和不确定性都可能受坐标系影响。</li>
+<li>如果只做 ensemble/dropout 等启发式不确定性，概率校准可能不足，尤其在小数据和 out-of-distribution 场景下。</li>
+</ul>
+</li>
+<li>论文提出的问题是：能否把<strong>概率预测</strong>和 <strong>SE(3)-equivariant 表示学习</strong>结合起来，使材料模型同时满足物理对称性和不确定性量化需求？</li>
+<li>对用户当前关注的 MLIP uncertainty/reliability 主题：这篇更像方法观点 + 小型验证，不是大规模 MLIP benchmark，但其“probabilistic equivariant model + calibration metric”的框架可用于整理 reliability 叙事。</li>
+</ul>
+<h2 id="section-4">Methods</h2>
+<ul>
+<li><strong>总体思想</strong>
+<ul>
+<li>构建 probabilistic neural network，不只输出性质点估计 <code>y_hat</code>，而是输出条件分布 <code>p(y | structure)</code>。</li>
+<li>对材料结构使用 SE(3)-equivariant message passing，使中间表示对旋转/平移/三维几何变化满足正确变换规律，最终标量性质预测保持不变性。</li>
+<li>用概率损失训练模型，使预测分布的均值和方差同时受数据约束。</li>
+</ul>
+</li>
+<li><strong>模型实现：P-EGNN / P-Orb</strong>
+<ul>
+<li>以等变图神经网络为主体，每个原子为节点，边由原子间距离/邻接关系定义；通过等变消息传递更新节点特征和坐标相关表示。</li>
+<li>概率头输出目标性质的分布参数，尤其是均值与方差/尺度参数。</li>
+<li>文章把普通 deterministic equivariant GNN 与 probabilistic variant 对比，强调概率版本可以直接表达 aleatoric/epistemic-like uncertainty 的综合效果。</li>
+<li>文中还讨论了 <code>P-Orb</code> 相关实现/对比，它体现了把概率输出与轨道/几何特征结合的路线。</li>
+</ul>
+</li>
+<li><strong>训练目标与评价</strong>
+<ul>
+<li>概率模型使用 negative log-likelihood 或等价的 proper scoring rule 训练，要求模型既预测准确，又避免给出过窄或过宽的不确定性。</li>
+<li>使用 **CRPS（continuous ranked probability score）**评价概率预测质量。CRPS 可理解为概率分布版 MAE：既惩罚均值偏差，也惩罚不确定性校准不佳。</li>
+<li>同时比较 MAE/RMSE 等点估计误差，以确认概率输出没有以牺牲平均精度为代价。</li>
+</ul>
+</li>
+<li><strong>数据与实验对象</strong>
+<ul>
+<li>案例集中在 **silica polymorphs（二氧化硅多晶型）**的能量预测。</li>
+<li>该体系具有材料结构多样、数据规模相对有限、能量差异细微等特点，适合测试小数据下对称性和概率校准的作用。</li>
+<li>训练/测试中比较确定性模型与概率等变模型，观察能量预测、uncertainty ranking 和 calibration 行为。</li>
+</ul>
+</li>
+<li><strong>核心评价维度</strong>
+<ul>
+<li>点预测准确性：模型是否能预测 silica polymorph relative/stability-related energy。</li>
+<li>概率质量：预测区间是否覆盖真实值，CRPS 是否改善。</li>
+<li>对称性：结构旋转/平移不应改变标量能量预测分布。</li>
+<li>实用性：uncertainty 是否能标记高风险候选，辅助主动学习或候选筛选。</li>
+</ul>
+</li>
+</ul>
+<h2 id="section-5">Main findings</h2>
+<ul>
+<li><strong>概率输出是材料发现中必要的，而非附加装饰</strong>
+<ul>
+<li>作者强调，高通量筛选或 inverse design 不只需要“哪个候选分数最低”，还需要知道模型对候选排序的置信度。</li>
+<li>若两个候选点估计能量接近，但一个不确定性极大，一个不确定性较小，后续 DFT/实验优先级应不同。</li>
+<li>因此，模型输出完整预测分布能更自然地支持 risk-aware screening、Bayesian/active learning 和实验预算分配。</li>
+</ul>
+</li>
+<li><strong>把概率预测与 SE(3) 对称性结合是关键设计</strong>
+<ul>
+<li>普通概率模型如果不尊重几何对称性，可能对同一材料的不同旋转/平移表示给出不同均值或方差。</li>
+<li>P-EGNN 通过等变 message passing 保持结构物理对称性，最终标量能量分布对 SE(3) 操作保持不变。</li>
+<li>这使得不确定性本身也成为物理一致的输出，而不是坐标表示的副产物。</li>
+</ul>
+</li>
+<li><strong>silica polymorph 案例支持概率等变模型在小数据下的价值</strong>
+<ul>
+<li>二氧化硅多晶型能量差异通常较细，且结构空间复杂；这类问题中 deterministic 模型很容易给出看似精确但未校准的预测。</li>
+<li>概率等变模型能够在保持点预测能力的同时，给出更有信息量的预测分布。</li>
+<li>文章报告概率模型在 CRPS 等指标上更优，说明其分布预测质量优于只看均值的模型。</li>
+</ul>
+</li>
+<li><strong>不确定性可用于候选排序和数据采集决策</strong>
+<ul>
+<li>如果某个结构被预测为潜在低能但不确定性高，它应进入“需要 DFT 复核/主动学习采样”的队列，而不是直接被当作确定发现。</li>
+<li>如果某类结构系统性具有高 uncertainty，说明训练数据覆盖不足，可能提示补充该结构族数据。</li>
+<li>这一点与 MLIP/DFT workflow 中的 uncertainty gating 非常接近：不是让 ML 模型替代高精度计算，而是把高精度计算用在最有信息增益或最高风险的位置。</li>
+</ul>
+</li>
+<li><strong>方法层面的主张更重要于单一 benchmark 数值</strong>
+<ul>
+<li>文章的贡献不是提出一个大规模 SOTA foundation model，而是强调材料模型评估应从“低 MAE”扩展到“低误差 + 校准概率 + 对称性一致”。</li>
+<li>这种思想对当前 MLIP reliability、agentic materials workflow 和自动筛选系统都很重要。</li>
+</ul>
+</li>
+</ul>
+<h2 id="section-6">Limitations and caveats</h2>
+<ul>
+<li><strong>验证规模较小</strong>：主要以 silica polymorphs 为案例，不能直接推出在大规模催化吸附、金属氧化物、非晶表面或多组分 OOD 泛化中同样有效。</li>
+<li><strong>概率分布不等于真正 epistemic uncertainty 分解</strong>：单模型输出方差可能混合数据噪声、模型不确定性和任务难度；若用于安全决策，仍需 ensemble、Bayesian posterior 或 conformal calibration 等补充。</li>
+<li><strong>校准需要单独检验</strong>：CRPS 好不代表所有置信区间覆盖率都正确；后续应看 reliability diagram、coverage vs interval width、OOD detection 等。</li>
+<li><strong>对主动学习/闭环的实际收益尚未充分证明</strong>：论文强调 uncertainty 可指导采样，但是否能显著减少 DFT 计算量，需要真实 active learning loop 验证。</li>
+<li><strong>与 MLIP 动力学稳定性仍有距离</strong>：能量标量预测的概率校准不能直接替代力、应力和长时间 MD 稳定性的 uncertainty 评估。</li>
+</ul>
+<h2 id="section-7">Possible actions</h2>
+<ul>
+<li>加入用户当前 <code>MLIP uncertainty/reliability</code> 文献池，作为“probabilistic equivariant model / calibrated uncertainty”类别。</li>
+<li>对 CatMaster 或科研 agent workflow，可借鉴为 validation gate 叙事：agent 不只收集预测值，还应收集预测分布、CRPS/校准状态和 OOD 风险。</li>
+<li>对 PX-New/MOF 筛选，若后续要解释 MACE/DFT 预筛不确定性，可把这篇作为“候选排序应考虑 uncertainty，不应只看 point estimate energy”的方法引用。</li>
+<li>后续若精读扩展，建议补查：
+<ul>
+<li>P-EGNN/P-Orb 代码是否公开；</li>
+<li>silica 数据量、split 与 energy label 来源；</li>
+<li>是否有 coverage calibration 图；</li>
+<li>与 ensemble equivariant GNN、MACE-style uncertainty、conformal prediction 的对比。</li>
+</ul>
+</li>
+</ul>
+</div><div class="credit">本文为辅助理解研究方法的中文解读。论文原图、图注及摘要内容归原作者和相应权利人；来源见文首论文链接。</div></article></main><script>window.MathJax={tex:{inlineMath:[['$','$'],['\\(','\\)']],displayMath:[['$$','$$'],['\\[','\\]']]},options:{skipHtmlTags:['script','noscript','style','textarea','pre','code']}};</script><script defer src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-mml-chtml.js"></script><footer><span>AI for Materials 文献精读</span><span>中文研究笔记 · 图与摘要注明论文来源 · 不提供论文 PDF</span></footer></body></html>

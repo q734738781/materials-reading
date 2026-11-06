@@ -1,0 +1,53 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Autonomous Computational Catalysis Research via Agentic Systems · AI for Materials 文献精读</title><meta name="description" content="AI for Materials、原子模拟与科研智能体的中文文献解读"><link rel="stylesheet" href="../style.css"><link rel="icon" href="../icon.svg" type="image/svg+xml"></head><body><header><a class="brand" href="../index.html"><span class="mark">M</span><span>AI for Materials<small>文献精读 / RESEARCH NOTES</small></span></a><a class="header-link" href="../index.html#library">浏览文献 <span>↗</span></a></header><main class="article-layout"><aside><a href="../index.html#library">← 返回文献库</a><nav aria-label="文章目录"><a href="#section-1">1. 文献信息</a><a href="#section-2">2. 一句话总结</a><a href="#section-3">3. 研究背景</a><a href="#section-4">4. 系统设计</a><a href="#section-8">5. 评测与案例</a><a href="#section-9">6. 关键结论</a><a href="#section-10">7. 局限与注意点</a><a href="#section-11">8. 读后要点</a></nav></aside><article><div class="eyebrow">RESEARCH NOTE / T8</div><h1>Autonomous Computational Catalysis Research via Agentic Systems</h1><div class="article-meta"><span>智能体技术与科研系统</span><span>收录 2026-04-29</span><span>3 分钟阅读</span></div><a class="original" href="https://arxiv.org/abs/2601.13508" target="_blank" rel="noopener noreferrer">论文原文 ↗</a><div class="prose"><h2 id="section-1">1. 文献信息</h2>
+<ul>
+<li>类型：arXiv preprint v2, 2026</li>
+<li>主题：CatMaster / 催化计算 Agent 系统</li>
+</ul>
+<h2 id="section-2">2. 一句话总结</h2>
+<p>本文介绍 CatMaster，一个面向计算催化研究的 autonomous agentic system，通过分层 Agent、工具/技能层、持久化项目状态和人类审阅节点，完成从计算任务规划、DFT/ML 工作流执行、MatBench 建模、反应机理验证到端到端单原子催化剂设计的多类任务。</p>
+<h2 id="section-3">3. 研究背景</h2>
+<p>计算催化研究包含大量可被标准化但又需要领域判断的任务，例如结构构建、VASP 输入生成、计算提交与监控、结果解析、反应路径或能垒判断、ML 数据集构建和论文级报告整理。传统 workflow engine 可以自动化固定流程，但难以处理开放式问题和中途失败修复；通用 LLM 又容易在物理约束、文件状态和工具调用上犯错。CatMaster 的目标是在二者之间构建一个可执行、可追踪、可审阅的 Agentic 计算催化系统。</p>
+<h2 id="section-4">4. 系统设计</h2>
+<h3 id="section-5">4.1 分层 Agent 架构</h3>
+<p>CatMaster 采用层级化、LangChain/DeepAgent 风格的运行时。核心设计包括：</p>
+<ul>
+<li>planning / summarization：将自然语言科学目标拆成可执行计划，并在多轮执行后压缩项目状态；</li>
+<li>task orchestration：将任务分派给实验、机器学习、量化计算、写作等 specialist；</li>
+<li>execution layer：调用具体工具执行文件、结构、DFT、MLFF、分析和报告生成任务。</li>
+</ul>
+<h3 id="section-6">4.2 Skills 与 tools</h3>
+<p>系统强调 skills 与 primitive tools 的分离：</p>
+<ul>
+<li>skills 是可复用科研 SOP，例如 slab 构建、VASP relaxation、NEB 分析、MACE 数据集构建等；</li>
+<li>tools 是更小粒度的文件、结构、计算和分析原语；</li>
+<li>skills 给 Agent 提供流程和约束，tools 负责执行可验证动作。</li>
+</ul>
+<p>文中提到当前 active codebase 包含 36 个显式 skills 和 70 个注册 tools。</p>
+<h3 id="section-7">4.3 持久化与可审计</h3>
+<p>CatMaster 通过稳定 thread/project identifier 保存长期项目状态，避免每次任务都从零开始。对计算催化这类长周期任务，这一点很关键：结构、输入文件、计算状态、失败原因和中间结论都必须可追踪。</p>
+<h2 id="section-8">5. 评测与案例</h2>
+<p>文章覆盖多个层次的评测：</p>
+<ul>
+<li><strong>基准计算场景</strong>：包括表面吸附、DOS 分析等基础计算任务，用于测试 Agent 是否能把自然语言目标转为正确计算流程。</li>
+<li><strong>MatBench 建模</strong>：测试其在材料性质预测任务中的通用 ML 建模能力，要求产生可复现脚本、训练/验证结果和报告。</li>
+<li><strong>反应机理验证/网络探索</strong>：在已知催化体系中复现或验证关键机理判断，考察 Agent 是否能在物理约束下组织计算。</li>
+<li><strong>端到端 SAC 设计</strong>：从自然语言目标出发，完成单原子催化剂候选构建、筛选、计算和报告。</li>
+</ul>
+<p>文中强调，在若干 benchmark 中单次 autonomous CatMaster episode 即可达到 best 或 near-best 结果；但也明确指出当前 Agent 在遇到局部研究路径陷阱时仍可能需要人类干预。</p>
+<h2 id="section-9">6. 关键结论</h2>
+<ul>
+<li>计算催化 Agent 不能只依赖 LLM 推理，必须绑定可靠工具、技能 SOP 和物理引擎。</li>
+<li>长周期科研任务需要持久化记忆和项目级状态压缩，而不是一次性对话式执行。</li>
+<li>人类审阅不是失败，而是系统设计中的必要安全阀，尤其在科学结论、机理归因和昂贵计算前。</li>
+<li>Skills 的价值在于把科研经验变成可复用、可审计、可组合的操作单元。</li>
+</ul>
+<h2 id="section-10">7. 局限与注意点</h2>
+<ul>
+<li>文章展示的是系统能力与案例，不应把所有 autonomous episode 的成功外推为完全无人监督科研。</li>
+<li>LLM 后端的工具调用、上下文保持和科学常识差异会显著影响表现。</li>
+<li>对开放式机理探索，Agent 可能收敛到局部解释或过度相信早期计算结果。</li>
+<li>真正严谨的催化结论仍需要 DFT 设置审查、收敛性测试、对照结构和人工物理化学判断。</li>
+</ul>
+<h2 id="section-11">8. 读后要点</h2>
+<p>这篇文章的核心价值不只是“LLM 能做计算”，而是把计算催化任务拆解为可执行工具、可复用技能、可持久化项目状态和可审阅科学结论之间的系统工程。它展示了 autonomous computational catalysis 的可行形态，同时也提示当前系统最需要补强的是失败诊断、科学验证和人类审阅接口。</p>
+</div><div class="credit">本文为辅助理解研究方法的中文解读。论文原图、图注及摘要内容归原作者和相应权利人；来源见文首论文链接。</div></article></main><script>window.MathJax={tex:{inlineMath:[['$','$'],['\\(','\\)']],displayMath:[['$$','$$'],['\\[','\\]']]},options:{skipHtmlTags:['script','noscript','style','textarea','pre','code']}};</script><script defer src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-mml-chtml.js"></script><footer><span>AI for Materials 文献精读</span><span>中文研究笔记 · 图与摘要注明论文来源 · 不提供论文 PDF</span></footer></body></html>

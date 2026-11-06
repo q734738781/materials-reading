@@ -1,0 +1,177 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Rational Design, Synthesis, and Catalytic Enantioselective Derivatization of an achiral ansa-Macrocycle · AI for Materials 文献精读</title><meta name="description" content="AI for Materials、原子模拟与科研智能体的中文文献解读"><link rel="stylesheet" href="../style.css"><link rel="icon" href="../icon.svg" type="image/svg+xml"></head><body><header><a class="brand" href="../index.html"><span class="mark">M</span><span>AI for Materials<small>文献精读 / RESEARCH NOTES</small></span></a><a class="header-link" href="../index.html#library">浏览文献 <span>↗</span></a></header><main class="article-layout"><aside><a href="../index.html#library">← 返回文献库</a><nav aria-label="文章目录"><a href="#section-1">Bibliographic status</a><a href="#section-2">One-line takeaway</a><a href="#section-3">What the paper asks</a><a href="#section-4">Methods</a><a href="#section-9">Main findings</a><a href="#section-10">Limitations and caveats</a><a href="#section-11">Possible actions</a></nav></aside><article><div class="eyebrow">RESEARCH NOTE / T1</div><h1>Rational Design, Synthesis, and Catalytic Enantioselective Derivatization of an achiral ansa-Macrocycle</h1><div class="article-meta"><span>材料生成与逆向设计</span><span>收录 2026-07-30</span><span>12 分钟阅读</span></div><a class="original" href="https://doi.org/10.26434/chemrxiv-2025-jcnff" target="_blank" rel="noopener noreferrer">论文原文 ↗</a><div class="prose"><h2 id="section-1">Bibliographic status</h2>
+<ul>
+<li><strong>作者</strong>：Rui Wang（清华大学化学工程系；ORCID: 0000-0002-2362-3214）。</li>
+<li><strong>文献类型与状态</strong>：ChemRxiv 预印本，发布于 <strong>2025-08-11</strong>；<strong>未经同行评审</strong>，文中数据应视为初步结果。</li>
+<li><strong>DOI</strong>：<a href="https://doi.org/10.26434/chemrxiv-2025-jcnff" target="_blank" rel="noopener noreferrer">10.26434/chemrxiv-2025-jcnff</a>。</li>
+<li><strong>许可</strong>：CC BY-NC-ND 4.0。</li>
+<li><strong>证据范围说明</strong>：所给全文文本包含 5 页正文、实验部分及参考文献，但没有实际展开 Supporting Information（SI）的谱图、计算坐标/能量表和 Table S3；下文对 SI 的描述仅限正文明确引用或概述的内容，不能替代对原始 SI 的独立核查。</li>
+</ul>
+<h2 id="section-2">One-line takeaway</h2>
+<p>作者以“<strong>可阻转的刚性吡咯核心 + 柔性烷基 ansa 桥 + 高亲核反应位点</strong>”为设计逻辑，制得一个对称、未衍生化时不具平面手性的宏环 1a，并以手性磷酸催化单点亲电取代将其去对称化为平面手性产物 2a；代表性结果为 <strong>84% 分离产率、52% ee</strong>，证明概念可行，但立体控制、底物范围和阻转证据仍较初步。</p>
+<h2 id="section-3">What the paper asks</h2>
+<ol>
+<li><strong>能否绕开传统对环芳烃的反应惰性与苛刻衍生化条件？</strong> 传统 paracyclophane 可提供稳定平面手性，但非杂环苯环亲核性低，往往需要强锂试剂，且宏环合成困难、产率偏低。作者试图以电子更富集的吡咯替代普通芳环。</li>
+<li><strong>能否同时满足“足够高的构象/阻转稳定性”和“足够强的亲核性”？</strong> 设计的 1a 以吡咯为刚性芳香核心、长烷基链为 ansa 桥；桥链既限制芳环相对运动，又保留可合成性。</li>
+<li><strong>能否从一个对称、非手性的宏环出发，通过单侧 C1/C1′ 官能化直接建立平面手性？</strong> 1a 的 C1 与 C1′ 在起始物中等价；若只在其中一位发生亲电取代，结构对称性被破坏，生成平面手性阻转异构体 2。</li>
+<li><strong>手性磷酸（CPA）能否在这一去对称化亲电取代中控制对映选择性？</strong> 论文选择 ketomalonate 3a 作为模型亲电试剂，考察 CPA、温度、溶剂和分子筛等条件对产率与 ee 的影响。</li>
+</ol>
+<h2 id="section-4">Methods</h2>
+<h3 id="section-5">1. 分层理性设计与 DFT</h3>
+<p>作者的设计不是单一能量计算，而是依次回答“能否合成—是否阻转—是否足够亲核—优先在哪个位点反应”四个层级的问题。</p>
+<ol>
+<li>
+<p><strong>逆合成层级</strong></p>
+<ul>
+<li>比较两类常见宏环路线：先在芳基前体上安装长链再关环，或直接构建对位连接的芳香骨架。</li>
+<li>作者认为直接构建芳香骨架更高效，因而提出由宏环 1,4-二酮 1b 与 4-tert-butylbenzylamine（1c）经 Knorr/Paal–Knorr 型吡咯合成形成 1a。</li>
+<li>1b 可由十二烷二酸 1d 按已报道路线制备；路线中涉及叠氮化物 1f。</li>
+</ul>
+</li>
+<li>
+<p><strong>阻转与构象稳定性层级</strong></p>
+<ul>
+<li>软件：Gaussian 09。</li>
+<li>几何优化与频率：B3LYP/6-31G(d)。</li>
+<li>通过逐步改变关键二面角、进行约束几何优化来扫描旋转势能面；正文给出的旋转势垒为 <strong>&gt;26.6 kcal mol⁻¹</strong>（对应 SI Fig. S1）。</li>
+<li>构象稳定性评估另考虑 SMD 隐式溶剂，溶剂设为氯仿；正文措辞显示单点能建立在气相优化结构之上，但具体能量修正流程在所给文本中不够清楚。</li>
+<li>这一势垒被作者解释为与常见 cyclophane 相当，足以产生受阻旋转。</li>
+</ul>
+</li>
+<li>
+<p><strong>全局亲核性/亲电性层级</strong></p>
+<ul>
+<li>分别采用 <strong>ωB97X-D/6-311+G(d,p)</strong> 和 <strong>M06-2X/6-311+G(d,p)</strong> 进行几何优化与频率计算，随后进行单点能和静电势（ESP）分析。</li>
+<li>利用 Parr 方程相关指标比较 1a 与参照环芳烃（参照结构在纯文本中无法从图 2 准确识别）：
+<ul>
+<li>ωB97X-D：1a 的亲核性指数 <strong>N ≈ 4.61 eV</strong>，高于参照的 <strong>3.34 eV</strong>；亲电性指数 <strong>ω ≈ 0.60 eV</strong>，略低于参照的 <strong>0.62 eV</strong>。</li>
+<li>M06-2X：1a 的 <strong>N ≈ 4.69 eV</strong>，高于参照的 <strong>3.41 eV</strong>；<strong>ω ≈ 0.91 eV</strong>，低于参照的 <strong>1.20 eV</strong>。</li>
+</ul>
+</li>
+<li>两套泛函给出一致的定性判断：1a 是较强亲核体而只是弱至边缘亲电体，适合接受亲电试剂进攻，而不适合作为主要亲电反应平台。</li>
+</ul>
+</li>
+<li>
+<p><strong>局部反应位点层级</strong></p>
+<ul>
+<li>在 M06-2X/6-311+G(d,p) 水平分析 1a 自由基阳离子的 α-spin SCF 电子密度等值面，以及 Mulliken 和 NBO 自旋密度分布（正文指向 SI Fig. S2）。</li>
+<li>计算把 <strong>C1/C1′</strong> 识别为相对更易发生亲核反应的位置；因此，C1 或 C1′ 的单官能团化被设定为建立平面手性的关键步骤。</li>
+<li>论文没有对 CPA 催化反应的竞争过渡态进行计算；DFT 只支持宏环与位点的前置设计，未直接解释 52% ee 的来源。</li>
+</ul>
+</li>
+</ol>
+<h3 id="section-6">2. 合成路线与表征</h3>
+<ol>
+<li>
+<p><strong>宏环二酮 1b</strong></p>
+<ul>
+<li>主要按 Chandler 与 List 的文献方法制备。</li>
+<li>作者指出，若尝试分离纯化路线中的叠氮化物 1f，会因溶解度问题显著损失总收率；因此合成流程对该中间体的处理进行了实用化简化。</li>
+</ul>
+</li>
+<li>
+<p><strong>1a 的关键成环反应</strong></p>
+<ul>
+<li>粗品 1b：3.8 g，15 mmol；4-tert-butylbenzylamine 1c：3.0 g，18 mmol。</li>
+<li>在氮气下以乙酸乙酯 100 mL 溶解 1b，缓慢加入乙酸 15 mL，再缓慢加入 1c；回流过夜。</li>
+<li>TLC 监测至 1b 消失；冰浴下用饱和 NaHCO₃ 中和，萃取、水洗、无水 Na₂SO₄ 干燥，再经柱层析纯化。</li>
+<li>得浅黄色黏稠 1a <strong>2.4 g，约 45%（该步）</strong>；从路线起始物计的正文报告<strong>总收率为 9.6%</strong>。这两个数字分别对应关键成环步与全路线，不应混用。</li>
+<li>HRMS：C₂₅H₃₈N⁺ [M+H]⁺ 计算 352.2999，实测 352.3004。</li>
+</ul>
+</li>
+<li>
+<p><strong>NMR 与受阻旋转判断</strong></p>
+<ul>
+<li>仪器：¹H NMR 400 MHz、¹³C NMR 101 MHz，CDCl₃。</li>
+<li>正文称 C4–H 与 C5–H 处于不同化学环境，支持宏环桥导致的受阻旋转。</li>
+<li>1a 的 ¹H NMR 中吡咯/桥相关信号包括 δ 5.90（s, 2H）、5.29（s, 0.6H）与 5.11（s, 1.4H）；后两组总积分为 2H，但比例约 0.6:1.4。作者将不等价信号作为 atropisomeric rigidity 的实验依据。</li>
+<li>所给文本未报告变温 NMR、EXSY、峰形线分析或实验活化参数，因此 NMR 主要证明“在测量时间尺度上存在不等价环境”，尚未给出阻转半衰期的定量实验测定。</li>
+</ul>
+</li>
+</ol>
+<h3 id="section-7">3. 亲电试剂与不对称衍生化筛选</h3>
+<ol>
+<li>
+<p><strong>亲电试剂预筛选</strong></p>
+<ul>
+<li>作者测试了多种亲电衍生化设想，最终选择 <strong>ketomalonate 3a</strong> 作为最适合展示 C1/C1′ 去对称化单取代的模型亲电试剂。</li>
+<li>其他尝试据称列于 SI Section 5、Table S3，但所给全文文本没有 Table S3 的条目、转化率或失败模式，无法判断筛选覆盖面以及“最优”的完整比较基础。</li>
+</ul>
+</li>
+<li>
+<p><strong>标准反应</strong></p>
+<ul>
+<li>1a 0.10 mmol、3a 0.12 mmol、CPA 4a 10 mol%，环己烷 1 mL，密封，30 ℃，24 h。</li>
+<li>收率用 CH₂Br₂ 内标经 ¹H NMR 测定；ee 用 Chiralpak IC-H 手性 HPLC 测定。</li>
+<li>标准条件给出 <strong>92% NMR 收率、52% ee</strong>；0.20 mmol 放大时为 <strong>84% 分离收率、52% ee</strong>。</li>
+</ul>
+</li>
+<li>
+<p><strong>催化剂、温度、溶剂和添加剂筛选（Table 1）</strong></p>
+<ul>
+<li>4b 替代 4a：<strong>96% NMR 收率，91% 放大分离收率，ee 标为“—”</strong>；纯文本无法确认“—”表示外消旋、未测定，还是 4b 本身不具手性。</li>
+<li>标准 4a：<strong>92% NMR 收率，84% 放大分离收率，52% ee</strong>。</li>
+<li>4c 替代 4a：一行是 <strong>95% 收率、6% ee</strong>；下一行在提取文本中也写成“4c instead of 4a”，结果为 <strong>76% 收率、3% ee</strong>。这很可能是图像转文本或原表标签问题，不能在没有原始表格的情况下确定第二种催化剂身份。</li>
+<li>0、10 或 20 ℃代替 30 ℃：<strong>无反应（n.r.）</strong>。</li>
+<li>50 ℃：<strong>96% 收率、51% ee</strong>，说明升温提高/保持转化，但未改善对映选择性。</li>
+<li>甲苯替代环己烷：<strong>93% 收率、52% ee</strong>，与标准条件相近。</li>
+<li>加入 3 Å、4 Å 或 5 Å 分子筛：收率 <strong>83–93%</strong>、ee <strong>50–53%</strong>，影响很小。</li>
+</ul>
+</li>
+<li>
+<p><strong>2a 的分离与鉴定</strong></p>
+<ul>
+<li>制备操作：反应后以乙酸乙酯洗涤，浓缩，经厚层制备 TLC 得灰白色黏稠产物 2a。</li>
+<li>0.20 mmol 规模得到 <strong>44.2 mg，84%，52% ee</strong>。</li>
+<li>比旋光度：[α]²⁵_D = <strong>−4.2</strong>（c = 1，CHCl₃）。</li>
+<li>手性 HPLC：Chiralpak IC-H，15% i-PrOH/hexane，1.0 mL min⁻¹，210 nm；次峰 9.4 min，主峰 17.1 min。</li>
+<li>HRMS：C₃₂H₄₈NO₅⁺ [M+H]⁺ 计算 526.3527，实测 526.3530；正文同时提供完整 ¹H/¹³C NMR 数据。</li>
+</ul>
+</li>
+</ol>
+<h3 id="section-8">4. SI 在正文中明确提及的主要补充内容</h3>
+<ul>
+<li><strong>Section 3.1 / Fig. S1</strong>：约束二面角旋转扫描及 &gt;26.6 kcal mol⁻¹ 势垒的详细计算结果。</li>
+<li><strong>Section 3.2 / Fig. S2</strong>：Parr 亲核/亲电指标、α-spin SCF 电子密度等值面，以及自由基阳离子的 Mulliken/NBO 自旋密度，用于支持 C1/C1′ 位点选择。</li>
+<li><strong>Section 5 / Table S3</strong>：除 ketomalonate 3a 外的其他催化不对称衍生化尝试。</li>
+<li><strong>分析附件</strong>：1a、2a 等化合物的 NMR 谱和 2a 的手性 HPLC 谱。</li>
+<li><strong>重要边界</strong>：上述 SI 内容只是在正文中被列举；当前文本没有相应原始图表、数值表、坐标或谱图，因而无法核验扫描步长、各构象相对能、虚频、全部 Parr 指标定义、失败亲电试剂清单、峰纯度和 HPLC 基线分离质量。</li>
+</ul>
+<h2 id="section-9">Main findings</h2>
+<ol>
+<li><strong>设计层面形成了相互衔接的证据链。</strong> B3LYP 二面角扫描预测较高旋转势垒（&gt;26.6 kcal mol⁻¹）；两套较高水平泛函都预测 1a 的全局亲核性高于参照环芳烃；自由基阳离子自旋密度又把 C1/C1′ 指定为优先反应位点。计算由“稳定性—全局反应性—局部选择性”逐层收窄到实验靶点。</li>
+<li><strong>目标 achiral ansa-macrocycle 确实可获得，但全路线效率仍低。</strong> Paal–Knorr/Knorr 成环本身约 45%，但全路线仅 9.6%；叠氮中间体 1f 的溶解度与纯化损失是作者明确指出的瓶颈。</li>
+<li><strong>NMR 与计算共同支持受阻旋转，但实验力度有限。</strong> 1a 中桥相关/环上氢信号不等价，与受限构象相容；然而实验尚未直接测得旋转活化自由能或热稳定半衰期。</li>
+<li><strong>吡咯核心实现了温和的直接亲电衍生化。</strong> 1a 不需传统对环芳烃常用的强锂试剂，即可与 ketomalonate 3a 在 CPA 条件下高转化单官能团化，验证“提高亲核性以降低衍生化门槛”的核心设计思想。</li>
+<li><strong>不对称去对称化概念成立，但 ee 仅中等。</strong> 标准条件及放大反应均为 <strong>52% ee</strong>；放大分离产率 <strong>84%</strong>。温度、溶剂和分子筛变化几乎不能提高 ee，而其他 CPA 只有 3–6% ee，说明 4a 确有特定匹配，但当前催化剂口袋对两个等价反应面的区分仍不充分。</li>
+<li><strong>作者把中等 ee 归因于可能存在多个亲核进攻过渡态。</strong> 这是合理假设，却没有计算过渡态、动力学或非线性效应等直接证据；目前只能作为后续催化剂设计的工作模型。</li>
+<li><strong>当前成果本质上是单一概念验证。</strong> 文本展示的是 1a + 3a → 2a 这一组代表反应，并未建立亲电试剂范围、桥链/吡咯取代基结构—性能关系或可推广的产物谱系。</li>
+</ol>
+<h2 id="section-10">Limitations and caveats</h2>
+<ol>
+<li><strong>预印本证据等级</strong>：稿件未经同行评审；数据、结构归属、表格标签和结论均可能在正式发表前修订。作者人数、单位拼写和部分表格文字在提取文本中也有明显排版/OCR 异常。</li>
+<li><strong>SI 不在给定文本中</strong>：用户要求关注的 SI 关键内容只能依据正文摘要，不能独立读取和核查。尤其是 Table S3 的其他亲电试剂结果、Fig. S1 的完整势能面以及 Fig. S2 的原始自旋密度数据均缺失。</li>
+<li><strong>DFT 旋转势垒方法偏初步</strong>：势垒来自 B3LYP/6-31G(d) 约束扫描；没有看到严格定位并验证的一阶鞍点、色散/高水平单点校正、显式溶剂、构象充分采样或方法敏感性分析。“&gt;26.6 kcal mol⁻¹”与实验时间尺度稳定性的对应仍需实验验证。</li>
+<li><strong>构象与阻转的实验验证不足</strong>：不等价 NMR 信号可支持受限构象，却不能单独排除慢交换构象混合或其他不对称环境。缺少变温 NMR、EXSY、动力学测定以及 X-ray 结构。</li>
+<li><strong>“achiral”与“atropisomeric”的表述需谨慎</strong>：1a 因 C1/C1′ 对称而作为非手性前体使用；其受阻构象不等同于已分离的稳定对映体。单侧官能团化后才打破对称性并形成平面手性 2a。</li>
+<li><strong>反应性指标主要是定性支持</strong>：Parr N/ω 数值在两套泛函上趋势一致，但绝对值有明显方法依赖；参照分子的身份无法从纯文本图中准确读取，也没有以实验速率或竞争实验验证计算排序。</li>
+<li><strong>没有催化立体模型</strong>：未报告 CPA–底物复合物、过渡态能差、氢键模式或构象分布，因此无法从计算上解释主对映体、52% ee 或催化剂结构效应。</li>
+<li><strong>绝对构型未建立</strong>：文本只报告 HPLC 保留时间和负比旋光度，没有 X-ray、ECD/VCD 或可靠计算比对来指定 2a 的绝对平面手性构型。</li>
+<li><strong>筛选表存在可读性问题</strong>：Table 1 中两个条目都被提取为“4c instead of 4a”；4b 条目的 ee 为“—”。在看到原表图和催化剂结构前，不宜据此建立精细构效关系。</li>
+<li><strong>范围与统计不足</strong>：没有系统底物/亲电试剂 scope，没有重复实验、误差条或批次稳定性；0.20 mmol 的“放大”仍属于小试规模。</li>
+<li><strong>产物稳定性尚未证明</strong>：没有报告 2a 的消旋速率、储存稳定性、升温稳定性或后续转化中 ee 保持情况；因此“可用平面手性平台”的长期构型稳定性仍待证明。</li>
+<li><strong>合成可及性仍是瓶颈</strong>：虽然关键成环为约 45%，全路线 9.6% 仍不高，且依赖对难处理叠氮中间体的操作优化；尚不能据此断言平台具备普适、可规模化的“robust blueprint”。</li>
+</ol>
+<h2 id="section-11">Possible actions</h2>
+<ol>
+<li><strong>先补齐 SI 核验</strong>：获取原始 SI，逐项记录 Fig. S1 的扫描二面角、步长、各极小值与最高点能量，Fig. S2 的原子自旋密度，以及 Table S3 的全部亲电试剂、催化剂、转化率、产率和 ee；同时核对 Table 1 第 4 行催化剂标签及 4b 的“—”含义。</li>
+<li><strong>把阻转从“计算 + 静态 NMR”升级为定量实验</strong>：做变温 NMR/线形拟合或 EXSY，测得 ΔG‡、交换速率和半衰期；对 2a 做热消旋实验，确认平面手性在分离、储存和反应条件下是否稳定。</li>
+<li><strong>提高计算可信度</strong>：对多个桥链构象做系统构象搜索；使用含色散的泛函和更大基组，在适当溶剂模型下重新优化旋转过渡态并做 IRC/频率确认；比较 DLPNO-CCSD(T) 或其他高水平单点结果，给出方法误差范围。</li>
+<li><strong>建立真正的催化立体模型</strong>：计算 4a 与 1a/3a 形成的关键复合物和两条对映竞争过渡态，考察质子化模式、氢键网络、CPA 3,3′-取代基空间效应及多个底物构象；将预测 ΔΔG‡ 与 52% ee 对应的实验选择性比较。</li>
+<li><strong>优化催化剂而非继续做单变量溶剂筛选</strong>：温度、甲苯/环己烷和分子筛对 ee 几乎无影响，下一步应重点扩大 CPA 3,3′-取代基、酸性、手性口袋深度，或尝试双功能酸/碱、离子对和受限空间催化剂。</li>
+<li><strong>扩展反应范围并设置失败对照</strong>：系统考察不同 ketomalonate、偶氮二甲酸酯、亚胺、Michael 受体等亲电试剂；同时比较无 ansa 桥吡咯、不同桥长、不同 N-取代基和 C1/C1′ 电子效应，区分“高亲核性”与“阻转几何”各自的贡献。</li>
+<li><strong>改进前体合成</strong>：围绕 1f 的溶解度问题探索不分离串联、溶剂切换、盐形式或替代二酮合成路线；分别报告每步分离收率和物料衡算，以确定 9.6% 总收率的真正控制步骤。</li>
+<li><strong>补强结构与手性指认</strong>：争取 1a/2a 单晶 X-ray；若无法结晶，可结合二维 NMR、NOE/ROE、ECD/VCD 与计算光谱指定构象和绝对平面手性，并用独立手性柱复核 ee。</li>
+<li><strong>验证平台价值</strong>：对 2a 进行可继续转化的官能团操作，考察是否保持 ee；进一步测试其作为配体、催化剂骨架或主客体分子的性能，才能把“可衍生化宏环”推进到真正功能平台。</li>
+<li><strong>当前引用方式应保持克制</strong>：可将本工作引用为“吡咯型 achiral ansa-macrocycle 经 CPA 去对称化得到 52% ee 的预印本概念验证”，不宜在 SI、绝对构型、底物范围和正式同行评审完成前写成已确立的通用方法。</li>
+</ol>
+</div><div class="credit">本文为辅助理解研究方法的中文解读。论文原图、图注及摘要内容归原作者和相应权利人；来源见文首论文链接。</div></article></main><script>window.MathJax={tex:{inlineMath:[['$','$'],['\\(','\\)']],displayMath:[['$$','$$'],['\\[','\\]']]},options:{skipHtmlTags:['script','noscript','style','textarea','pre','code']}};</script><script defer src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-mml-chtml.js"></script><footer><span>AI for Materials 文献精读</span><span>中文研究笔记 · 图与摘要注明论文来源 · 不提供论文 PDF</span></footer></body></html>

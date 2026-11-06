@@ -1,0 +1,45 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Truncated automatic sparse differentiation for machine learning interatomic potentials · AI for Materials 文献精读</title><meta name="description" content="AI for Materials、原子模拟与科研智能体的中文文献解读"><link rel="stylesheet" href="../style.css"><link rel="icon" href="../icon.svg" type="image/svg+xml"></head><body><header><a class="brand" href="../index.html"><span class="mark">M</span><span>AI for Materials<small>文献精读 / RESEARCH NOTES</small></span></a><a class="header-link" href="../index.html#library">浏览文献 <span>↗</span></a></header><main class="article-layout"><aside><a href="../index.html#library">← 返回文献库</a><nav aria-label="文章目录"><a href="#section-1">原始摘要中文全译</a><a href="#section-2">研究对象：从原子力走向集体振动</a><a href="#section-3">理论要点：精确零与足够小不是同一回事</a><a href="#section-4">作者实际验证了什么</a><a href="#section-5">决定性证据及解释</a><a href="#section-6">得到的新认识，以及不能越过的边界</a></nav></aside><article><div class="eyebrow">RESEARCH NOTE / T6</div><h1>Truncated automatic sparse differentiation for machine learning interatomic potentials</h1><div class="article-meta"><span>机器学习势训练与泛化</span><span>收录 2026-09-23</span><span>6 分钟阅读</span></div><a class="original" href="https://arxiv.org/abs/2609.20510" target="_blank" rel="noopener noreferrer">论文原文 ↗</a><div class="prose"><ul>
+<li><strong>文献信息</strong>：Marcel F. Langer、Adrian Hill、Michele Ceriotti；2026；arXiv:2609.20510v1，2026-09-17；预印本，尚不等同于同行评议结论。</li>
+</ul>
+<h2 id="section-1">原始摘要中文全译</h2>
+<p>机器学习原子间势（MLIP）学习从原子位置到势能的映射。力是该能量的负梯度，它驱动分子动力学，并可通过自动微分方便地获得。更高阶导数，尤其是Hessian矩阵，描述集体运动，并允许直接预测实验可观测量，但通常被认为对于大体系而言在计算上难以取得。我们提出一种解决办法：在物理体系中，相互作用随距离衰减，而大多数MLIP通过在有限感受野内进行消息传递来利用这种局域性。这意味着高阶导数既具有稀疏性，其数值也随距离衰减。这一结构可以通过自动稀疏微分（ASD）加以利用。我们解释如何计算MLIP导数的稀疏模式，并展示对于多个基础MLIP，ASD能够精确计算大型多孔材料的完整Hessian矩阵，但最多只能获得有限的加速。更大的收益来自截断ASD：舍弃远距离原子之间很小但非零的Hessian元素，可带来数量级的加速，同时对预测可观测量的影响可以忽略。</p>
+<h2 id="section-2">研究对象：从原子力走向集体振动</h2>
+<p>本文不是训练一个新的势，而是改变现有势的二阶导数计算方式。原子位置输入势能模型后，能量的一阶导数给出力；二阶导数则回答“移动一个原子后，另一个原子受到的力如何改变”。这些力常数决定原子如何协同振动。对局部能量最低点附近的小振幅运动，质量加权的Hessian可以分解为声子频率，继而计算热容等量。这条联系依赖谐近似，不涵盖任意温度下的强非谐运动（第1—2页）。</p>
+<p>困难不是自动微分不会求二阶导数，而是完整矩阵太大。对于N个原子、每个原子三个坐标，普通方法要做3N次Hessian—向量乘积，每次成本随N增长，因此组装Hessian总成本近似为N的平方。相比之下，标量总能量的全部一阶导数只需一次反向传播。大孔材料又常有巨大晶胞，若超胞不足以容纳模型相互作用范围，周期边界还会把不同原子像的耦合折叠到同一个元素中，影响声子结果（第1、4、12页）。</p>
+<h2 id="section-3">理论要点：精确零与足够小不是同一回事</h2>
+<p><strong>论文原式及定义（第2页）</strong>：力常数为
+\[
+\Phi_{i\alpha,j\beta}=\frac{\partial^2E}{\partial r_{i\alpha}\partial r_{j\beta}}.
+\]
+E是势能，文中以eV计；r是原子坐标，以Å计；i、j标记原子，α、β标记三个笛卡尔方向，因此Φ的单位是eV/Å²。每对原子对应一个3×3块，作者用该块的Frobenius范数衡量耦合强度。质量加权后的矩阵本征值是频率平方，而不是直接测得的实验频率。</p>
+<p><strong>论文原式（第2页式1）</strong>：谐振动定容热容为
+\[
+C_V(T)=k_B\sum_s\frac{x_s^2e^{x_s}}{(e^{x_s}-1)^2},\qquad x_s=\frac{\hbar\omega_s}{k_BT}.
+\]
+T是绝对温度，单位K；k_B是玻尔兹曼常数；ℏ是约化普朗克常数；ω_s为第s个振动模式的角频率；x_s无量纲。这里的C_V是求和体系的热容，转为图5的质量比热时还需按质量归一化。该式说明热容是整个频谱的加权结果，因此矩阵误差不一定一比一传递到热容误差。</p>
+<p>对有限层数的消息传递模型，两个原子只有同时影响某一个局部能量项，二阶耦合才可能非零。MACE的能量按节点读出，L层消息传递对应最远K=2L跳；PET按边读出，对应K=2L+1跳。这里“跳”是输入原子图上的邻接步数，不是固定的欧氏距离。**论文原式（第4页式2）**用布尔矩阵运算构造模式：\(A^{(K)}=\sum_{k=0}^{K}A^k\)，其中A是无量纲邻接矩阵，K是精确最大跳数；布尔求和仅判断是否存在路径，不累计路径数。</p>
+<p>ASD先给稀疏图做星形着色，把能无冲突恢复的多个矩阵列压入同一次向量乘积，再解压。颜色越少，计算次数越少。截断ASD则主动以k&lt;K的较小邻域作为假定模式。它不只是把远端元素置零：原本被忽略的非零项还可能混入保留项，引起解压污染。附录H发现污染与舍弃项的误差同阶，中位比例约0.60（第18页图4）；因此不能把这种近似描述为“保留块仍完全精确”。</p>
+<h2 id="section-4">作者实际验证了什么</h2>
+<p>作者比较MACE-MP-0 medium、PET-MAD-1.5的XS和S版本，精确K分别为4、5、7；使用MOF、COF和沸石的分层子集，并加入MIL-101等巨大MOF。计时在单张H100上完成，包含稀疏模式构造、着色和Hessian计算，不只统计内核速度。233个结构的MACE单位晶胞重算用于验证热容流程；真正的模型收敛超胞成本比较采用较小分层子集，不能把233说成全部大超胞测试数（第5、12、14页）。</p>
+<p>计时还有一个须保留的实现细节：Hessian和向量乘积来自直接给坐标图着色的一次运行，着色耗时则取自随后仅给原子图着色的运行。两次在全部234个稀疏级次上给出相同颜色和向量乘积，因此作者认为可以组合；这不是一次未经拆分的流水线实测。原子图着色使着色阶段总耗时由22.8小时降到1.2小时（第14页附录D）。</p>
+<p>实现采用JAX，并与原PyTorch能量、力和应力核对。作者明确禁用TF32矩阵乘法，因为它虽属于常见GPU默认加速路径，却使力误差增加近四个数量级；使用完整单精度与使用TF32不是同一精度条件（第13页表2）。</p>
+<h2 id="section-5">决定性证据及解释</h2>
+<ol>
+<li>
+<p><strong>观察到的结果：精确稀疏并不自动意味着大幅加速。</strong> 精确ASD相对稠密Hessian的相对Frobenius误差均在5×10⁻⁴以内，通常约10⁻⁶；但MACE、PET-XS、PET-S端到端中位加速仅1.7、1.4、1.2倍，所有体系均不超过6倍（第5页）。作者解释为基础势的感受野已与大晶胞相当，实际可利用的零元素不足。</p>
+</li>
+<li>
+<p><strong>观察到的结果：化学类别影响可截断程度。</strong> 每增加一跳，MACE的力常数块典型衰减约两个数量级，PET略多于一个数量级；到第三跳，中位块范数比原位块低3.5—7个数量级。沸石衰减慢于MOF和COF（第5页及第17页图3）。这说明近似有效性与真实耦合传播及模型表达有关，不能仅按原子数选择截断。</p>
+</li>
+<li>
+<p><strong>观察到的结果：对300 K热容，适当截断比完全稀疏更有用。</strong> 以热容相对误差0.1%为阈值，大多数结构的MACE在k=2、PET-S在k=3、PET-XS在k=4收敛，对应中位加速11、13、1.6倍（第6页图2）。例如6464原子的MOF-177，MACE稠密计算9431秒，k=2约312秒，表1热容误差低于0.01‰；不能把k=1的80.5倍速度与k=2的精度配成一个结果（第5页表1、第16页表4）。</p>
+</li>
+<li>
+<p><strong>观察到的结果：算法误差小不意味着实验预测准确。</strong> 在300 K，MOF-177的MACE热容比实验高30%，PET约高17%；MIL-101分别高84%与61%—64%（第19页图5）。作者将前者联系到势的声子系统性偏软；后者可能还涉及实验样品缺陷、残余客体与理想晶体不一致。这是作者解释，而不是本文独立测出的缺陷成分。</p>
+</li>
+</ol>
+<h2 id="section-6">得到的新认识，以及不能越过的边界</h2>
+<p><strong>作者的解释</strong>是：消息传递势的形式作用范围很长，但对某些谐可观测量真正重要的二阶耦合范围可以更短。<strong>卡片推断</strong>是：应把“导数精确性”“可观测量数值收敛”和“势对实验的准确性”分成三道检查；本文改善第一道的计算成本，并展示第二道在热容上的容错，不消除第三道的物理模型偏差。这里获得的是导数结构和可观测量敏感性的认识，不是新的MOF热容机制。</p>
+<p>几个限制直接影响复用。第一，生产Hessian对MACE省略D3色散，对PET省略自适应截断半径的位置导数，因此精确ASD是相对这一约定下的稠密参考精确，不是对含所有原始力项的势严格无近似。附录E的组合近似热容中位偏差最高0.12%，最差可达几个百分点，且个别频率误差明显（第14—15页表3）。第二，近零模式按10⁻³ cm⁻¹阈值删除，虚频被置零；模式跨越阈值能造成非连续热容变化，声学求和规则只消除声学模的这类歧义。第三，正文给出总体收敛趋势，但第16页表4中NPT/PET-S从k=3的0.04%变为k=4的−0.56%，不能把“增加跳数”写成每一个可观测误差严格单调下降。</p>
+<p>最后，三阶导数、声子线宽、无限程势和以实验数据微调是扩展方向，不是已经完成的验证。第7页明确提醒线宽可能比热容更依赖远端耦合。实际使用时，需要按目标可观测量检验截断收敛，不能直接把热容所需的二跳或三跳转移到热输运、过渡态或长程静电体系。</p>
+</div><div class="credit">本文为辅助理解研究方法的中文解读。论文原图、图注及摘要内容归原作者和相应权利人；来源见文首论文链接。</div></article></main><script>window.MathJax={tex:{inlineMath:[['$','$'],['\\(','\\)']],displayMath:[['$$','$$'],['\\[','\\]']]},options:{skipHtmlTags:['script','noscript','style','textarea','pre','code']}};</script><script defer src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-mml-chtml.js"></script><footer><span>AI for Materials 文献精读</span><span>中文研究笔记 · 图与摘要注明论文来源 · 不提供论文 PDF</span></footer></body></html>

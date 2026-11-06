@@ -1,0 +1,27 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Training AI Scientists to Replicate Research · AI for Materials 文献精读</title><meta name="description" content="AI for Materials、原子模拟与科研智能体的中文文献解读"><link rel="stylesheet" href="../style.css"><link rel="icon" href="../icon.svg" type="image/svg+xml"></head><body><header><a class="brand" href="../index.html"><span class="mark">M</span><span>AI for Materials<small>文献精读 / RESEARCH NOTES</small></span></a><a class="header-link" href="../index.html#library">浏览文献 <span>↗</span></a></header><main class="article-layout"><aside><a href="../index.html#library">← 返回文献库</a><nav aria-label="文章目录"><a href="#section-1">What the paper asks</a><a href="#section-2">Methods</a><a href="#section-3">Main findings</a><a href="#section-4">Limitations and caveats</a><a href="#section-5">Possible actions</a></nav></aside><article><div class="eyebrow">RESEARCH NOTE / T8</div><h1>Training AI Scientists to Replicate Research</h1><div class="article-meta"><span>智能体技术与科研系统</span><span>收录 2026-08-18</span><span>5 分钟阅读</span></div><a class="original" href="https://arxiv.org/abs/2608.13331`" target="_blank" rel="noopener noreferrer">论文原文 ↗</a><div class="prose"><ul>
+<li><strong>Bibliographic status</strong>: Damon Falck, Samer Sabri, Anja Surina, Thom Foster, Anya Sims, Sam Devlin, Dylan Rogers, Tantum Collins, Kaloyan Aleksiev, Louis Kirsch, Edward Hughes；Inherent；2026；arXiv:2608.13331，<code>https://arxiv.org/abs/2608.13331</code>。</li>
+<li><strong>One-line takeaway</strong>: 论文把“一小时和单 GPU 切片内重做论文图”构造成 310 个任务，并训练 27B 外层研究代理 Faraday 调度 GPT-5.5 编码代理；系统在自定义裁判下优于 Claude/Codex，但关键结论依赖模型裁判和有条件的人类样本，尚不能证明随机任务上的平均人类偏好或开放式创新。</li>
+</ul>
+<h2 id="section-1">What the paper asks</h2>
+<p>论文询问：能否通过强化学习，让相对较小的语言模型充当科研决策层，在论文未充分说明实验细节时规划、委派、检查并迭代真实实验，从而比直接使用前沿编码代理更好地复现研究结果。</p>
+<p>作者进一步检验任务空间能否规模化、非完全可验证的科学任务能否产生稳定奖励、权重后训练是否优于 prompt 优化，以及复现策略能否迁移到未见 AI-for-science 任务、反事实任务、更大算力和更强内部编码工具。</p>
+<h2 id="section-2">Methods</h2>
+<p>作者从 100 篇机器学习与 AI-for-science 论文生成 310 个图复现任务，包括 242 个训练任务和 68 个测试任务。Gemini 2.5 Pro 扫描结果图、定位并遮去目标图；每题提供 caption、被遮去目标图的论文 PDF 和供裁判使用的 gold plot。所有任务经过人工质检。</p>
+<p>每个代理获得一小时、一块 H200 的 1/7 MIG 切片、容器和互联网。目标是在预算内执行最忠实的缩小实验，而不是硬编码原图。Faraday 基于 Qwen3.6-27B，负责研究规划、范围选择、诊断和下一步决策，所有实现委派给编码代理；训练早期使用 GPT-5.4 mini，后期和正式评估使用 GPT-5.5。</p>
+<p>任务专属 rubric 由 Claude Opus 4.7 生成，覆盖视觉一致性、科学主张、机制实现、预算使用和诚信。正式评分由 Codex GPT-5.5 完成，可查看完整轨迹、代码、git 历史和最终图，并可重跑。每个 rollout 评分三次取均值；每项任务执行八个 rollout 后取平均。</p>
+<p>Faraday 使用修改版 GRPO 和 rank 128 LoRA，128K 上下文、恒定学习率 6×10^-6。每步抽取 10 个任务，每题八个 rollout。作者引入 turn-level credit，把一条长轨迹中的梯度更多分配给关键研究决策和委派步骤。</p>
+<h2 id="section-3">Main findings</h2>
+<p>在 242 个同分布任务中，Faraday 有 73% 的任务同时超过 Claude 和 Codex；在 68 个 AI-for-science 测试任务中为 60%。测试集平均分比 Claude 高 6%，比 Codex 高 8%。优势主要集中在实验深度、主张复现和图形忠实度，对方法实现忠实度和诚信大致只是追平 Claude。</p>
+<p>裁判稳定性有所提高，但与人类仍不强。两次 rubric judge 的 Kendall 相关为 0.66，baseline judge 为 0.46，两名人类为 0.30，rubric judge 与人类为 0.19，baseline judge 与人类为 0.15。三次 rubric judge 的噪声约等于八次 baseline judge。直接 judge 比较中，人类在分歧样本上有 63% 支持 rubric judge，但 p=0.109，未达显著。</p>
+<p>Agent 人类比较只选择 rubric judge 认为 Faraday 比两个基线都高至少 0.2 分的三元组。在这 41 份排名中，人类偏好 Faraday 胜过 Claude 为 80%，胜过 Codex 为 88%，并有 71% 将其排在两者之上。该结果验证的是“大优势样本”，不能外推到随机任务的平均人类偏好。</p>
+<p>对 Codex baseline 进行 24 代自动 prompt 优化没有复制 Faraday 的增益，支持研究策略进入模型权重的解释。20 个反事实“想象型复现”中，Faraday 在 19 个任务上优于 Codex，但该任务集仍使用同类 rubric 和模型裁判，尚未进行人类校准。</p>
+<p>在最多八小时、八张 B300 的八个较大任务上，Faraday 平均高于 Claude，并在 5/8 任务中胜出；样本很小且每题每模型只有一次 rollout。Turn-level credit 消融约 50 步后训练崩溃，生成与训练策略的 Jensen-Shannon divergence 增大约两个数量级。无编码代理工具的 Faraday Coder 即使获得两倍时间，约 300 步后也崩溃。</p>
+<h2 id="section-4">Limitations and caveats</h2>
+<p>训练奖励和主要 benchmark 仍依赖 GPT-5.5 裁判，rubric 与人类相关只有 0.19。人类 agent 比较经过优势样本筛选，不能证明平均性能。所谓 OOD 同时改变领域、论文年代和难度，无法分离究竟迁移了哪种能力。</p>
+<p>任务单位是一张图，不是完整论文复现，也不覆盖湿实验、材料合成和仪器操作。知名论文及其代码可能进入过模型预训练，遮去当前 PDF 中的图不能排除参数记忆。任务自动生成仍需逐题人工过滤。</p>
+<p>Faraday 在评估时调用 GPT-5.5，因此准确结论是训练过的 27B 研究层改善了 GPT-5.5 的使用方式，而不是 27B 模型单独超过前沿大模型。论文也没有给出完整的外层和内层 token、API、GPU 时间及单位成功任务成本。</p>
+<h2 id="section-5">Possible actions</h2>
+<p>科学代理评测可借鉴“论文、遮图、caption、gold plot”模板，但应从单图扩展到数据准备、方法实现、主要对照、误差、多 seed、负结果和完整 claim chain。rubric 应预先冻结，视觉相似只占有限权重，并把诚实未复现纳入正向评分。</p>
+<p>外层研究代理与内层编码代理的职责应分开。外层负责主张、最小忠实实验、对照、预算和停止规则，内层负责编码和调试。评估必须采用同 harness 对照，并统计外层与内层 tokens、工具调用、GPU 时间、API 成本和每次成功复现的总成本。</p>
+<p>随机人类评估应从全部任务分层抽样，不按模型裁判的优势边际选题。还应跨 ML、材料、化学和生物分别报告 judge-human 相关、重测信度和专家差异。只有这样，Replica 才能从训练环境中的低噪声评分工具升级为可信的科学能力 benchmark。</p>
+</div><div class="credit">本文为辅助理解研究方法的中文解读。论文原图、图注及摘要内容归原作者和相应权利人；来源见文首论文链接。</div></article></main><script>window.MathJax={tex:{inlineMath:[['$','$'],['\\(','\\)']],displayMath:[['$$','$$'],['\\[','\\]']]},options:{skipHtmlTags:['script','noscript','style','textarea','pre','code']}};</script><script defer src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-mml-chtml.js"></script><footer><span>AI for Materials 文献精读</span><span>中文研究笔记 · 图与摘要注明论文来源 · 不提供论文 PDF</span></footer></body></html>

@@ -1,0 +1,110 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Machine Learning for Transition State Searching: From Traditional Methods to Deep Learning · AI for Materials 文献精读</title><meta name="description" content="AI for Materials、原子模拟与科研智能体的中文文献解读"><link rel="stylesheet" href="../style.css"><link rel="icon" href="../icon.svg" type="image/svg+xml"></head><body><header><a class="brand" href="../index.html"><span class="mark">M</span><span>AI for Materials<small>文献精读 / RESEARCH NOTES</small></span></a><a class="header-link" href="../index.html#library">浏览文献 <span>↗</span></a></header><main class="article-layout"><aside><a href="../index.html#library">← 返回文献库</a><nav aria-label="文章目录"><a href="#section-1">Bibliographic status</a><a href="#section-2">One-line takeaway</a><a href="#section-3">What the paper asks</a><a href="#section-4">Methods</a><a href="#section-11">Main findings</a><a href="#section-18">Limitations and caveats</a><a href="#section-19">Possible actions</a></nav></aside><article><div class="eyebrow">RESEARCH NOTE / T1</div><h1>Machine Learning for Transition State Searching: From Traditional Methods to Deep Learning</h1><div class="article-meta"><span>材料生成与逆向设计</span><span>收录 2026-07-11</span><span>11 分钟阅读</span></div><div class="prose"><h2 id="section-1">Bibliographic status</h2>
+<ul>
+<li><strong>Title</strong>: Machine Learning for Transition State Searching: From Traditional Methods to Deep Learning</li>
+<li><strong>Authors</strong>: Xingyu Wang, Yu Mao, Ziyun Wang</li>
+<li><strong>Source/status</strong>: Scholar Mail Digest 2026-07-11 推送；PDF 已保存并可解析。</li>
+</ul>
+<h2 id="section-2">One-line takeaway</h2>
+<p>这是一篇关于机器学习辅助过渡态搜索的综述，最值得关注的是它把 GNN、等变网络、扩散模型、强化学习和传统 NEB/dimer 等方法放在同一条谱系中比较；对 CatMaster 的反应网络/机理探索、PX-New 的 PMF/路径定义，以及后续把 ReactionAtlas 式 denoising/saddle-point 思路扩展到表面反应有直接启发，但当前方法主体仍偏小分子/气相有机反应，距离周期表面催化可直接部署还有明显 gap。</p>
+<h2 id="section-3">What the paper asks</h2>
+<p>这篇文章要回答的问题是：在传统过渡态搜索方法计算成本高、依赖专家初猜、难以大规模扫描反应路径的背景下，机器学习能在哪些环节加速或替代过渡态结构/能垒搜索？文章将问题分成几层：</p>
+<ol>
+<li><strong>传统方法的瓶颈是什么</strong>：LST、NEB、dimer、eigenvector following、quasi-Newton 等方法各自需要不同输入、梯度/Hessian 或多图像路径，可靠但成本高，且复杂体系需要人工给定较好的初始路径或结构。</li>
+<li><strong>哪些数据支撑 ML 过渡态搜索</strong>：过渡态数据集远小于常规分子结构数据集，且高度偏向小分子、有机、气相、SN2 或异构化等简单反应。</li>
+<li><strong>ML 方法如何介入</strong>：包括传统 ML、GNN、等变 GNN、sequence/pair interaction、GAN、diffusion、reinforcement learning 等。</li>
+<li><strong>如何验证这些方法是否真的有效</strong>：不同论文使用 RMSD、MAE、能垒误差、虚频、量化化学优化成功率等指标，横向比较困难。</li>
+<li><strong>未来要往哪里走</strong>：更大的过渡态数据库、标准 benchmark、面向大体系/催化体系的模型压缩和分布式计算、与 DFT/计算化学软件集成。</li>
+</ol>
+<h2 id="section-4">Methods</h2>
+<p>文章本身是综述，不提出一个新的模型，而是按方法类别系统归纳已有工作。</p>
+<h3 id="section-5">1. 传统过渡态搜索方法</h3>
+<p>文章首先区分 single-endpoint 和 double-endpoint 两类传统方法：</p>
+<ul>
+<li><strong>Single-endpoint</strong>：如 eigenvector following、quasi-Newton、dimer method。优点是可以从一个初始结构出发，dimer method 不需要完整 Hessian，适合较大体系；缺点是依赖初猜、局部 PES 信息和收敛路径。</li>
+<li><strong>Double-endpoint</strong>：如 LST、NEB、CI-NEB。优点是有反应物和产物作为边界，路径解释性强；缺点是需要多图像能量/力计算，计算成本高，路径初始插值不合理时容易失败。</li>
+</ul>
+<p>这部分对 PX-New/MOF 比较有用：文章强调传统 NEB/路径搜索不是“输入两端点就自动可信”，仍需要合理路径定义和后续验证。这与当前 MOF 表面–孔道过程不应直接硬跑默认 NEB，而应先做几何检查和合理插点路径的策略一致。</p>
+<h3 id="section-6">2. 数据集与数据瓶颈</h3>
+<p>文章指出 TS 数据相比 QM9/GDB-17 等结构数据库小很多。典型数据集包括：</p>
+<ul>
+<li><strong>QMrxn20</strong>：偏 SN2 反应；</li>
+<li><strong>Transition1x</strong>：约 10,000 个有机反应；</li>
+<li>其他小分子、气相、有机反应相关数据。</li>
+</ul>
+<p>文章特别强调：现有数据严重偏向简单有机反应和气相体系，溶液、催化、无机/有机金属、多步反应都很不足。过渡态数据还需要频率分析、IRC 验证、能量 profile validation，因此生成成本高。这个 caveat 很关键：不能把小分子 TS ML 模型的成功直接外推到表面催化和 MOF/zeolite 反应。</p>
+<h3 id="section-7">3. Graph neural network / equivariant network 路线</h3>
+<p>文章总结了多类图模型：</p>
+<ul>
+<li>早期 GNN 可从反应物/产物图生成平均 TS 图，再预测距离矩阵和权重矩阵，通过非线性最小二乘重构 TS 坐标。</li>
+<li>TSNet 使用 tensor field network 和 transfer learning，从反应物/产物几何预测 TS 结构。模型利用 RBF、方向向量、原子类型 one-hot、球谐函数和 Clebsch–Gordan 系数来保持 3D 几何信息。</li>
+<li>PaiNN 被用作势能面 surrogate，再配合 NEB/CINEB 优化路径。文中给出的对比显示，使用 Transition1x 训练时，模型能比 DFT 快约 1500 倍，能垒 MAE 约 0.23 eV，RMSE 约 0.52 eV；而使用 ANI1x/QM9x 等非 TS 专用数据训练时性能显著变差。</li>
+<li>NewtonNet 类等变 message-passing 网络可预测 TS Hessian，减少 DFT 优化步数并加速。</li>
+</ul>
+<p>这里最重要的结论不是“某个模型已经解决 TS”，而是：<strong>TS-region 数据的专门性比模型架构本身还关键</strong>。对 CatMaster/表面反应网络而言，这意味着如果要做 surface TS/MEP agent，不能只接入通用分子模型；需要任务域数据、验证门槛和 fallback 到 DFT/NEB/PMF。</p>
+<h3 id="section-8">4. Sequence / pair-interaction 路线</h3>
+<p>文章介绍 PSI-Net：使用三输入结构，即 reactant、linear interpolated structure、product；将原子对特征送入 transformer encoder 和 bidirectional GRU，输出归一化 TS 原子间距离。文中称 PSI-Net 可从反应物/产物预测 3D TS，优化成功率高，且具有 size-extensivity。</p>
+<p>这一路线对表面催化直接适配性有限，因为周期边界、吸附构型、表面自由度和多体环境会使“反应物-产物-线性插值”过于简化。但 pair feature / distance-ratio 表达对定义 NEB/PMF 初始路径、约束关键键长变化仍有参考价值。</p>
+<h3 id="section-9">5. Generative models：GAN 与 diffusion</h3>
+<p>文章把生成模型单独作为一类，理由是它们不只是预测单点结构，而是学习构型分布并可生成多种 TS 候选。</p>
+<ul>
+<li><strong>TS-GAN</strong>：从反应物/产物 Cartesian coordinates 出发，通过 CNN generator 生成 synthetic TS，并由 discriminator 判断真假。文中比较显示，在一些氢迁移/异构化数据上，TS-GAN 的 activation energy 或 frequency 判断准确率优于 GTS/QST2。</li>
+<li><strong>OA-ReactDiff</strong>：object-aware SE(3) equivariant diffusion model。它通过 system-level 和 object-level SE(3) 处理，保持分子整体和片段几何不变性，避免片段错位。模型在 Transition1x 上训练，能在约 6 秒生成 TS；文中列出 46% 结构 RMSD &lt; 0.05 Å、65% &lt; 0.10 Å、98% &lt; 0.47 Å。</li>
+<li><strong>TSDiff</strong>：基于 reaction graph 和 SchNet-like denoising network，从 noisy initial state 逐步去噪到 TS 结构。它使用 atom-mapped SMARTS、3-hop node-pair relationships 和 SE(3) invariant 设计；文中称 MAE 约 0.063 Å，量化化学验证成功率约 90.6%，并且能生成多个可能 TS 构型，部分路径能垒低于参考库。</li>
+</ul>
+<p>这部分与近期 ReactionAtlas 的启发高度相关：加噪/去噪不是只用于分子生成，也可能作为 saddle-point 或路径候选搜索的机制。对用户当前工作而言，更现实的落点不是直接训练 diffusion TS model，而是在 CatMaster/表面反应网络探索中，把 denoising/generated candidates 当作候选路径生成器，然后用 DFT/MLFF/NEB/PMF 验证。</p>
+<h3 id="section-10">6. Reinforcement learning 路线</h3>
+<p>文章介绍 RL 用于 TS 搜索的思路：不预设具体反应机理，而是通过 trial-and-error 在 PES 上寻找关键构型。</p>
+<ul>
+<li>Zhang 等的 Expert Iteration 框架包含：在 modified PES 上 expert sampling；从候选点发射正反方向轨迹做 shooting game 验证反应物/产物连通性；更新 transition-state probability/value function；优化 policy function 指导后续采样。</li>
+<li>Actor-Critic RL 被用于 Claisen rearrangement 和 SN2，文中列出 Claisen 活化能误差约 2 kcal/mol，SN2 TS RMSD &lt; 0.1 Å。</li>
+</ul>
+<p>对 CatMaster 来说，这说明 RL/active search 的关键不是“agent 自己猜结构”，而是把搜索、连通性验证、value function 和后续采样闭环组织起来。它更像一个 workflow/agent design 问题，而不是单模型预测问题。</p>
+<h2 id="section-11">Main findings</h2>
+<h3 id="section-12">1. ML 确实能加速 TS 搜索，但多数成功案例仍在小分子域</h3>
+<p>文章反复强调 ML 方法可以在 TS 初猜、势能面 surrogate、Hessian/路径预测、生成候选等环节显著降低计算成本。PaiNN、OA-ReactDiff、TSDiff 等例子显示，速度可以从 DFT 级别降到秒级或大幅减少优化步数。</p>
+<p>但这些结果大多来自小分子、有机、气相数据集，尤其是 Transition1x、QMrxn20、SN2、异构化等。对表面催化、MOF/zeolite、溶剂、电化学界面或周期体系，文章没有给出同等强度证据。因此对我们而言，它更适合作为“方法路线图”和“系统设计参考”，而不是可以直接用于 PX-New 或 Pd-TWC 的工具结论。</p>
+<h3 id="section-13">2. 数据质量和 domain-specific TS 数据比单纯换模型更关键</h3>
+<p>PaiNN 对比很说明问题：Transition1x 训练明显优于 ANI1x/QM9x 训练。这说明过渡态附近构型分布、能量曲率和反应坐标信息不能从普通稳定分子数据中自然学到。文章提出未来需要高通量 TS workflow、标准 functional/basis protocol 和数据共享平台。</p>
+<p>这对 CatMaster 的启发是：如果后续要发展“反应网络/路径探索 agent”，应优先设计数据和验证闭环，包括结构候选、频率/IRC 或替代连通性验证、NEB/PMF 结果、失败案例记录，而不是只接一个 foundation model。</p>
+<h3 id="section-14">3. Diffusion/denoising 是最值得后续关注的方法方向</h3>
+<p>OA-ReactDiff 和 TSDiff 是文章中最接近“生成多个候选 TS / 发现新路径”的方向。TSDiff 即使只用单一 TS conformation 训练，也能生成多个可能构型，并找到低于参考库的能垒路径。这和 ReactionAtlas 的“加噪/去噪寻找 saddle point”非常一致。</p>
+<p>潜在行动点：后续文献维护可以把关键词扩展到 <code>transition state diffusion model</code>、<code>reaction path diffusion</code>、<code>saddle point denoising</code>、<code>surface reaction network generative model</code>。但目前不建议立即开新计算任务。</p>
+<h3 id="section-15">4. 验证指标不统一，不能只看 RMSD 或模型成功率</h3>
+<p>文章指出不同方法使用 RMSD、MAE、barrier error、frequency correctness、optimization success rate 等不同指标，横向比较很困难。例如 RMSD 很低不一定代表能垒正确，能垒误差低也不一定说明 TS 连通性正确。对于催化应用，真正需要的验证至少包括：</p>
+<ul>
+<li>反应物/产物连通性；</li>
+<li>虚频模式是否对应目标反应坐标；</li>
+<li>能垒是否在同一 DFT/MLFF 协议下可比；</li>
+<li>是否能在复杂表面环境下保持吸附构型合理；</li>
+<li>对多路径竞争是否有覆盖。</li>
+</ul>
+<p>这与 CatMaster 当前强调 validation gates、audit trail、人机监督的叙事一致。</p>
+<h3 id="section-16">5. 对 PX-New/MOF 的直接启发是“路径生成之前先定义物理过程”</h3>
+<p>文章传统方法部分再次提醒：NEB、dimer、LST 都不是自动给出正确机制的黑箱。对 MOF 表面–孔道、ZSM-5 表面释放、MOF 表面释放等过程，关键仍是合理初态/末态、约束变量、插点路径和物理过程定义。ML/diffusion 可作为候选路径生成辅助，但不能替代 PMF/NEB 的物理定义。</p>
+<h3 id="section-17">6. 对 Spin_SAC/HESAC 的关联较弱，但有间接方法启发</h3>
+<p>这篇文章不直接讨论 ORR、Fe–N4、OOH 描述符或高熵单原子，因此不是 Spin_SAC 主线必读。但其中关于 TS data scarcity、domain-specific training、validation metrics 的讨论，对后续如果要从 ORR adsorption descriptor 扩展到 elementary-step kinetics/OOH formation barrier 有参考意义。</p>
+<h2 id="section-18">Limitations and caveats</h2>
+<ol>
+<li><strong>综述范围偏小分子 TS 搜索</strong>：大部分案例是有机小分子、气相反应或有限元素体系；周期表面催化、MOF/zeolite、电化学界面数据不足。</li>
+<li><strong>对表面催化可迁移性没有充分验证</strong>：文章提到催化 development 的应用愿景，但并未系统评估周期表面 TS、吸附态路径、覆盖度效应或溶剂/电场影响。</li>
+<li><strong>部分指标可能被过度乐观解读</strong>：RMSD、结构成功率或优化步数不能直接等价于机理正确；需要连通性和能垒验证。</li>
+<li><strong>数据集偏置严重</strong>：SN2、异构化等过代表，复杂多步、自由基、无机、有机金属、溶液/催化反应不足。</li>
+<li><strong>生成模型仍有随机性和尺度限制</strong>：OA-ReactDiff 等方法在超过 100 atoms 或大体系上可能性能下降，需要多次采样。</li>
+<li><strong>对实验/真实工业体系的距离仍大</strong>：文章未来展望提到要集成到 DFT 软件和用户界面，但现阶段还不是可直接替代专家 TS 搜索的成熟工具。</li>
+</ol>
+<h2 id="section-19">Possible actions</h2>
+<ol>
+<li><strong>优先级：High，建议保留精读卡片</strong>。这篇与 CatMaster 的反应路径/机理探索 agent、PX-New 路径定义、ReactionAtlas 后续思路都有交叉。</li>
+<li><strong>短期不启动新计算</strong>。当前只作为方法参考，不把它转化成新的大任务。</li>
+<li><strong>在 CatMaster 未来叙事中可引用的角度</strong>：
+<ul>
+<li>autonomous/agentic catalysis 不能只做任务自动化，还需要 TS/path validation gates；</li>
+<li>ML TS 方法发展迅速，但 data scarcity 和 benchmark 缺失说明 human-supervised audit trail 仍必要；</li>
+<li>diffusion/RL 可作为 candidate generator，但 DFT/NEB/PMF 仍是验证层。</li>
+</ul>
+</li>
+<li><strong>在 PX-New 中的行动边界</strong>：MOF 表面–孔道路径仍先做 UMA/geometric inspection 和物理路径定义；不因这篇文章改成直接 ML/NEB 硬跑。</li>
+<li><strong>后续文献关键词</strong>：<code>OA-ReactDiff</code>、<code>TSDiff</code>、<code>transition state diffusion</code>、<code>saddle point denoising</code>、<code>reinforcement learning transition state search</code>、<code>surface reaction path machine learning</code>。</li>
+<li>**如果以后写 reaction network / CatMaster methods，可把这篇作为“现有 ML-TS 方法仍需验证与工作流集成”的背景文献之一。`</li>
+</ol>
+</div><div class="credit">本文为辅助理解研究方法的中文解读。论文原图、图注及摘要内容归原作者和相应权利人；来源见文首论文链接。</div></article></main><script>window.MathJax={tex:{inlineMath:[['$','$'],['\\(','\\)']],displayMath:[['$$','$$'],['\\[','\\]']]},options:{skipHtmlTags:['script','noscript','style','textarea','pre','code']}};</script><script defer src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-mml-chtml.js"></script><footer><span>AI for Materials 文献精读</span><span>中文研究笔记 · 图与摘要注明论文来源 · 不提供论文 PDF</span></footer></body></html>

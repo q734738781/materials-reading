@@ -1,0 +1,34 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>CogEEGAgent: Toward Autonomous Cognitive EEG Analysis with Grounded Execution and Selection-Aware Verification · AI for Materials 文献精读</title><meta name="description" content="AI for Materials、原子模拟与科研智能体的中文文献解读"><link rel="stylesheet" href="../style.css"><link rel="icon" href="../icon.svg" type="image/svg+xml"></head><body><header><a class="brand" href="../index.html"><span class="mark">M</span><span>AI for Materials<small>文献精读 / RESEARCH NOTES</small></span></a><a class="header-link" href="../index.html#library">浏览文献 <span>↗</span></a></header><main class="article-layout"><aside><a href="../index.html#library">← 返回文献库</a><nav aria-label="文章目录"><a href="#section-1">Bibliographic status</a><a href="#section-2">One-line takeaway</a><a href="#section-3">What the paper asks</a><a href="#section-4">Methods</a><a href="#section-5">Main findings</a><a href="#section-6">Limitations and caveats</a><a href="#section-7">Competitive overlap and implications</a><a href="#section-8">Possible actions</a></nav></aside><article><div class="eyebrow">RESEARCH NOTE / T8</div><h1>CogEEGAgent: Toward Autonomous Cognitive EEG Analysis with Grounded Execution and Selection-Aware Verification</h1><div class="article-meta"><span>智能体技术与科研系统</span><span>收录 2026-08-04</span><span>3 分钟阅读</span></div><a class="original" href="https://arxiv.org/abs/2607.25045" target="_blank" rel="noopener noreferrer">论文原文 ↗</a><div class="prose"><ul>
+<li><strong>High 类型</strong>：High—Direct competitor</li>
+</ul>
+<h2 id="section-1">Bibliographic status</h2>
+<p>Hou et al., <em>CogEEGAgent: Toward Autonomous Cognitive EEG Analysis with Grounded Execution and Selection-Aware Verification</em>, arXiv:2607.25045 (2026)，预印本；正文与 SI 合并 16 页；代码/审计材料声明公开。</p>
+<h2 id="section-2">One-line takeaway</h2>
+<p>CogEEGAgent 把 LLM 限定为语义路由器，让 typed contract、一次性承诺、隐藏确认集、确定性执行、独立 replay 和 evidence-bound release 掌握科学权限。</p>
+<h2 id="section-3">What the paper asks</h2>
+<p>科研分析智能体如何既保留自然语言灵活性，又避免选完最有利分析后再用同一证据确认、或用流畅报告掩盖未执行/无效统计？</p>
+<h2 id="section-4">Methods</h2>
+<p>MNE-Python 执行器+EEG 注册分析目录；Scientific Contract 和状态机；discovery/participant-disjoint confirmation；PCVR/fault injection；60 请求路由、21 请求组合 campaign、100,000 配对选择策略重复和 3,100 legacy runs。</p>
+<h2 id="section-5">Main findings</h2>
+<ul>
+<li>有效请求路由 39/40，FW-BM25 为 33/40；差 15 个百分点，但精确配对 p=.070，优势是描述性而非稳健普适。</li>
+<li>21 个外部措辞请求中 18/21 terminal action 正确；3 个支持分析均经不重叠参与者确认、11/11 release checks、独立 replay 和 falsification 后发布。</li>
+<li>未校正 best-p adaptive search 的假阳性率 16.5%；held-out confirmation 降到 4.9%，同时在效应位置变化时比固定分析有更高功效。</li>
+<li>20 项 runtime fault 和 188 项 verifier fixture 均匹配预设 hard-failure 结果；模型在 commit 后无重试、修复或重新选择权限。</li>
+<li>legacy 结果显示“完成报告”不能代表真实统计执行：部分模型无统计调用却大量声称显著。</li>
+</ul>
+<h2 id="section-6">Limitations and caveats</h2>
+<ul>
+<li>EEG、闭集、单轮和准备好的数据；语义正确性及 curator 选择仍在信任边界外。</li>
+<li>路由比较样本小且语料特定；组合 campaign 的三项语义漏判被固定排序/lifecycle 偶然封住。</li>
+<li>held-out confirmation 需要可保留的独立数据；无此资源时只能做较弱的 post-hoc audit。</li>
+</ul>
+<h2 id="section-7">Competitive overlap and implications</h2>
+<p><strong>对应项目：CatMaster。</strong> 其 typed contracts、deterministic validation、state transitions、audit/replay、confirmation holdout、evidence-bound release 与 CatMaster 的 validation gates、typed research graph、provenance 和 human supervision 高度重叠，直接压缩“可审计 bounded-autonomy 科研基础设施”的 novelty 空间。立即更新竞品表和 claim audit；CatMaster 需强调计算催化/HPC/DFT/MLIP 异构生态、remote receipts 和真实案例，同时用等强 fault-injection/claim-binding 证据支撑差异。</p>
+<h2 id="section-8">Possible actions</h2>
+<ul>
+<li>CatMaster 将 model authority 与 scientific authority 明确拆开：LLM 只提议 typed route，deterministic stages 拥有执行、承诺、验证和 release。</li>
+<li>为 hypothesis/research graph 增加 Committed→ConfirmationOpened→EvidenceBound→Released 状态及不可逆 receipt。</li>
+<li>设计 fault-injection 与“无成功 tool return 不得生成 claim”的 release gate。</li>
+</ul>
+</div><div class="credit">本文为辅助理解研究方法的中文解读。论文原图、图注及摘要内容归原作者和相应权利人；来源见文首论文链接。</div></article></main><script>window.MathJax={tex:{inlineMath:[['$','$'],['\\(','\\)']],displayMath:[['$$','$$'],['\\[','\\]']]},options:{skipHtmlTags:['script','noscript','style','textarea','pre','code']}};</script><script defer src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-mml-chtml.js"></script><footer><span>AI for Materials 文献精读</span><span>中文研究笔记 · 图与摘要注明论文来源 · 不提供论文 PDF</span></footer></body></html>

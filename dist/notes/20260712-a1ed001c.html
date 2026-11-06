@@ -1,0 +1,73 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>EquiFiLM: Charge-Conditioned Equivariant Force Fields via Feature-wise Linear Modulation · AI for Materials 文献精读</title><meta name="description" content="AI for Materials、原子模拟与科研智能体的中文文献解读"><link rel="stylesheet" href="../style.css"><link rel="icon" href="../icon.svg" type="image/svg+xml"></head><body><header><a class="brand" href="../index.html"><span class="mark">M</span><span>AI for Materials<small>文献精读 / RESEARCH NOTES</small></span></a><a class="header-link" href="../index.html#library">浏览文献 <span>↗</span></a></header><main class="article-layout"><aside><a href="../index.html#library">← 返回文献库</a><nav aria-label="文章目录"><a href="#section-1">Bibliographic status</a><a href="#section-2">One-line takeaway</a><a href="#section-3">What the paper asks</a><a href="#section-4">Methods</a><a href="#section-9">Main findings</a><a href="#section-16">Limitations and caveats</a><a href="#section-17">Possible actions</a></nav></aside><article><div class="eyebrow">RESEARCH NOTE / T6</div><h1>EquiFiLM: Charge-Conditioned Equivariant Force Fields via Feature-wise Linear Modulation</h1><div class="article-meta"><span>机器学习势训练与泛化</span><span>收录 2026-07-12</span><span>9 分钟阅读</span></div><a class="original" href="https://doi.org/10.5281/zenodo.20067517" target="_blank" rel="noopener noreferrer">论文原文 ↗</a><div class="prose"><h2 id="section-1">Bibliographic status</h2>
+<ul>
+<li><strong>Title</strong>: EquiFiLM: Charge-Conditioned Equivariant Force Fields via Feature-wise Linear Modulation</li>
+<li><strong>Source/status</strong>: arXiv preprint, Scholar Mail Digest 2026-07-12 批次。</li>
+<li><strong>Code/data reported by paper</strong>: GitHub <code>https://github.com/samsahsch/EquiFiLM</code>; Zenodo DOI <code>10.5281/zenodo.20067517</code>。</li>
+</ul>
+<h2 id="section-2">One-line takeaway</h2>
+<p>EquiFiLM 把“给 foundation MLFF 增加连续外部控制变量”表述成轻量 adapter 问题：在 MACE 这类等变势函数的 scalar channels 上用 charge-conditioned FiLM 做缩放/平移，少量 DFT 数据即可让同一模型在不同总电荷下插值/外推；对后续电化学、带电界面、温度/压力/掺杂分数条件化 MLFF 有方法启发。</p>
+<h2 id="section-3">What the paper asks</h2>
+<p>文章要解决的问题是：foundation interatomic potential 通常在固定条件下训练，若体系总电荷、温度、压力、掺杂分数或外场等连续条件改变，是否必须重新训练一个大型 charge-aware/condition-aware 模型？能否只用少量沿条件轴采样的 DFT 数据，在保持 E(3) 等变性的同时，为已有 MACE/NequIP/Allegro/UMA/eSEN/SevenNet-Omni 等 backbone 增加一个连续条件输入？</p>
+<p>具体 demonstration 是 charged liquid water：作者用 MACE-MatPES 作为 backbone，在不同总电荷 <code>q</code> 的水体系上训练/测试，目标是一个模型覆盖多个电荷状态，而不是每个电荷训练一个独立模型。</p>
+<h2 id="section-4">Methods</h2>
+<h3 id="section-5">1. Backbone: equivariant message passing in MACE</h3>
+<p>作者以 MACE-MatPES 为基础。MACE 节点特征可分解为 O(3) 不可约表示：scalar channels (<code>ℓ=0</code>)、vector channels (<code>ℓ=1</code>) 和更高阶张量通道。MACE 通过 tensor product 和 Atomic Cluster Expansion 风格的 higher-body-order messages 构造信息传递。</p>
+<p>等变性要求在旋转/平移下，输入和输出按对应表示变换。文章利用一个关键事实：如果操作只作用于 scalar channels，并且条件输入本身是 O(3)-invariant 的 per-graph scalar，那么该操作不会破坏 E(3)-equivariance。</p>
+<h3 id="section-6">2. ChargeFiLMBlock</h3>
+<p>作者定义 per-graph conditioning scalar <code>c</code>。在实验中 <code>c=q/N</code>，即总电荷除以 cell atom count。对每个 interaction layer 的 scalar channels，两个小 MLP 分别输出 <code>γ(c)</code> 和 <code>β(c)</code>，对 message tensor 的 scalar slice 做 feature-wise linear modulation：</p>
+<p>\[
+m&#x27;^{(t,\ell=0)}_i = (1+\gamma(c))\odot m^{(t,\ell=0)}_i + \beta(c)
+\]</p>
+<p>而所有 <code>ℓ≥1</code> 的 equivariant channels 原样通过。这样既给模型一个 charge-conditioning 通道，又不破坏 E(3)-equivariance 和 atom-permutation equivariance。</p>
+<p>ChargeFiLMBlock 插在 MACE interaction layer 的 message tensor 和 linear projection 之间。作者把输出层初始化为 0，使初始时 <code>γ=β=0</code>，adapter 等价于 identity，训练起点与原 backbone bit-identical。该 adapter 约增加 15% 参数量：约 0.10M adapter vs 0.66M backbone，并且推理开销可忽略。</p>
+<h3 id="section-7">3. Training data and task</h3>
+<p>训练标签来自 charged liquid water 的 AIMD：总电子添加数 <code>q ∈ {0, 6e, 10e, 16e}</code>，能量和力由 VASP r2SCAN meta-GGA 计算。四条轨迹共约 6,400 frames，每条轨迹随机 10% 作为 validation set。</p>
+<p>测试包括：</p>
+<ul>
+<li>interpolation charges: <code>q ∈ {2e,4e,8e,12e,14e}</code>；</li>
+<li>extrapolation charges: <code>q ∈ {18e,20e}</code>。</li>
+</ul>
+<p>作者强调 held-out geometries 来自相近训练电荷的 AIMD，再在目标电荷下 relabel，因此这一测试主要评估 fixed near-equilibrium geometry 下的 vertical electronic force response，不完全等价于 charge-plus-geometry generalization；后者由 MD runs 间接测试。</p>
+<h3 id="section-8">4. Baselines and ablations</h3>
+<p>对比对象包括：</p>
+<ul>
+<li>unconditioned fine-tuned MACE-MatPES / no-FiLM baseline；</li>
+<li>concat charge embedding baseline，即把 charge 在输入端拼接，而不是每层调制；</li>
+<li>additive-only ablation，只保留 <code>β</code> shift，禁用 multiplicative <code>γ</code>；</li>
+<li>random-initialization variant；</li>
+<li>width comparison: adapter hidden width <code>h=64</code> vs <code>h=128</code>；</li>
+<li>fine-tuned MACE-POLAR-1-M，一个更大的、显式 charge-aware 的 MACE 系列模型。</li>
+</ul>
+<p>推理耗时在 324-atom water cells、A100 GPU、float32 下测试。</p>
+<h2 id="section-9">Main findings</h2>
+<h3 id="section-10">1. 同一个 E-MACE 模型可覆盖多个电荷状态</h3>
+<p>在训练电荷上，E-MACE 的 force RMSE 为 5.5–7.5 meV/Å，per-atom energy RMSE 低于 0.15 meV/atom。在 held-out charges 上，force RMSE 保持在 18–61 meV/Å，raw energy RMSE 为 0.7–5.4 meV/atom。误差随电荷大小和 relabel source trajectory 距离增大，但 interpolation 与 extrapolation 之间没有明显断裂。</p>
+<p>作者据此认为：一套 E-MACE 权重可在测试电荷范围内使用，替代每个电荷单独训练一个模型。</p>
+<h3 id="section-11">2. 相比无条件 MACE，FiLM conditioning 明显降低误差</h3>
+<p>对比 unconditioned fine-tuned MACE-MatPES，E-MACE 在训练电荷上的 force RMSE 约好 3 倍，在 held-out charges 上约好 1.3–2.8 倍。原因很直接：没有 conditioning channel 时，backbone 无法根据总电荷调节输出；ChargeFiLMBlock 给了模型一个在每层调制 scalar channels 的机制。</p>
+<h3 id="section-12">3. 轻量 adapter 可接近或超过大得多的 charge-aware foundation model</h3>
+<p>MACE-POLAR-1-M 约 15.2M 参数，E-MACE 约 0.76M 参数。结果显示两者在 force accuracy 上可比；在 offset-corrected energy comparison 中，E-MACE 在每个 interpolation charge 上优于 MACE-POLAR-1-M，最多约 16 倍差异。作者认为这说明轻量 scalar adapter 在当前任务上能匹配 dedicated charge-aware architecture，而不需要显式 partial charge/Wannier-center supervision。</p>
+<h3 id="section-13">4. 数据效率较高</h3>
+<p>数据效率实验显示：energy RMSE 在 25% training data（约 1,605 frames）附近饱和，force RMSE 在 50% training data（约 3,211 frames）附近饱和。作者解释为 adapter 的 inductive bias 很强：它不需要重新发现 condition 应该在哪里进入网络，而是固定在每层 scalar channels 上调制。</p>
+<h3 id="section-14">5. 机制上 additive shift 贡献最大</h3>
+<p>ablation 表明只保留 <code>β</code> additive shift 就能捕获大部分增益，说明对 charge-conditioned liquid water 任务而言，主要 effect 可能表现为 baseline/feature shift，而不是复杂 feature rescaling。作者也承认，如果 conditioning effect 更像 feature rescaling，<code>γ</code> 的作用可能更重要，但尚未系统验证。</p>
+<h3 id="section-15">6. 泛化想法：continuous external variable adapter</h3>
+<p>讨论部分把 EquiFiLM 泛化到任意 smooth external variable：temperature、field-response coefficient、hydrostatic pressure、doping fraction interpolation 等。作者特别指出，该 block 可迁移到任何有 scalar interaction-layer channels 的 equivariant potential，包括 MACE、NequIP、Allegro、Equiformer，以及 UMA、eSEN、SevenNet-Omni 等 foundations。</p>
+<h2 id="section-16">Limitations and caveats</h2>
+<ol>
+<li>demonstration 只在 charged liquid water 上完成，不等价于已证明对复杂电化学界面、带电表面、催化吸附态普适有效。</li>
+<li>测试中的 held-out charge relabeling 主要是 fixed geometry 的 vertical response，完整 charge-plus-geometry generalization 证据较弱。</li>
+<li>方法假设 backbone 已覆盖 chemistry；若化学空间不在 foundation model 覆盖范围内，adapter 不能替代 backbone fine-tuning。</li>
+<li>conditioning effect 被假定为随 <code>c</code> 平滑变化；若条件变化引发相变、重构或离散态切换，FiLM interpolation 可能不可靠。</li>
+<li>多条件轴、离散/categorical condition、spin/electronic state 等情况未验证。</li>
+<li>对电荷的物理处理仍是 per-graph scalar conditioning，不等价于显式长程电荷平衡或严格 electrostatics。</li>
+</ol>
+<h2 id="section-17">Possible actions</h2>
+<ol>
+<li><strong>MLFF 方法跟踪：High/Medium 之间</strong>。如果后续 Spin_SAC、Pd-TWC 或 CatMaster 需要“条件化 MLFF”，这篇值得保留。</li>
+<li><strong>对 Spin_SAC/HESAC 的启发</strong>：charge/spin response 目前主要是描述符分析；若以后做 MLFF/代理模型，可考虑把总电荷、spin proxy、coverage/filling 等作为 continuous conditioning axis，但必须保留物理 caveat。</li>
+<li><strong>对 PX-New/MOF 的启发</strong>：孔道填充度、温度或外部环境可能可视为 conditioning axis；不过当前数据量和任务阶段不适合立即开模型训练。</li>
+<li><strong>对 CatMaster 的启发</strong>：可作为“foundation MLFF + lightweight adapter + validation”的工具路线备选；特别适合写入长期 infrastructure/future work，而不是当前主线新任务。</li>
+<li><strong>短期行动</strong>：不启动计算；保留卡片和关键词 <code>EquiFiLM</code>, <code>conditional adapter</code>, <code>charge-conditioned MLFF</code>, <code>MACE-MatPES</code>, <code>foundation interatomic potential adapter</code>。</li>
+</ol>
+</div><div class="credit">本文为辅助理解研究方法的中文解读。论文原图、图注及摘要内容归原作者和相应权利人；来源见文首论文链接。</div></article></main><script>window.MathJax={tex:{inlineMath:[['$','$'],['\\(','\\)']],displayMath:[['$$','$$'],['\\[','\\]']]},options:{skipHtmlTags:['script','noscript','style','textarea','pre','code']}};</script><script defer src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-mml-chtml.js"></script><footer><span>AI for Materials 文献精读</span><span>中文研究笔记 · 图与摘要注明论文来源 · 不提供论文 PDF</span></footer></body></html>

@@ -1,0 +1,66 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>让物理模型与显微镜共同导航实验：在线校准薄膜生长模型 · AI for Materials 文献精读</title><meta name="description" content="AI for Materials、原子模拟与科研智能体的中文文献解读"><link rel="stylesheet" href="../style.css"><link rel="icon" href="../icon.svg" type="image/svg+xml"></head><body><header><a class="brand" href="../index.html"><span class="mark">M</span><span>AI for Materials<small>文献精读 / RESEARCH NOTES</small></span></a><a class="header-link" href="../index.html#library">浏览文献 <span>↗</span></a></header><main class="article-layout"><aside><a href="../index.html#library">← 返回文献库</a><nav aria-label="文章目录"><a href="#section-1">这项工作比“让贝叶斯优化选择下一点”多做了什么</a><a href="#section-2">从表面起伏反推看不见的扩散过程</a><a href="#section-3">三个循环如何联动</a><a href="#section-4">AFM 怎样提供独立基准</a><a href="#section-5">证据支持到哪一步</a><a href="#section-6">不能由这次闭环排除的解释</a><a href="#section-7">结论边界</a></nav></aside><article><div class="eyebrow">RESEARCH NOTE / T4</div><h1>让物理模型与显微镜共同导航实验：在线校准薄膜生长模型</h1><div class="article-meta"><span>性质、表征与材料表示</span><span>收录 2026-08-26</span><span>9 分钟阅读</span></div><a class="original" href="https://doi.org/10.1021/acsnano.6c03268" target="_blank" rel="noopener noreferrer">论文原文 ↗</a><div class="prose"><ul>
+<li><strong>原始题名</strong>：Bayesian Conavigation of a Computational Physical Model and Atomic Force Microscopy Experiment to Autonomously Survey a Combinatorial Materials Library</li>
+<li><strong>作者</strong>：Boris N. Slautin；Kamyar Barakati；Yu Liu；Reece Emery；Philip Rack；Sergei V. Kalinin</li>
+<li><strong>来源</strong>：ACS Nano，2026；DOI：10.1021/acsnano.6c03268</li>
+<li><strong>全文</strong>：</li>
+</ul>
+<h2 id="section-1">这项工作比“让贝叶斯优化选择下一点”多做了什么</h2>
+<p>这项工作处理的不是单纯的“下一点测哪里”，而是一个更棘手的问题：当物理模型本身不够准确时，能否让实验一边选择新测量位置，一边反过来修正模型中的物理参数？作者把自动原子力显微镜与薄膜生长的动力学蒙特卡洛模型接在同一个闭环中，用它们共同探索 \((\mathrm{CrTaWV})_x-\mathrm{Mo}_{1-x}\) 成分梯度薄膜。实验观测的是表面粗糙度，隐藏量则是控制表面扩散的三种有效键能。</p>
+<p>普通贝叶斯优化通常训练一个代理模型来逼近实验目标，并根据预测均值和不确定度选择下一次实验。即使均值函数带有物理先验，物理模型通常仍然固定。多保真贝叶斯优化解决的是另一个问题：多个来源被视为同一高保真目标的不同成本和精度近似，算法在便宜低保真源和昂贵高保真源之间分配查询。</p>
+<p>本文称为 conavigation 的设置不同。实验和动力学蒙特卡洛是两个独立、都昂贵的探索域，各自维护一条高斯过程代理曲线。实验循环寻找最缺 AFM 信息的成分位置；理论循环在当前参数下寻找最缺模拟信息的位置；外层循环比较两条代理对共同可观测量——粗糙度——的预测，再调整物理模型参数。它更接近在采样过程中不断重做的模型校准，而不是把一个固定低保真函数塞进普通贝叶斯优化。三循环原理见 PDF 物理页 2，图 1及“Principle of the Conavigation Experiment”。</p>
+<h2 id="section-2">从表面起伏反推看不见的扩散过程</h2>
+<p>溅射粒子到达薄膜表面后，可以在热涨落驱动下跳到相邻位置。一次跳跃有多容易，由 Arrhenius 速率决定。</p>
+<p><strong>论文原式，式（1），PDF 物理页 3：</strong></p>
+<p>\[
+r_{i\rightarrow j}=\nu_0\exp[-E_{\mathrm{diff}}(i,j)/(k_{\mathrm B}T)].
+\]</p>
+<p>\(r_{i\rightarrow j}\) 和尝试频率 \(\nu_0\) 的单位都是 \(\mathrm{s^{-1}}\)；\(E_{\mathrm{diff}}\) 是以 eV 计的跳跃势垒；\(k_{\mathrm B}\) 是玻尔兹曼常数；\(T\) 是 K 为单位的温度。势垒越高，跳跃越少，沉积粒子越难通过表面迁移消除局部堆积。正文没有报告此次模拟的 \(\nu_0\) 和 \(T\)，因此不能由主文复算绝对跳跃时间尺度。</p>
+<p>作者进一步把势垒写成 broken-bond 粗粒化模型。</p>
+<p><strong>论文原式，式（2），PDF 物理页 3–4：</strong></p>
+<p>\[
+E_{\mathrm{diff}}=E_0+n_{AA}E_{AA}+n_{BB}E_{BB}+n_{AB}E_{AB}+E_{\mathrm{step}}.
+\]</p>
+<p>\(E_0\) 是台面扩散势垒；\(n_{AA}\)、\(n_{BB}\)、\(n_{AB}\) 是此次跳跃要断开的三类键数，为无量纲整数；\(E_{AA}\)、\(E_{BB}\)、\(E_{AB}\) 是相应的有效键能；\(E_{\mathrm{step}}\) 则区分向上和向下跨台阶。本次动力学蒙特卡洛使用横向宽度为 300 格点的二维晶格，每次模拟沉积 \(10^4\) 个模型粒子；这些粒子表示有效结构单元，而不是逐元素真实原子。论文固定 \(E_0=0.2\) eV、下跳修正参数 \(\Delta E_d=0.1\) eV、Ehrlich–Schwoebel 系数 \(\gamma_{\mathrm{ES}}=0.15\) eV，只把三种有效键能放在 0.01–0.1 eV 内优化（PDF 物理页 6，Experimental Section）。</p>
+<p><strong>论文原式，式（3），PDF 物理页 4：</strong></p>
+<p>\[
+E_{\mathrm{step}}=
+\begin{cases}
+\Delta E_d\,\Delta h, &amp; \Delta h&lt;0,\\
+0, &amp; \Delta h=0,\\
+\gamma_{\mathrm{ES}}\,\Delta h, &amp; \Delta h&gt;0.
+\end{cases}
+\]</p>
+<p>\(\Delta h\) 是终点相对起点的离散局部高度差。向下跳跃时，第一项为负，使下降更有利；向上跨台阶时，正势垒抑制跳跃。这种表示把真实台阶结构简化成只依赖高度差的线性项。</p>
+<p>A 和 B 在这里并非两种真实原子。A 表示 CrTaWV 富集端的有效结构单元，B 表示 Mo 富集端。作者之所以不把五种元素全部展开，是因为实验只提供一条粗糙度曲线，完整元素对参数会强烈相关，无法由现有信息分别辨认。即使压缩成三种键能，逆问题仍不唯一：不同参数组合可能产生近似相同的最终粗糙度。因此，反演得到的是二元粗粒化模型的有效参数，不能直接解释成某一真实元素对的化学键能（PDF 物理页 6，Experimental Section）。</p>
+<h2 id="section-3">三个循环如何联动</h2>
+<p>实验循环和理论循环各从 5 个随机成分点开始。实验端用 AFM 粗糙度训练代理模型，并按预测不确定度选择下一处成分；理论端在当前键能参数下运行动力学蒙特卡洛，训练独立代理并选择下一处模拟成分。两端不必在同一位置同步采样，因为外循环比较的是两条代理曲线，而不只是同时采得的原始点（PDF 物理页 2）。</p>
+<p>外层循环把两条代理在对应成分上的粗糙度差异压缩成均方误差，再在三维参数空间 \(\boldsymbol\theta=(E_{AA},E_{BB},E_{AB})\) 中寻找较低误差区域。论文以文字给出 MSE 定义，没有印出公式。可将其形式化为以下<strong>卡片推导</strong>：</p>
+<p>\[
+\mathcal L(\boldsymbol\theta)
+=\frac{1}{N}\sum_{q=1}^{N}
+\left[\mu_{\mathrm{exp}}(x_q)-\mu_{\mathrm{kMC}}(x_q;\boldsymbol\theta)\right]^2.
+\]</p>
+<p>\(x_q\) 是用于比较的成分位置；\(N\) 为位置数；\(\mu_{\mathrm{exp}}\) 与 \(\mu_{\mathrm{kMC}}\) 分别是实验和理论代理的粗糙度均值。若粗糙度都以 nm 表示，则 \(\mathcal L\) 的单位为 nm²。作者采用未加权 MSE，没有把每个 AFM 点的重复性误差显式传入损失（文字来源为 PDF 物理页 2、4–5，图 5a）。</p>
+<p>每进行 10 次理论模拟，系统执行一次 AFM 测量，并更新一次理论参数。前三次参数更新随机采样，之后采用正文称为低置信下界的采集函数。全流程共 201 次迭代（PDF 物理页 6）。</p>
+<p>参数更新后，旧 AFM 数据仍然成立，但旧模拟来自另一套势垒。作者因此让理论代理只记住最近 10 次模拟，形成 memory tail；实验数据不会因理论参数改变而失效，可以继续保留。10∶1 的模拟—实验比例、每 10 次更新和 10 点记忆长度都是启发式设定，并非从 conavigation 理论推导出的最优值（PDF 物理页 4、6）。</p>
+<h2 id="section-4">AFM 怎样提供独立基准</h2>
+<p>样品是通过 CrTaWV 合金靶与纯 Mo 靶共溅射制得的 100 mm 成分梯度薄膜。生长温度为 500 °C，总沉积时间 3 h 20 min，厚度约 2 μm（PDF 物理页 6，Experimental Section）。AFM 使用 Jupiter 仪器、非接触形貌模式和 Tap300Al-G 硬硅探针，探针实测弹簧常数为 32 N/m；AESPM Python 库自动完成定位、接近、扫描和数据采集（PDF 物理页 7）。</p>
+<p>为建立独立基准，作者先在约 \(x=0.15\) 至 0.85 的完整成分区间做了 100 个等间距扫描，其中 3 个被判为离群点并排除。完整采集超过 16 h（PDF 物理页 3，图 2）。Mo 富集端 \(x=0.15\) 呈颗粒状表面，粗糙度约 20–23 nm。随着 CrTaWV 名义比例上升，颗粒和粗糙度逐渐增大，在 \(x\approx0.7\) 附近出现最大值，随后向 CrTaWV 富集端急剧下降，颗粒形貌也消失。</p>
+<p>这里存在两处需要保留的口径问题。图 2 图注使用 RMS roughness，正文却写 mean-square surface roughness；20–23 nm 按图注应理解为均方根粗糙度。正文又多次把先升至峰后下降的曲线称作 U-shaped，但图形更接近峰形或倒 U 形。</p>
+<p>自动 conavigation 全流程约 2 h，其中包括 AFM、动力学蒙特卡洛、模型训练和预测（PDF 物理页 7）。超过 16 h 的数字对应 100 点穷举扫描，是比较基线。不过论文没有报告 conavigation 最终到底测了多少 AFM 点，也没有规定达到何种误差才算完成，因此不能把两者直接解释成同等精度下的严格八倍加速。</p>
+<h2 id="section-5">证据支持到哪一步</h2>
+<p><strong>观察到的结果。</strong> 图 4 中的理论代理从迭代 1 到 100 再到 199 逐步靠近实验曲线，并恢复 \(x\approx0.7\) 附近的峰。比较基线是图 2 由 97 个保留扫描构成的粗糙度曲线，位置为 PDF 物理页 4–5、图 4。</p>
+<p><strong>作者的解释。</strong> 动态参数更新把通用的简化动力学蒙特卡洛模型调整成该材料库的特定理论表示。</p>
+<p><strong>卡片推断。</strong> 图 4 支持曲线形状和峰位得到定性重现，但主文没有给出最终 MSE、误差条、重复运行，或与普通贝叶斯优化、多保真贝叶斯优化的定量对照，不能进一步声称达到某一数值预测精度。</p>
+<p>第二条证据来自参数轨迹。MSE 在早期探索阶段大幅波动，随后减小；三维键能向量的更新步长也逐渐收缩。约在迭代 150 后，参数保持 \(E_{AB}&gt;E_{AA},E_{BB}\) 的排序。比较基线是初始随机参数和早期广泛探索阶段，三种键能范围均为 0.01–0.1 eV（PDF 物理页 5–6，图 5）。</p>
+<p>作者据此提出，中间成分处 A–B 异类邻接最多，如果异类接触更难断开，表面跳跃势垒便会升高，扩散受抑，从而形成粗糙度峰。这套解释把实验中的非单调粗糙度与局部迁移机制连了起来，但仍是有效模型推断。优化轨迹缩进窄区只说明这一次优化稳定下来，不说明参数后验只有一个峰。正文也明确承认，非线性耦合使 MSE 最小化不足以证明参数唯一（PDF 物理页 6）。</p>
+<p>因此，较可信的新认识是：<strong>在本次 conavigation 收敛得到的简化模型参数中，中间成分峰与混合局域环境中增强的扩散抑制相联系，其有效表现为 \(E_{AB}&gt;E_{AA},E_{BB}\)</strong>。这是一条来自单次优化轨迹的有效模型解释；论文没有证明该排序是重现峰形的必要条件，也不能据此认定某一真实元素对拥有相应的化学键能。</p>
+<p>作者还认为 CrTaWV 富集端的平滑、无颗粒表面与非晶生长相符（PDF 物理页 6）。AFM 确实观察到了形貌消失，但没有直接测量晶体结构。因此，“无颗粒”是观察，“与非晶相符”是作者解释，真正确认仍需要衍射或局域结构表征。</p>
+<h2 id="section-6">不能由这次闭环排除的解释</h2>
+<p>三种键能承担了模型与实验之间的大部分差异，但模型把 \(E_0\) 和台阶参数固定不变。若真实体系的台面扩散势垒、台阶动力学或相结构也随成分变化，拟合的键能会吸收这些遗漏效应。</p>
+<p>模拟粗糙度还被统一乘以经验因子 5，才进入与 AFM 可比的纳米范围（PDF 物理页 6）。绝对粗糙度因此不是无标定的模型预测。AFM 点位的重复性误差没有显式传播进优化，只由高斯过程噪声部分表示。实际成分剖面也可能偏离假定的线性梯度，作者在 PDF 物理页 3 承认这一点。</p>
+<p>成分符号还存在正文内部冲突：主文用 \(x\) 表示 CrTaWV 比例，Experimental Section 的重标度坐标却把 \(x=0\) 指向 CrTaWV 富集端、\(x=1\) 指向 Mo 富集端，同时又把 A 定义为 CrTaWV 富集端并写成 \(A_xB_{1-x}\)。这些定义不能同时完全成立。因此，实验峰位应按图 2 的主文坐标理解，模拟端点方向则需要作者代码或勘误确认。</p>
+<h2 id="section-7">结论边界</h2>
+<p>conavigation 在这篇论文中完成的是<strong>固定模型类别内的在线校准</strong>。它表明物理模拟和自动实验可以用共同可观测量彼此纠正，并给出一个关于混合局域环境抑制扩散的候选机制。它没有完成模型形式选择，也没有把有效键能变成唯一、元素分辨的材料常数。</p>
+<p>论文只展示一块 \((\mathrm{CrTaWV})_x-\mathrm{Mo}_{1-x}\) 薄膜库和一次 conavigation 运行；没有跨样品、跨生长条件的外部验证。动力学蒙特卡洛没有报告尝试频率和模拟温度。100 个基准扫描中排除了 3 个离群点，却没有给出离群标准。三种键能没有后验置信区间、多次随机初始化或等误差面。因此，最稳妥的结论停留在曲线形状被校准、有效能量排序稳定，以及该排序对应一种可检验但非唯一的扩散抑制解释。</p>
+</div><div class="credit">本文为辅助理解研究方法的中文解读。论文原图、图注及摘要内容归原作者和相应权利人；来源见文首论文链接。</div></article></main><script>window.MathJax={tex:{inlineMath:[['$','$'],['\\(','\\)']],displayMath:[['$$','$$'],['\\[','\\]']]},options:{skipHtmlTags:['script','noscript','style','textarea','pre','code']}};</script><script defer src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-mml-chtml.js"></script><footer><span>AI for Materials 文献精读</span><span>中文研究笔记 · 图与摘要注明论文来源 · 不提供论文 PDF</span></footer></body></html>
